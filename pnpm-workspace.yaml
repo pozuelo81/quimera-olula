@@ -6,6 +6,16 @@ packages:
   - legacy/libs/*
   - legacy/extensions/**
 
+allowBuilds:
+  '@parcel/watcher': true
+  core-js: false
+  es5-ext: false
+  esbuild: true
+
+minimumReleaseAgeExclude:
+  - baseline-browser-mapping@2.11.1
+  - sass@1.101.6
+
 onlyBuiltDependencies:
   - esbuild
   - '@parcel/watcher'
