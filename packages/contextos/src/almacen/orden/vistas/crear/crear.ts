@@ -4,5 +4,5 @@ import { NuevaOrdenAlmacen } from "../../diseño.ts";
 export const nuevaOrdenAlmacenVacia: NuevaOrdenAlmacen = {
     tipoOrden: "",
     almacenId: "",
-    abierta: true,
+    abierta: false,
 };  

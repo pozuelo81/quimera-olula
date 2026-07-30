@@ -1,8 +1,4 @@
-import {
-  ClausulaFiltro,
-  Entidad,
-  TipoInput,
-} from "@olula/lib/diseño.ts";
+import { ClausulaFiltro, Entidad, TipoInput } from "@olula/lib/diseño.ts";
 import { useModelo } from "@olula/lib/useModelo.js";
 import { ReactNode, useMemo, useState } from "react";
 import { QBoton } from "../../atomos/qboton.tsx";
@@ -31,7 +27,10 @@ const fechaLocalStr = (fecha: Date): string => {
   return `${y}-${m}-${d}`;
 };
 
-export const filtroFechas = (id: string, valor: unknown): ClausulaFiltro | null => {
+export const filtroFechas = (
+  id: string,
+  valor: unknown
+): ClausulaFiltro | null => {
   if (!Array.isArray(valor)) return [id, "=", valor] as ClausulaFiltro;
 
   const [desde, hasta] = valor as [Date, Date];
@@ -57,7 +56,10 @@ export const filtroFechas = (id: string, valor: unknown): ClausulaFiltro | null 
   ] as ClausulaFiltro;
 };
 
-export const filtroNumeros = (id: string, valor: unknown): ClausulaFiltro | null => {
+export const filtroNumeros = (
+  id: string,
+  valor: unknown
+): ClausulaFiltro | null => {
   const [desde, hasta] = valor as [number, number];
 
   const hayDesde = desde !== undefined && desde !== null && !isNaN(desde);
@@ -81,17 +83,27 @@ export const filtroNumeros = (id: string, valor: unknown): ClausulaFiltro | null
   ] as ClausulaFiltro;
 };
 
-export const filtroMesAnyoConManual = (id: string, valor: unknown): ClausulaFiltro | null => {
+export const filtroMesAnyoConManual = (
+  id: string,
+  valor: unknown
+): ClausulaFiltro | null => {
   if (Array.isArray(valor)) {
     const [desde, hasta] = valor as [string, string];
     if (!desde && !hasta) return null;
     const operador = desde && hasta ? "<>" : desde ? ">=" : "<=";
-    return [id, operador, [desde, hasta].filter(Boolean).join("_")] as ClausulaFiltro;
+    return [
+      id,
+      operador,
+      [desde, hasta].filter(Boolean).join("_"),
+    ] as ClausulaFiltro;
   }
   return filtroMesAnyo(id, valor);
 };
 
-export const filtroMesAnyo = (id: string, valor: unknown): ClausulaFiltro | null => {
+export const filtroMesAnyo = (
+  id: string,
+  valor: unknown
+): ClausulaFiltro | null => {
   if (!valor || typeof valor !== "string") return null;
   const [anyo, mes] = valor.split("-").map(Number);
   if (!anyo || !mes) return null;
@@ -188,7 +200,7 @@ export const filtroToValores = (filtro: ClausulaFiltro[], meta: MetaFiltro) => {
   }
 
   for (const clausula of filtro) {
-    const [campoApi, _, valor] = clausula;
+    const [campoApi, operador, valor] = clausula;
     const id = campoApiAId[campoApi] ?? campoApi;
 
     if (!meta[id]) continue;
@@ -212,7 +224,29 @@ export const filtroToValores = (filtro: ClausulaFiltro[], meta: MetaFiltro) => {
         );
         break;
       case "multiseleccion":
-        valores[id] = Array.isArray(valores[id]) ? valores[id] : [valores[id]];
+        {
+          const valoresSeleccionados = Array.isArray(valor_final)
+            ? valor_final.map(String)
+            : typeof valor_final === "string"
+              ? valor_final
+                  .split(",")
+                  .map((v) => v.trim())
+                  .filter(Boolean)
+              : valor_final === undefined || valor_final === null
+                ? []
+                : [String(valor_final)];
+
+          if (operador === "!in") {
+            const opciones = (meta[id].opciones ?? []).map((o) => o.valor);
+            valores[id] = opciones.length
+              ? opciones.filter(
+                  (opcion) => !valoresSeleccionados.includes(opcion)
+                )
+              : valoresSeleccionados;
+          } else {
+            valores[id] = valoresSeleccionados;
+          }
+        }
         break;
       case "fecha":
         valores[id] = new Date(Date.parse(valor_final as string));
@@ -262,7 +296,7 @@ export const MaestroFiltrosActivoControlado = ({
   );
 
   const valores = useModelo({ campos: metaFiltro }, valoresIniciales);
-  const { modelo, modeloInicial, uiProps, init } = valores;
+  const { modelo, uiProps, init } = valores;
 
   const [mostrar, setMostar] = useState(false);
 
@@ -340,29 +374,19 @@ export const MaestroFiltrosActivoControlado = ({
   };
 
   const onLimpiar = () => {
-    init(modeloInicial);
+    init(filtroToValores(filtroInicial, metaFiltro));
     onFiltroChanged(filtroInicial);
   };
 
   const limpiarUno = (id: string) => {
-    const valorDefecto = metaFiltro[id]?.valorDefecto ?? undefined;
-    const campoApi = metaFiltro[id]?.campo ?? id;
+    const valorDefecto = metaFiltro[id]?.valorDefecto;
+    const siguienteModelo = {
+      ...modelo,
+      [id]: valorDefecto,
+    };
 
-    if (valorDefecto) {
-      const filtros = filtro.filter(([campo]) => campo !== campoApi);
-      const clausulaExistente = filtro.find(([campo]) => campo === campoApi);
-      if (!clausulaExistente) {
-        init({ ...modelo, [id]: valorDefecto });
-        return;
-      }
-      const [_, operador] = clausulaExistente;
-
-      init({ ...modelo, [id]: valorDefecto });
-      onFiltroChanged([...filtros, [campoApi, operador, valorDefecto as string]]);
-    } else {
-      const filtros = filtro.filter(([campo]) => campo !== campoApi);
-      onFiltroChanged(filtros);
-    }
+    init(siguienteModelo);
+    onFiltroChanged(buildFiltros(siguienteModelo));
   };
 
   if (!Object.keys(metaFiltro).length) return;

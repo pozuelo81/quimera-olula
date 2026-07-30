@@ -1,15 +1,15 @@
 import { MetaModelo, stringNoVacio } from "@olula/lib/dominio.ts";
 import { NuevaCaja } from "../diseño.ts";
 
-export const nuevaCajaVacia = (): NuevaCaja => ({
-    ubicacionId: "",
-});
+export const nuevaCajaVacia: NuevaCaja = {
+    idUbicacion: "",
+};
 
 export const metaNuevaCaja: MetaModelo<NuevaCaja> = {
     campos: {
-        ubicacionId: {
+        idUbicacion: {
             requerido: true,
-            validacion: (m: NuevaCaja) => stringNoVacio(m.ubicacionId),
+            validacion: (m: NuevaCaja) => stringNoVacio(m.idUbicacion),
         },
     },
 };

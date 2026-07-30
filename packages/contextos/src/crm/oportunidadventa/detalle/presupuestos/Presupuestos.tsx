@@ -1,40 +1,26 @@
 import { BorrarPresupuesto } from "#/ventas/presupuesto/borrar/BorrarPresupuesto.tsx";
 import { Presupuesto } from "#/ventas/presupuesto/diseño.ts";
 import { getPresupuesto } from "#/ventas/presupuesto/infraestructura.ts";
-import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
+import { TarjetaPresupuesto } from "#/ventas/presupuesto/vistas/TarjetaPresupuesto.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
-import { MetaTabla } from "@olula/componentes/index.js";
 import { ListadoSemiControlado } from "@olula/componentes/maestro/ListadoSemiControlado.tsx";
+import { QuimeraAcciones } from "@olula/componentes/moleculas/qacciones.tsx";
 import { listaEntidadesInicial } from "@olula/lib/ListaEntidades.js";
 import { criteriaDefecto } from "@olula/lib/dominio.js";
 import { HookModelo } from "@olula/lib/useModelo.ts";
 import { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router";
+import { useNavigate } from "react-router";
 import { OportunidadVenta } from "../../diseño.ts";
 import { crearPresupuestoOportunidad } from "../../infraestructura.ts";
 import { getMaquina } from "./maquina.ts";
 import { metaTablaPresupuesto } from "./presupuestos.ts";
-
-const metaTabla: MetaTabla<Presupuesto> = [
-  ...metaTablaPresupuesto,
-  {
-    id: "ver_presupuesto",
-    cabecera: "",
-    tipo: "booleano",
-    ancho: "80px",
-    render: (v) => (
-      <Link to={`/ventas/presupuesto?id=${v.id}`}>
-        <QBoton>Ver presupuesto</QBoton>
-      </Link>
-    ),
-  },
-];
 
 export const Presupuestos = ({
   oportunidad,
 }: {
   oportunidad: HookModelo<OportunidadVenta>;
 }) => {
+  const navigate = useNavigate();
   const [cargando, setCargando] = useState(false);
 
   const { ctx, emitir } = useMaquina(getMaquina, {
@@ -74,21 +60,37 @@ export const Presupuestos = ({
       )}
 
       <ListadoSemiControlado
-        metaTabla={metaTabla}
+        metaTabla={metaTablaPresupuesto}
+        tarjeta={TarjetaPresupuesto}
+        modosDisponibles={["tarjetas"]}
         entidades={ctx.presupuestos.lista}
         totalEntidades={ctx.presupuestos.lista.length}
         cargando={cargando}
         renderAcciones={() => (
-          <div className="maestro-botones">
-            <QBoton onClick={() => crearPresupuesto()}>Nuevo</QBoton>
-
-            <QBoton
-              onClick={() => emitir("borrado_presupuesto_solicitado")}
-              deshabilitado={!ctx.presupuestos.activo}
-            >
-              Borrar
-            </QBoton>
-          </div>
+          <QuimeraAcciones
+            acciones={[
+              {
+                texto: "Nuevo",
+                onClick: () => crearPresupuesto(),
+              },
+              {
+                texto: "Editar",
+                onClick: () => {
+                  if (ctx.presupuestos.activo?.id) {
+                    navigate(
+                      `/ventas/presupuesto?id=${ctx.presupuestos.activo.id}`
+                    );
+                  }
+                },
+                deshabilitado: !ctx.presupuestos.activo,
+              },
+              {
+                texto: "Borrar",
+                onClick: () => emitir("borrado_presupuesto_solicitado"),
+                deshabilitado: !ctx.presupuestos.activo,
+              },
+            ]}
+          />
         )}
         seleccionada={ctx.presupuestos.activo ?? null}
         onSeleccion={(presupuesto) =>

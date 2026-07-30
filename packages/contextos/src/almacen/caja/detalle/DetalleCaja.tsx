@@ -4,14 +4,14 @@ import { QuimeraAcciones } from "@olula/componentes/index.js";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
 import { useModelo } from "@olula/lib/useModelo.ts";
 import { useCallback, useEffect } from "react";
-import { Caja } from "../diseño.ts";
 import { BorrarCaja } from "../borrar/BorrarCaja.js";
+import { Caja } from "../diseño.ts";
 import { ArbolContenidoCaja } from "./ArbolContenidoCaja.tsx";
 import "./DetalleCaja.css";
 import { contextoDetalleCajaInicial, guardarCaja, metaCaja } from "./dominio.ts";
 import { getMaquina } from "./maquina.ts";
 
-const titulo = ({ lpn }: { lpn: string }) => "Caja " + lpn;
+const titulo = ( caja : Caja ) => `Caja ${caja.lpn} en ${caja.ubicacion}`;
 
 export const DetalleCaja = ({
     id,

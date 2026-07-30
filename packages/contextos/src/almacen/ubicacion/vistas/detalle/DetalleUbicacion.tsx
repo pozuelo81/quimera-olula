@@ -1,4 +1,4 @@
-import { Almacen } from "#/almacen/comun/componentes/Almacen.tsx";
+import { Zona } from "#/almacen/comun/componentes/Zona.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { Detalle } from "@olula/componentes/detalle/Detalle.tsx";
@@ -70,7 +70,7 @@ export const DetalleUbicacion = ({
                         <Tab key="general" label="General">
                             <quimera-formulario>
                                 <QInput label="Código" {...modelo.uiProps("codigo")} />
-                                <Almacen {...modelo.uiProps("almacenId")} />
+                                <Zona {...modelo.uiProps("zonaId")} />
                             </quimera-formulario>
                         </Tab>,
                         <Tab key="stock" label="Stock">

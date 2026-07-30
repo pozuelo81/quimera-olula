@@ -23,19 +23,19 @@
         grid-column: span 2;
     }
 
-    quimera-select[nombre="cajaOrigenId"] {
+    quimera-autocompletar[nombre="idCajaOrigen"] {
         grid-column: span 6;
     }
 
-    quimera-select[nombre="ubicacionOrigenId"] {
+    quimera-autocompletar[nombre="idUbicacionOrigen"] {
         grid-column: span 6;
     }
 
-    quimera-select[nombre="cajaDestinoId"] {
-        grid-column: span 6;
+    quimera-autocompletar[nombre="idCajaDestino"] {
+        grid-column: span 5;
     }
 
-    quimera-select[nombre="ubicacionDestinoId"] {
+    quimera-autocompletar[nombre="idUbicacionDestino"] {
         grid-column: span 6;
     }
 }

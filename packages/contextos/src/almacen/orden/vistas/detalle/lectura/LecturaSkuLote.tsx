@@ -10,8 +10,10 @@ interface SkuLoteResultado {
 
 export const LecturaSkuLote = ({
     onLectura,
+    nombre,
 }: {
     onLectura: (resultado: SkuLoteResultado) => void;
+    nombre?: string;
 }) => {
     const focus = useFocus();
 
@@ -24,7 +26,7 @@ export const LecturaSkuLote = ({
     return (
         <QInput
             label="Código de barras"
-            nombre="codigoBarras"
+            nombre={nombre || "codigo_barras"}
             valor=""
             onEnterKeyUp={leerCodigo}
             ref={focus}

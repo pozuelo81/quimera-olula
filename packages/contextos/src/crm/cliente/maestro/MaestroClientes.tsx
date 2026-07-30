@@ -1,7 +1,8 @@
+import { Agente } from "#/ventas/comun/componentes/agente.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
-import { QAvatar, QTarjetaGenerica } from "@olula/componentes/index.js";
 import { Listado } from "@olula/componentes/maestro/Listado.js";
 import { MaestroDetalle } from "@olula/componentes/maestro/MaestroDetalle.tsx";
+import { getMetaFiltroDefecto } from "@olula/componentes/maestro/maestroFiltros/MaestroFiltrosActivoControlado.js";
 import { listaActivaEntidadesInicial } from "@olula/lib/ListaActivaEntidades.js";
 import { getUrlParams, useUrlParams } from "@olula/lib/url-params.js";
 import { useEffect } from "react";
@@ -10,6 +11,7 @@ import { Cliente } from "../diseño.ts";
 import { metaTablaCliente } from "./maestro.ts";
 import "./MaestroClientes.css";
 import { getMaquina } from "./maquina.ts";
+import { TarjetaCliente } from "./TarjetaCliente.tsx";
 
 export const MaestroClientes = () => {
   const { id, criteria } = getUrlParams();
@@ -35,7 +37,22 @@ export const MaestroClientes = () => {
 
             <Listado<Cliente>
               metaTabla={metaTablaCliente}
+              metaFiltro={{
+                ...getMetaFiltroDefecto(metaTablaCliente),
+                agente_id: {
+                  id: "agente_id",
+                  label: "Agente",
+                  filtro: (v) => (v ? ["agente_id", "=", v as string] : null),
+                  render: (valor, onChange) => (
+                    <Agente
+                      valor={(valor as string) ?? ""}
+                      onChange={(opcion) => onChange(opcion?.valor ?? "")}
+                    />
+                  ),
+                },
+              }}
               criteria={ctx.clientes.criteria}
+              modosDisponibles={["tarjetas"]}
               tarjeta={TarjetaCliente}
               entidades={ctx.clientes.lista}
               totalEntidades={ctx.clientes.total}
@@ -43,6 +60,9 @@ export const MaestroClientes = () => {
               onSeleccion={(payload) => emitir("cliente_seleccionado", payload)}
               onCriteriaChanged={(payload) =>
                 emitir("criteria_cambiado", payload)
+              }
+              onSiguientePagina={(payload) =>
+                emitir("siguiente_pagina", payload)
               }
             />
           </>
@@ -52,16 +72,5 @@ export const MaestroClientes = () => {
         modoDisposicion="maestro-50"
       />
     </div>
-  );
-};
-
-const TarjetaCliente = (cliente: Cliente) => {
-  return (
-    <QTarjetaGenerica
-      avatar={<QAvatar nombre={cliente.nombre} />}
-      arribaIzquierda={cliente.nombre}
-      abajoIzquierda={cliente.email}
-      abajoDerecha={cliente.telefono1}
-    />
   );
 };

@@ -1,20 +1,6 @@
 import { Maquina } from "@olula/lib/diseño.ts";
-import { ListaActivaEntidades } from "@olula/lib/ListaActivaEntidades.js";
-import { Modulo } from "../diseño.js";
+import { ContextoMaestroModulo, EstadoMaestroModulo } from "./diseño.js";
 import * as maestro from "./maestro.js";
-
-/**
- * Estados posibles del maestro.
- */
-export type EstadoMaestroModulo = 'INICIAL' | 'CREANDO';
-
-/**
- * Contexto del maestro (listado de módulos)
- */
-export type ContextoMaestroModulo = {
-    estado: EstadoMaestroModulo;
-    modulos: ListaActivaEntidades<Modulo>;
-};
 
 export const getMaquina: () => Maquina<EstadoMaestroModulo, ContextoMaestroModulo> = () => {
     return {

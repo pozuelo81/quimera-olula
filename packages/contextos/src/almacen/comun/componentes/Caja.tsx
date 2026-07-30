@@ -36,7 +36,7 @@ export const Caja = ({
             valor: caja.id,
             descripcion: caja.lpn,
             // descripcionOpcion: caja.lpn,
-            datos: caja,
+            ...caja,
         }));
     };
 

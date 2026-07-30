@@ -3,6 +3,7 @@ import { QuimeraAcciones } from "@olula/componentes/moleculas/qacciones.tsx";
 import { criteriaDefecto } from "@olula/lib/dominio.js";
 import { CrmContacto } from "../../diseño.ts";
 import { metaTablaCrmContactos } from "./dominio.ts";
+import { TarjetaCrmContacto } from "./TarjetaCrmContacto.tsx";
 
 export const TabCrmContactosLista = ({
   contactos,
@@ -21,6 +22,8 @@ export const TabCrmContactosLista = ({
     <div className="CrmContactos">
       <ListadoSemiControlado
         metaTabla={metaTablaCrmContactos}
+        tarjeta={TarjetaCrmContacto}
+        modosDisponibles={["tarjetas"]}
         entidades={contactos}
         totalEntidades={contactos.length}
         cargando={cargando}

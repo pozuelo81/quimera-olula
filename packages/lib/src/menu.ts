@@ -13,6 +13,8 @@ export interface ElementoMenuPadre extends ElementoMenuBase {
 
 export interface ElementoMenuHijo extends ElementoMenuBase {
     url: string;
+    descripcionIA?: string;
+    parametrosIA?: Record<string, string>;
 }
 
 export type ElementoMenu = ElementoMenuPadre | ElementoMenuHijo;

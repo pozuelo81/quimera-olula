@@ -1,12 +1,12 @@
-import { describe, test, expect } from "vitest";
-import { validacionCampoModelo } from "@olula/lib/dominio.js";
 import {
-    ordenVacia,
+    ERR_CANTIDAD_PREVISTA_REQUERIDA,
+    ERR_SKU_REQUERIDO,
     lineaOrdenVacia,
     metaNuevaLinea,
-    ERR_SKU_REQUERIDO,
-    ERR_CANTIDAD_PREVISTA_REQUERIDA,
+    ordenVacia,
 } from "#/almacen/orden/dominio.ts";
+import { validacionCampoModelo } from "@olula/lib/dominio.js";
+import { describe, expect, test } from "vitest";
 
 // ---------------------------------------------------------------------------
 // [orden-dominio-01] ordenVacia retorna una orden con los campos por defecto
@@ -35,19 +35,19 @@ describe("[orden-dominio-01] ordenVacia retorna una orden con los campos por def
     });
 
     test("tiene ubicacion_origen_id en null", () => {
-        expect(ordenVacia().ubicacionOrigenId).toBeNull();
+        expect(ordenVacia().idUbicacionOrigen).toBeNull();
     });
 
     test("tiene caja_origen_id en null", () => {
-        expect(ordenVacia().cajaOrigenId).toBeNull();
+        expect(ordenVacia().idCajaOrigen).toBeNull();
     });
 
     test("tiene ubicacion_destino_id en null", () => {
-        expect(ordenVacia().ubicacionDestinoId).toBeNull();
+        expect(ordenVacia().idUbicacionDestino).toBeNull();
     });
 
     test("tiene caja_destino_id en null", () => {
-        expect(ordenVacia().cajaDestinoId).toBeNull();
+        expect(ordenVacia().idCajaDestino).toBeNull();
     });
 
     test("tiene lineas como array vacío", () => {
@@ -73,19 +73,19 @@ describe("[orden-dominio-02] lineaOrdenVacia retorna una línea con los campos p
     });
 
     test("tiene ubicacion_origen_id en null", () => {
-        expect(lineaOrdenVacia().ubicacionOrigenId).toBeNull();
+        expect(lineaOrdenVacia().idUbicacionOrigen).toBeNull();
     });
 
     test("tiene caja_origen_id en null", () => {
-        expect(lineaOrdenVacia().cajaOrigenId).toBeNull();
+        expect(lineaOrdenVacia().idCajaOrigen).toBeNull();
     });
 
     test("tiene ubicacion_destino_id en null", () => {
-        expect(lineaOrdenVacia().ubicacionDestinoId).toBeNull();
+        expect(lineaOrdenVacia().idUbicacionDestino).toBeNull();
     });
 
     test("tiene caja_destino_id en null", () => {
-        expect(lineaOrdenVacia().cajaDestinoId).toBeNull();
+        expect(lineaOrdenVacia().idCajaDestino).toBeNull();
     });
 });
 

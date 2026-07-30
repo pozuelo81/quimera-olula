@@ -44,6 +44,23 @@
     }
 }
 
+#boton-asistente {
+    display: none;
+}
+
+#etiqueta-asistente-abierto {
+    margin-left: 0;
+    order: 98;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    cursor: pointer;
+
+    quimera-icono {
+        fill: var(--blanco);
+    }
+}
+
 #cabecera-titulo {
     position: absolute;
     left: 50%;

@@ -1,6 +1,6 @@
-import { describe, test, expect } from "vitest";
-import { itemOrdenDesdeApi, ItemOrdenApi } from "#/almacen/orden/infraestructura.ts";
 import type { ItemOrdenAlmacen } from "#/almacen/orden/diseño.ts";
+import { ItemOrdenApi, itemOrdenDesdeApi } from "#/almacen/orden/infraestructura.ts";
+import { describe, expect, test } from "vitest";
 
 // ---------------------------------------------------------------------------
 // [orden-infra-03] itemOrdenDesdeApi convierte un ItemOrdenApi (snake_case) al tipo dominio ItemOrdenAlmacen (camelCase)
@@ -13,6 +13,7 @@ describe("[orden-infra-03] itemOrdenDesdeApi convierte un ItemOrdenApi (snake_ca
         tipo: "ENTRADA",
         abierta: true,
         estado: "PENDIENTE",
+        descripcion: "DESCRIPCION",
         ubicacion_origen_id: "UBI-001",
         caja_origen_id: "CAJA-001",
         ubicacion_destino_id: "UBI-002",
@@ -44,35 +45,35 @@ describe("[orden-infra-03] itemOrdenDesdeApi convierte un ItemOrdenApi (snake_ca
         expect(item.estado).toBe("PENDIENTE");
     });
 
-    test("mapea ubicacion_origen_id a ubicacionOrigenId", () => {
+    test("mapea ubicacion_origen_id a idUbicacionOrigen", () => {
         const item: ItemOrdenAlmacen = itemOrdenDesdeApi(itemApi);
-        expect(item.ubicacionOrigenId).toBe("UBI-001");
+        expect(item.idUbicacionOrigen).toBe("UBI-001");
     });
 
-    test("mapea caja_origen_id a cajaOrigenId", () => {
+    test("mapea caja_origen_id a idCajaOrigen", () => {
         const item: ItemOrdenAlmacen = itemOrdenDesdeApi(itemApi);
-        expect(item.cajaOrigenId).toBe("CAJA-001");
+        expect(item.idCajaOrigen).toBe("CAJA-001");
     });
 
-    test("mapea ubicacion_destino_id a ubicacionDestinoId", () => {
+    test("mapea ubicacion_destino_id a idUbicacionDestino", () => {
         const item: ItemOrdenAlmacen = itemOrdenDesdeApi(itemApi);
-        expect(item.ubicacionDestinoId).toBe("UBI-002");
+        expect(item.idUbicacionDestino).toBe("UBI-002");
     });
 
-    test("mapea caja_destino_id a cajaDestinoId", () => {
+    test("mapea caja_destino_id a idCajaDestino", () => {
         const item: ItemOrdenAlmacen = itemOrdenDesdeApi(itemApi);
-        expect(item.cajaDestinoId).toBe("CAJA-002");
+        expect(item.idCajaDestino).toBe("CAJA-002");
     });
 
-    test("mapea ubicacion_origen_id null a ubicacionOrigenId null", () => {
+    test("mapea ubicacion_origen_id null a idUbicacionOrigen null", () => {
         const itemSinUbicacionOrigen: ItemOrdenApi = { ...itemApi, ubicacion_origen_id: null };
         const item: ItemOrdenAlmacen = itemOrdenDesdeApi(itemSinUbicacionOrigen);
-        expect(item.ubicacionOrigenId).toBeNull();
+        expect(item.idUbicacionOrigen).toBeNull();
     });
 
-    test("mapea caja_origen_id null a cajaOrigenId null", () => {
+    test("mapea caja_origen_id null a idCajaOrigen null", () => {
         const itemSinCajaOrigen: ItemOrdenApi = { ...itemApi, caja_origen_id: null };
         const item: ItemOrdenAlmacen = itemOrdenDesdeApi(itemSinCajaOrigen);
-        expect(item.cajaOrigenId).toBeNull();
+        expect(item.idCajaOrigen).toBeNull();
     });
 });

@@ -1,4 +1,5 @@
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
+import { QIcono } from "@olula/componentes/atomos/qicono.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
 import { MetaTabla } from "@olula/componentes/index.js";
 import { Listado } from "@olula/componentes/maestro/Listado.js";
@@ -82,10 +83,15 @@ export const MaestroConDetalleModulo = () => {
                     <>
                         <h2>Módulos</h2>
                         <div className="maestro-botones">
-                            <QBoton
-                                texto={layout === "TARJETA" ? "Cambiar a TABLA" : "Cambiar a TARJETA"}
+                            <span
+                                className="cambio-modo-icono"
                                 onClick={cambiarLayout}
-                            />
+                            >
+                                <QIcono
+                                    nombre={layout === "TABLA" ? "lista" : "tabla"}
+                                    tamaño="md"
+                                />
+                            </span>
                         </div>
                         <Listado<Modulo>
                             metaTabla={metaTablaModulo}

@@ -2,7 +2,7 @@ import { Criteria, ProcesarContexto } from "@olula/lib/diseño.ts";
 import { accionesListaActivaEntidades, ProcesarListaActivaEntidades } from "@olula/lib/ListaActivaEntidades.js";
 import { Modulo } from "../diseño.js";
 import { getModulo, getModulos } from "../infraestructura.js";
-import { ContextoMaestroModulo, EstadoMaestroModulo } from "./maquina.js";
+import { ContextoMaestroModulo, EstadoMaestroModulo } from "./diseño.js";
 
 /**
  * Tipo para todos los handlers del maestro

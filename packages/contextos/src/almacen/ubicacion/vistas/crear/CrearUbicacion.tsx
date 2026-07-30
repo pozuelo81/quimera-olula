@@ -1,4 +1,4 @@
-import { Almacen } from "#/almacen/comun/componentes/Almacen.tsx";
+import { Zona } from "#/almacen/comun/componentes/Zona.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { Mostrar } from "@olula/componentes/moleculas/Mostrar.tsx";
@@ -59,7 +59,7 @@ const FormAltaUbicacion = ({
       <h2>Nueva Ubicación</h2>
       <quimera-formulario>
         <QInput label="Código" {...ubicacion.uiProps("codigo")} />
-        <Almacen {...ubicacion.uiProps("almacenId")} />
+        <Zona {...ubicacion.uiProps("zonaId")} />
       </quimera-formulario>
       <div className="botones">
         <QBoton onClick={crear} deshabilitado={!ubicacion.valido}>

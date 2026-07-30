@@ -9,13 +9,16 @@ export interface OrdenAlmacen extends Entidad {
     almacenId: string;
     almacen: string;
     abierta: boolean;
-    ubicacionOrigenId: string | null;
+    estado: string;
+    descripcion: string;
+    idUbicacionOrigen: string | null;
     ubicacionOrigen: string | null;
-    cajaOrigenId: string | null;
-    ubicacionDestinoId: string | null;
+    idCajaOrigen: string | null;
+    idUbicacionDestino: string | null;
     ubicacionDestino: string | null;
-    cajaDestinoId: string | null;
+    idCajaDestino: string | null;
     lineas: LineaOrdenAlmacen[];
+    lecturasCaja: LecturaCajaOrden[];
 }
 
 export interface LineaOrdenAlmacen extends Entidad {
@@ -25,11 +28,27 @@ export interface LineaOrdenAlmacen extends Entidad {
     loteId: string | null;
     cantidadPrevista: number;
     cantidadReal?: number;
-    ubicacionOrigenId: string | null;
-    cajaOrigenId: string | null;
-    ubicacionDestinoId: string | null;
-    cajaDestinoId: string | null;
+    idUbicacionOrigen: string | null;
+    ubicacionOrigen: string | null;
+    idCajaOrigen: string | null;
+    cajaOrigen: string | null;
+    idUbicacionDestino: string | null;
+    ubicacionDestino: string | null;
+    idCajaDestino: string | null;
+    cajaDestino: string | null;
     lecturas: LecturaLineaOrden[];
+}
+
+export interface LecturaCajaOrden extends Entidad {
+    id: string;
+    idCaja: string;
+    lpn: string;
+    idUbicacionDestino: string | null;
+    ubicacionDestino: string | null;
+    idCajaDestino: string | null;
+    cajaDestino: string | null;
+    cajaCompleta: boolean;
+    fechaHora: Date;
 }
 
 export interface LecturaLineaOrden {
@@ -37,15 +56,20 @@ export interface LecturaLineaOrden {
     sku: string;
     loteId: string | null;
     cantidad: number;
-    ubicacionOrigenId: string | null;
-    cajaOrigenId: string | null;
-    ubicacionDestinoId: string | null;
-    cajaDestinoId: string | null;
+    idUbicacionOrigen: string | null;
+    ubicacionOrigen: string | null;
+    idCajaOrigen: string | null;
+    cajaOrigen: string | null;
+    idUbicacionDestino: string | null;
+    ubicacionDestino: string | null;
+    idCajaDestino: string | null;
+    cajaDestino: string | null;
     fechaHora: Date;
+    idLecturaCaja: string | null;
 }
 
 export interface NuevaOrdenAlmacen extends Modelo {
-    fecha?: Date;
+    // fecha?: Date;
     tipoOrden: string;
     almacenId: string;
     abierta: boolean;
@@ -56,10 +80,10 @@ export interface NuevaLineaOrdenAlmacen extends Modelo {
     loteId: string | null;
     cantidadPrevista: number;
     cantidadReal?: number;
-    ubicacionOrigenId: string | null;
-    cajaOrigenId: string | null;
-    ubicacionDestinoId: string | null;
-    cajaDestinoId: string | null;
+    idUbicacionOrigen: string | null;
+    idCajaOrigen: string | null;
+    idUbicacionDestino: string | null;
+    idCajaDestino: string | null;
 }
 
 export interface NuevaLecturaOrden extends Modelo {
@@ -73,16 +97,32 @@ export interface NuevaLecturaOrden extends Modelo {
     idUbicacionOrigen: string | null;
 }
 
+export interface NuevaLecturaCajaOrden extends Modelo {
+    cajaId: string;
+    cajaCompleta: boolean;
+    idUbicacionDestino: string | null;
+    idCajaDestino: string | null;
+}
+
+
+export interface NuevaLecturaUbicacionOrden extends Modelo {
+    idUbicacion: string;
+    idUbicacionDestino: string | null;
+    idCajaDestino: string | null;
+}
+
+
 export interface ItemOrdenAlmacen extends Entidad {
     id: string;
     fecha: string;
     tipo: string;
     abierta: boolean;
     estado: string;
-    ubicacionOrigenId: string | null;
-    cajaOrigenId: string | null;
-    ubicacionDestinoId: string | null;
-    cajaDestinoId: string | null;
+    descripcion: string;
+    idUbicacionOrigen: string | null;
+    idCajaOrigen: string | null;
+    idUbicacionDestino: string | null;
+    idCajaDestino: string | null;
 }
 
 export type CambiosOrdenAlmacen = Partial<OrdenAlmacen>;

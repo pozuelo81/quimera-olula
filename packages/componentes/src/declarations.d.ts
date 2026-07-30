@@ -43,6 +43,7 @@ declare namespace React {
             'quimera-historias': NodoComun;
             'menu-lateral': NodoComun;
             'menu-usuario': NodoComun;
+            'panel-asistente': NodoComun;
             'quimera-editor-enriquecido': NodoComun;
         }
     }

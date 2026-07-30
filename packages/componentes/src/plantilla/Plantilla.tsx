@@ -1,4 +1,5 @@
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, useContext } from "react";
+import { FactoryCtx } from "@olula/lib/factory_ctx.tsx";
 import { MenuLateral } from "../menu/menu-lateral.tsx";
 import { MenuUsuario } from "../menu/menu-usuario.tsx";
 import { Slot } from "../slot/Slot.tsx";
@@ -10,6 +11,11 @@ import { SseSesionGlobal } from "./SseSesionGlobal.tsx";
 
 export const Plantilla = ({ children }: PropsWithChildren<object>) => {
   const slots = { hijos: children };
+  const { app } = useContext(FactoryCtx);
+  // Punto de extensión Factory: vacío por defecto (cualquier app que no registre
+  // Componentes.panel_asistente no ve nada aquí, cero impacto de layout). Solo
+  // apps/olula lo registra hoy (ver apps/olula/src/factory.ts).
+  const PanelAsistente = app.Componentes?.panel_asistente as (() => React.ReactNode) | undefined;
 
   return (
     <>
@@ -24,6 +30,7 @@ export const Plantilla = ({ children }: PropsWithChildren<object>) => {
           <MenuLateral />
           <Slot {...slots} />
           <MenuUsuario />
+          {PanelAsistente ? <PanelAsistente /> : null}
         </section>
       </MenuProvider>
 

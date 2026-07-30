@@ -1,6 +1,6 @@
 import { ProcesarContexto } from "@olula/lib/diseño.ts";
 import { ejecutarListaProcesos, MetaModelo, stringNoVacio } from "@olula/lib/dominio.ts";
-import { Caja, CajaContenido, ComponenteCaja, MovimientoCaja } from "../diseño.ts";
+import { Caja, CajaContenido, ComponenteCaja, MaterialCaja } from "../diseño.ts";
 import { getCaja, patchCaja } from "../infraestructura.ts";
 import { ContextoCaja, EstadoCaja } from "./diseño.ts";
 
@@ -11,7 +11,7 @@ export const metaCaja: MetaModelo<Caja> = {
     campos: {
         ubicacionId: {
             requerido: true,
-            validacion: (m: Caja) => stringNoVacio(m.ubicacionId),
+            validacion: (m: Caja) => stringNoVacio(m.idUbicacion),
         },
     },
 };
@@ -19,7 +19,8 @@ export const metaCaja: MetaModelo<Caja> = {
 export const cajaContenidoVacia = (): CajaContenido => ({
     id: "",
     lpn: "",
-    ubicacionId: "",
+    idUbicacion: "",
+    ubicacion: "",
     contenido: [],
 });
 
@@ -28,7 +29,7 @@ export const contextoDetalleCajaInicial: ContextoCaja = {
     caja: cajaContenidoVacia(),
 };
 
-export const esMaterial = (comp: ComponenteCaja): comp is MovimientoCaja =>
+export const esMaterial = (comp: ComponenteCaja): comp is MaterialCaja =>
     "sku" in comp;
 
 export const esSubcaja = (comp: ComponenteCaja): comp is CajaContenido =>

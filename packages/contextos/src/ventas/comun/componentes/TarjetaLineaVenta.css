@@ -1,0 +1,106 @@
+.linea-venta-tarjeta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-xxs);
+}
+
+.linea-venta-tarjeta-fila-principal {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--espaciado-s);
+}
+
+.linea-venta-tarjeta-titulo {
+    font-weight: var(--grosor-letra-7);
+    font-size: var(--tamaño-letra-m);
+    line-height: 1.2;
+    min-width: 0;
+}
+
+.linea-venta-tarjeta-desglose {
+    font-size: var(--tamaño-letra-m);
+    font-weight: var(--grosor-letra-5);
+    text-align: right;
+    white-space: nowrap;
+}
+
+.linea-venta-tarjeta-iva {
+    font-size: var(--tamaño-letra-xs);
+    font-weight: var(--grosor-letra-4);
+    color: var(--color-texto-secundario);
+    opacity: 0.75;
+}
+
+.linea-venta-tarjeta-cuerpo {
+    display: flex;
+    align-items: center;
+    margin-top: var(--espaciado-xs);
+}
+
+.linea-venta-stepper {
+    display: grid;
+    grid-template-columns: 44px 78px 44px;
+    align-items: center;
+    gap: var(--espaciado-xs);
+}
+
+.linea-venta-stepper-control quimera-boton button {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+    font-size: var(--tamaño-letra-l);
+    font-weight: var(--grosor-letra-7);
+    border-radius: var(--redondeo-borde-xs);
+}
+
+.linea-venta-stepper-control quimera-boton[variante="borde"] button {
+    border: var(--tamaño-borde-m) solid var(--color-primario);
+}
+
+.linea-venta-stepper-control quimera-boton[variante="borde"] button:hover,
+.linea-venta-stepper-control quimera-boton[variante="borde"] button:active,
+.linea-venta-stepper-control quimera-boton[variante="borde"] button:focus-visible {
+    border-color: var(--color-primario);
+}
+
+.linea-venta-stepper-input-wrapper {
+    width: 78px;
+}
+
+.linea-venta-stepper-input-wrapper quimera-input {
+    width: 100%;
+}
+
+.linea-venta-stepper-input-wrapper quimera-input .etiqueta {
+    display: none;
+}
+
+.linea-venta-stepper-input-wrapper quimera-input>label>input {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    height: 44px;
+    min-height: 44px;
+    border: var(--tamaño-borde-s) solid var(--color-borde-sutil);
+    border-radius: var(--redondeo-borde-xs);
+    background: var(--color-superficie);
+    color: var(--color-texto-primario);
+    text-align: center;
+    padding: 0 var(--espaciado-xs);
+    font-size: var(--tamaño-letra-xl);
+    font-weight: var(--grosor-letra-7);
+    line-height: 1;
+}
+
+@media (max-width: 768px) {
+    .linea-venta-stepper {
+        grid-template-columns: 44px 72px 44px;
+    }
+
+    .linea-venta-stepper-input-wrapper {
+        width: 72px;
+    }
+}

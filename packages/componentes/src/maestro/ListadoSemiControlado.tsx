@@ -9,7 +9,10 @@ import { QTarjetaMetatabla } from "../moleculas/qtarjeta_metatabla.tsx";
 import { SinDatos } from "../SinDatos/SinDatos.tsx";
 import "./Listado.css";
 import { filtrarEntidad } from "./maestroFiltros/filtro.ts";
-import { MaestroFiltrosActivoControlado, MetaFiltro } from "./maestroFiltros/MaestroFiltrosActivoControlado.tsx";
+import {
+  MaestroFiltrosActivoControlado,
+  MetaFiltro,
+} from "./maestroFiltros/MaestroFiltrosActivoControlado.tsx";
 
 const datosCargando = <T extends Entidad>() =>
   new Array(10).fill(null).map(
@@ -37,6 +40,7 @@ type MaestroProps<T extends Entidad> = {
   seleccionada: T | null;
   onSeleccion: (seleccionada: T) => void;
   modo?: Modo;
+  modosDisponibles?: Modo[];
   onModoChanged?: (modo: Modo) => void;
   onCriteriaChanged: (criteria: Criteria) => void;
 };
@@ -54,12 +58,28 @@ export const ListadoSemiControlado = <T extends Entidad>({
   seleccionada,
   onSeleccion,
   modo,
+  modosDisponibles,
   onModoChanged,
   onCriteriaChanged,
 }: MaestroProps<T>) => {
   const [criteria, setCriteria] = useState<Criteria>(criteriaInicial);
-  const [modoEstado, setModoEstado] = useState<Modo>(modo ?? "tabla");
+  const [modoEstado, setModoEstado] = useState<Modo>(modo ?? "tarjetas");
   const modoInterno = modo ?? modoEstado;
+
+  const puedeTabla = metaTabla !== undefined;
+  const puedeTarjetas = true;
+
+  const modosDisponiblesCalculados: Modo[] = modosDisponibles
+    ? modosDisponibles.filter((m) => {
+        if (m === "tabla") return puedeTabla;
+        if (m === "tarjetas") return puedeTarjetas;
+        return false;
+      })
+    : [...(puedeTabla ? (["tabla"] as Modo[]) : []), "tarjetas"];
+
+  const modoEfectivo = modosDisponiblesCalculados.includes(modoInterno)
+    ? modoInterno
+    : (modosDisponiblesCalculados[0] ?? "tarjetas");
 
   const cambiarCriteria = useCallback(
     (c: Criteria) => {
@@ -79,27 +99,14 @@ export const ListadoSemiControlado = <T extends Entidad>({
           <QTarjetaMetatabla entidad={entidad} metaTabla={obtenerCols(metaTabla)} />
         )
       : undefined;
-  const puedeTabla = metaTabla !== undefined;
-  const puedeTarjetas = tarjeta !== undefined;
-
-  const modoEfectivo =
-    modoInterno === "tabla" && puedeTabla
-      ? "tabla"
-      : modoInterno === "tarjetas" && puedeTarjetas
-        ? "tarjetas"
-        : puedeTabla
-          ? "tabla"
-          : puedeTarjetas
-            ? "tarjetas"
-            : null;
 
   const cambiarModo = (nuevoModo: Modo) => {
     if (modo === undefined) setModoEstado(nuevoModo);
     onModoChanged?.(nuevoModo);
   };
 
-  const mostrarCambioModo = puedeTabla && puedeTarjetas && modoEfectivo;
-  // const mostrarCambioModo = false;
+  const mostrarCambioModo =
+    modosDisponiblesCalculados.length > 1 && modoEfectivo;
   const acciones = renderAcciones?.();
   const mostrarCabecera = metaFiltro || mostrarCambioModo || Boolean(acciones);
 

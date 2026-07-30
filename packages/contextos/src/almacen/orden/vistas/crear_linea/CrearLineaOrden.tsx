@@ -1,14 +1,16 @@
+import { Caja } from "#/almacen/comun/componentes/Caja.tsx";
+import { Ubicacion } from "#/almacen/comun/componentes/Ubicacion.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QModal } from "@olula/componentes/moleculas/qmodal.tsx";
 import { EmitirEvento } from "@olula/lib/diseño.js";
 import { useForm } from "@olula/lib/useForm.js";
 import { useModelo } from "@olula/lib/useModelo.ts";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { OrdenAlmacen } from "../../diseño.ts";
 import { postLineasOrden } from "../../infraestructura.ts";
-import { nuevaLineaOrdenVacia } from "./crear_linea.ts";
-import { metaNuevaLineaOrden } from "./diseño.ts";
+import { nuevaLineaOrdenDesdeOrden } from "./crear_linea.ts";
+import { getMetaNuevaLineaOrden } from "./diseño.ts";
 
 export const CrearLineaOrden = ({
     publicar,
@@ -17,10 +19,20 @@ export const CrearLineaOrden = ({
     publicar: EmitirEvento;
     orden: OrdenAlmacen;
 }) => {
-    const { modelo, uiProps, valido } = useModelo(
-        metaNuevaLineaOrden,
-        nuevaLineaOrdenVacia
+    const meta = getMetaNuevaLineaOrden(orden.tipo);
+
+    const lineaInicial = useMemo(
+        () => nuevaLineaOrdenDesdeOrden(orden),
+        [orden.idUbicacionOrigen, orden.idCajaOrigen, orden.idUbicacionDestino, orden.idCajaDestino]
     );
+
+    const { modelo, uiProps, valido } = useModelo(
+        meta,
+        lineaInicial
+    );
+
+    const mostrarOrigen = orden.tipo === "SALIDA" || orden.tipo === "TRASPASO";
+    const mostrarDestino = orden.tipo === "ENTRADA" || orden.tipo === "TRASPASO";
 
     const crear_ = useCallback(async () => {
         await postLineasOrden(orden.id, [
@@ -28,10 +40,10 @@ export const CrearLineaOrden = ({
                 sku: modelo.sku,
                 cantidadPrevista: modelo.cantidadPrevista,
                 loteId: null,
-                ubicacionOrigenId: null,
-                cajaOrigenId: null,
-                ubicacionDestinoId: null,
-                cajaDestinoId: null,
+                idUbicacionOrigen: modelo.idUbicacionOrigen,
+                idCajaOrigen: modelo.idCajaOrigen,
+                idUbicacionDestino: modelo.idUbicacionDestino,
+                idCajaDestino: modelo.idCajaDestino,
             },
         ]);
         publicar("linea_creada");
@@ -54,6 +66,34 @@ export const CrearLineaOrden = ({
                 <quimera-formulario>
                     <QInput label="SKU" {...uiProps("sku")} />
                     <QInput label="Cantidad prevista" {...uiProps("cantidadPrevista")} />
+                    {mostrarOrigen && (
+                        <Ubicacion
+                            {...uiProps("idUbicacionOrigen")}
+                            label="Ubicación origen"
+                            nombre="idUbicacionOrigen"
+                        />
+                    )}
+                    {mostrarOrigen && (
+                        <Caja
+                            {...uiProps("idCajaOrigen")}
+                            label="Caja origen"
+                            nombre="idCajaOrigen"
+                        />
+                    )}
+                    {mostrarDestino && (
+                        <Ubicacion
+                            {...uiProps("idUbicacionDestino")}
+                            label="Ubicación destino"
+                            nombre="idUbicacionDestino"
+                        />
+                    )}
+                    {mostrarDestino && (
+                        <Caja
+                            {...uiProps("idCajaDestino")}
+                            label="Caja destino"
+                            nombre="idCajaDestino"
+                        />
+                    )}
                 </quimera-formulario>
                 <div className="botones maestro-botones">
                     <QBoton onClick={crear} deshabilitado={!valido}>

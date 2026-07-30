@@ -3,14 +3,11 @@ import { Entidad, Filtro, Orden, Paginacion, RespuestaLista } from "@olula/lib/d
 export interface Ubicacion extends Entidad {
     id: string;
     codigo: string;
-    almacenId: string;
+    idZona: string;
+    zona: string;
 };
 
-export interface UbicacionAPI extends Entidad {
-    id: string;
-    codigo: string;
-    almacen_id: string;
-}
+
 
 export interface StockUbicacion extends Entidad {
     id: string;

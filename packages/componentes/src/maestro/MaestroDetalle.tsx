@@ -58,6 +58,7 @@ export function MaestroDetalle<T extends Entidad>(
           abierto={haySeleccion}
           onCerrar={onCerrarDetalle}
           mostrarCabecera={false}
+          anchoEstable
         >
           {Detalle}
         </QModal>

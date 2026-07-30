@@ -2,7 +2,7 @@ import { ProcesarContexto } from "@olula/lib/diseño.ts";
 import { ejecutarListaProcesos, MetaModelo } from "@olula/lib/dominio.ts";
 import { Modulo } from "../diseño.js";
 import { getModulo, patchModulo } from "../infraestructura.js";
-import { ContextoDetalleModulo, EstadoDetalleModulo } from "./maquina.js";
+import { ContextoDetalleModulo, EstadoDetalleModulo } from "./diseño.js";
 
 
 /**

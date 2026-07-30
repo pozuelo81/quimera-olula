@@ -83,3 +83,8 @@ quimera-tarjeta {
         }
     }
 }
+
+quimera-tarjeta:has(quimera-acciones.abierto) {
+    z-index: 10;
+    overflow: visible;
+}

@@ -1,6 +1,5 @@
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
-import { QAvatar, QTarjetaGenerica } from "@olula/componentes/index.js";
 import { Listado } from "@olula/componentes/maestro/Listado.js";
 import { MaestroDetalle } from "@olula/componentes/maestro/MaestroDetalle.tsx";
 import { listaActivaEntidadesInicial } from "@olula/lib/ListaActivaEntidades.js";
@@ -12,6 +11,7 @@ import { Lead } from "../diseño.ts";
 import { metaTablaLead } from "./maestro.ts";
 import "./MaestroLeads.css";
 import { getMaquina } from "./maquina.ts";
+import { TarjetaLead } from "./TarjetaLead.tsx";
 
 export const MaestroLeads = () => {
   const { id, criteria } = getUrlParams();
@@ -38,6 +38,7 @@ export const MaestroLeads = () => {
             <Listado<Lead>
               metaTabla={metaTablaLead}
               criteria={ctx.leads.criteria}
+              modosDisponibles={["tarjetas"]}
               tarjeta={TarjetaLead}
               entidades={ctx.leads.lista}
               totalEntidades={ctx.leads.total}
@@ -53,6 +54,9 @@ export const MaestroLeads = () => {
               onCriteriaChanged={(payload) =>
                 emitir("criteria_cambiado", payload)
               }
+              onSiguientePagina={(payload) =>
+                emitir("siguiente_pagina", payload)
+              }
             />
           </>
         }
@@ -63,15 +67,5 @@ export const MaestroLeads = () => {
 
       {ctx.estado === "CREANDO" && <CrearLead publicar={emitir} />}
     </div>
-  );
-};
-
-const TarjetaLead = (lead: Lead) => {
-  return (
-    <QTarjetaGenerica
-      avatar={<QAvatar nombre={lead.nombre} />}
-      arribaIzquierda={lead.nombre}
-      abajoIzquierda={lead.estado_id}
-    />
   );
 };

@@ -9,6 +9,7 @@ export type FormFieldProps = {
   deshabilitado?: boolean;
   placeholder?: string;
   valor?: string;
+  maxLength?: number;
   textoValidacion?: string;
   erroneo?: boolean;
   advertido?: boolean;
@@ -87,6 +88,7 @@ export const FormInput = ({
   autocompletar,
   autoSeleccion,
   autoFocus,
+  maxLength,
   ref,
   onChange,
   onBlur,
@@ -159,6 +161,7 @@ export const FormInput = ({
     placeholder: placeholder,
     disabled: deshabilitado,
     required: !opcional,
+    maxLength: maxLength,
     list: lista,
     autoComplete: autocompletar,
     onChange: manejarChange,
@@ -170,11 +173,12 @@ export const FormInput = ({
     ref: ref as React.RefObject<HTMLInputElement>,
   }
   if (tipo === "checkbox") {
+    const checkedValue = checked ?? valor === "true";
     return (
       <input
         {...inputProps}
-        checked={onChange ? checked : undefined}
-        defaultChecked={onChange ? undefined : checked}
+        checked={onChange ? checkedValue : undefined}
+        defaultChecked={onChange ? undefined : checkedValue}
       />
     );
   }

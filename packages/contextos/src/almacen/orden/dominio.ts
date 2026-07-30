@@ -11,13 +11,16 @@ export const ordenVacia = (): OrdenAlmacen => ({
     almacenId: "",
     almacen: "",
     abierta: true,
-    ubicacionOrigenId: null,
+    estado: "",
+    descripcion: "",
+    idUbicacionOrigen: null,
     ubicacionOrigen: null,
-    cajaOrigenId: null,
-    ubicacionDestinoId: null,
+    idCajaOrigen: null,
+    idUbicacionDestino: null,
     ubicacionDestino: null,
-    cajaDestinoId: null,
+    idCajaDestino: null,
     lineas: [],
+    lecturasCaja: [],
 });
 
 export const lineaOrdenVacia = (): LineaOrdenAlmacen => ({
@@ -26,12 +29,38 @@ export const lineaOrdenVacia = (): LineaOrdenAlmacen => ({
     articulo: "",
     loteId: null,
     cantidadPrevista: 0,
-    ubicacionOrigenId: null,
-    cajaOrigenId: null,
-    ubicacionDestinoId: null,
-    cajaDestinoId: null,
+    idUbicacionOrigen: null,
+    ubicacionOrigen: null,
+    idCajaOrigen: null,
+    cajaOrigen: null,
+    idUbicacionDestino: null,
+    ubicacionDestino: null,
+    idCajaDestino: null,
+    cajaDestino: null,
     lecturas: [],
 });
+
+const onOrdenCambiada = (orden: OrdenAlmacen, campo: string, _: unknown, otros?: Record<string, unknown>) => {
+    if (campo === "idCajaDestino" && otros) {
+
+        const nuevoValor: OrdenAlmacen = {
+            ...orden,
+            idUbicacionDestino: otros.idUbicacion as string,
+            codUbicacionDestino: otros.codUbicacion as string,
+        }
+        return nuevoValor
+    }
+    else if (campo === "idCajaOrigen" && otros) {
+
+        const nuevoValor: OrdenAlmacen = {
+            ...orden,
+            idUbicacionOrigen: otros.idUbicacion as string,
+            codUbicacionOrigen: otros.codUbicacion as string,
+        }
+        return nuevoValor
+    }
+    return orden
+}
 
 export const metaOrden: MetaModelo<OrdenAlmacen> = {
     campos: {
@@ -39,12 +68,15 @@ export const metaOrden: MetaModelo<OrdenAlmacen> = {
         almacenId: { requerido: true },
         fecha: { requerido: true },
         abierta: { tipo: "checkbox", requerido: true },
-        cajaOrigenId: {},
-        ubicacionOrigenId: {},
-        cajaDestinoId: {},
-        ubicacionDestinoId: {},
+        idCajaOrigen: {},
+        idUbicacionOrigen: {},
+        idCajaDestino: {},
+        idUbicacionDestino: {},
     },
+    onChange: onOrdenCambiada
 };
+
+
 
 export const metaNuevaLinea: MetaModelo<LineaOrdenAlmacen> = {
     campos: {

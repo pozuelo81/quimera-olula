@@ -1,5 +1,5 @@
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
-import { Filtro, Orden } from "@olula/lib/diseño.ts";
+import { Entidad, Filtro, Orden } from "@olula/lib/diseño.ts";
 import { criteriaQuery } from "@olula/lib/infraestructura.ts";
 import {
     DeleteUbicacion,
@@ -11,21 +11,35 @@ import {
     StockUbicacion,
     StockUbicacionAPI,
     Ubicacion,
-    UbicacionAPI
 } from "./diseño.ts";
 
 const baseUrlUbicacion = `/almacen/ubicacion`;
 
+export interface UbicacionAPI extends Entidad {
+    id: string;
+    codigo: string;
+    zona_id: string;
+    zona: string;
+}
+
+export interface CambiosUbicacionAPI extends Entidad {
+    id: string;
+    codigo: string;
+    zona_id: string;
+}
+
 export const ubicacionFromApi = (ubicacionApi: UbicacionAPI): Ubicacion => ({
     id: ubicacionApi.id,
     codigo: ubicacionApi.codigo,
-    almacenId: ubicacionApi.almacen_id,
+    idZona: ubicacionApi.zona_id,
+    zona: ubicacionApi.zona,
 });
 
-export const ubicacionToApi = (ubicacion: Ubicacion): UbicacionAPI => ({
+export const ubicacionToApi = (ubicacion: Ubicacion): CambiosUbicacionAPI => ({
     id: ubicacion.id,
     codigo: ubicacion.codigo,
-    almacen_id: ubicacion.almacenId,
+    zona_id: ubicacion.idZona,
+    zona: ubicacion.zona,
 });
 
 export const obtenerUbicaciones = async (filtro: Filtro, orden: Orden): Promise<Ubicacion[]> => {
@@ -52,7 +66,7 @@ export const getUbicaciones: GetUbicaciones = async (
 export const postUbicacion: PostUbicacion = async (ubicacion) => {
     const apiUbicacion = {
         codigo: ubicacion.codigo,
-        almacen_id: ubicacion.almacenId,
+        zona_id: ubicacion.zonaId,
     };
     return await RestAPI.post(baseUrlUbicacion, apiUbicacion, "Error al guardar Ubicación").then(
         (respuesta) => respuesta.id

@@ -1,3 +1,4 @@
+import { TarjetaConfiguracionCrm } from "#/crm/comun/componentes/TarjetaConfiguracionCrm.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
 import { Listado } from "@olula/componentes/maestro/Listado.js";
@@ -34,6 +35,15 @@ export const MaestroEstadosOportunidad = () => {
 
             <Listado<EstadoOportunidad>
               metaTabla={metaTablaEstadoOportunidad}
+              tarjeta={(estado) => (
+                <TarjetaConfiguracionCrm
+                  codigo={estado.id}
+                  descripcion={estado.descripcion}
+                  valorDefecto={estado.valorDefecto}
+                  derecha={<span>{`${estado.probabilidad}%`}</span>}
+                  abajoDerecha={<span>{estado.estadobase}</span>}
+                />
+              )}
               criteria={ctx.estados_oportunidad.criteria}
               modo={"tarjetas"}
               entidades={ctx.estados_oportunidad.lista}

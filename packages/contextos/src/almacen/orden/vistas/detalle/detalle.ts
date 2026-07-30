@@ -6,8 +6,8 @@ import {
     ProcesarListaEntidades,
 } from "@olula/lib/ListaEntidades.js";
 import { LineaOrdenAlmacen, OrdenAlmacen } from "../../diseño.ts";
-import { getOrden, patchOrden } from "../../infraestructura.ts";
 import { ordenVacia } from "../../dominio.ts";
+import { getOrden, patchOrden } from "../../infraestructura.ts";
 import { ContextoOrdenAlmacen, EstadoOrdenAlmacen } from "./maquina.ts";
 
 type ProcesarDetalle = ProcesarContexto<EstadoOrdenAlmacen, ContextoOrdenAlmacen>;
@@ -40,10 +40,11 @@ export const guardarOrden = async (
     orden: OrdenAlmacen
 ): Promise<void> => {
     if (
-        orden.cajaOrigenId !== contexto.orden.cajaOrigenId ||
-        orden.ubicacionOrigenId !== contexto.orden.ubicacionOrigenId ||
-        orden.cajaDestinoId !== contexto.orden.cajaDestinoId ||
-        orden.ubicacionDestinoId !== contexto.orden.ubicacionDestinoId
+        orden.idCajaOrigen !== contexto.orden.idCajaOrigen ||
+        orden.idUbicacionOrigen !== contexto.orden.idUbicacionOrigen ||
+        orden.idCajaDestino !== contexto.orden.idCajaDestino ||
+        orden.idUbicacionDestino !== contexto.orden.idUbicacionDestino ||
+        orden.descripcion !== contexto.orden.descripcion
     ) {
         await patchOrden(orden.id, orden);
     }

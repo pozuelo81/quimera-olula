@@ -5,13 +5,14 @@ import { RouterFactoryCrmOlula } from '#/crm/router_factory.ts';
 import { RouterFactoryRrhh } from '#/rrhh/router_factory.ts';
 import { RouterFactoryTpvOlula } from '#/tpv/router_factory.ts';
 import { RouterFactoryVentasOlula } from '#/ventas/router_factory.ts';
-import { Historias } from '@olula/componentes/index.ts';
-import { FondoInicio } from '@olula/componentes/plantilla/FondoInicio.tsx';
+import { Historias, Home } from '@olula/componentes/index.ts';
+// import { FondoInicio } from '@olula/componentes/plantilla/FondoInicio.tsx';
+
 import { crearRouter } from '@olula/lib/router.ts';
 import { RouteObject } from 'react-router';
 
 export class RouterFactoryOlula {
-    Inicio = { router: { "": FondoInicio } };
+    Inicio = { router: { "": Home } };
     Auth = RouterFactoryAuthOlula;
     Ventas = RouterFactoryVentasOlula;
     Almacen = RouterFactoryAlmacenOlula;

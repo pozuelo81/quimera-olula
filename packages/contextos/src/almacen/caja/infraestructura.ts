@@ -8,6 +8,8 @@ import {
     DeleteCaja,
     GetCaja,
     GetCajas,
+    MaterialCaja,
+    MovimientoCaja,
     NuevaCaja,
     PatchCaja,
     PostCaja,
@@ -17,20 +19,31 @@ interface CajaAPI extends Entidad {
     id: string;
     lpn: string;
     ubicacion_id: string;
+    ubicacion: string;
     contenedor_id?: string | null;
 }
 
 interface MovimientoCajaAPI {
     id: string;
+    cantidad: number;
+    fecha_hora: string;
+    lote_id: string;
+    ubicacion_id: string;
+    ubicacion: string;
+}
+
+interface MaterialCajaAPI {
+    id: string;
     sku: string;
     descripcion: string;
     cantidad: number;
+    movimientos: MovimientoCajaAPI[];
 }
 
 interface CajaContenidoAPI extends CajaAPI {
     contenido: ComponenteCajaAPI[];
 }
-type ComponenteCajaAPI = CajaContenidoAPI | MovimientoCajaAPI;
+type ComponenteCajaAPI = CajaContenidoAPI | MaterialCajaAPI;
 
 interface NuevaCajaAPI {
     ubicacion_id: string;
@@ -41,17 +54,29 @@ type CambiosCajaAPI = Partial<CajaAPI>;
 
 const baseUrl = `/almacen/caja`;
 
-const esMaterialAPI = (comp: ComponenteCajaAPI): comp is MovimientoCajaAPI =>
+const esMaterialAPI = (comp: ComponenteCajaAPI): comp is MaterialCajaAPI =>
     "sku" in comp;
+
+const movimientoDesdeApi = (mov: MovimientoCajaAPI): MovimientoCaja => ({
+    id: mov.id,
+    cantidad: String(mov.cantidad),
+    fechaHora: new Date(mov.fecha_hora),
+    idLote: mov.lote_id,
+    idUbicacion: mov.ubicacion_id,
+    ubicacion: mov.ubicacion,
+});
+
+const materialDesdeApi = (mat: MaterialCajaAPI): MaterialCaja => ({
+    id: mat.id,
+    sku: mat.sku,
+    descripcion: mat.descripcion,
+    cantidad: mat.cantidad,
+    movimientos: mat.movimientos.map(movimientoDesdeApi),
+});
 
 const componenteDesdeApi = (comp: ComponenteCajaAPI): ComponenteCaja => {
     if (esMaterialAPI(comp)) {
-        return {
-            id: comp.id,
-            sku: comp.sku,
-            descripcion: comp.descripcion,
-            cantidad: comp.cantidad,
-        };
+        return materialDesdeApi(comp);
     }
     return cajaContenidoDesdeApi(comp);
 };
@@ -59,7 +84,7 @@ const componenteDesdeApi = (comp: ComponenteCajaAPI): ComponenteCaja => {
 export const cajaDesdeApi = (cajaApi: CajaAPI): Caja => ({
     id: cajaApi.id,
     lpn: cajaApi.lpn,
-    ubicacionId: cajaApi.ubicacion_id,
+    idUbicacion: cajaApi.ubicacion_id,
     ubicacion: cajaApi.ubicacion,
     contenedorId: cajaApi.contenedor_id,
     contenedor: cajaApi.contenedor,
@@ -68,20 +93,21 @@ export const cajaDesdeApi = (cajaApi: CajaAPI): Caja => ({
 const cajaContenidoDesdeApi = (cajaApi: CajaContenidoAPI): CajaContenido => ({
     id: cajaApi.id,
     lpn: cajaApi.lpn,
-    ubicacionId: cajaApi.ubicacion_id,
-    contenedorId: cajaApi.contenedor_id,
+    idUbicacion: cajaApi.ubicacion_id,
+    ubicacion: cajaApi.ubicacion,
+    idContenedor: cajaApi.contenedor_id,
     contenido: cajaApi.contenido.map(componenteDesdeApi),
 });
 
 const nuevaCajaAApi = (caja: NuevaCaja): NuevaCajaAPI => ({
-    ubicacion_id: caja.ubicacionId,
-    contenedor_id: caja.contenedorId,
+    ubicacion_id: caja.idUbicacion,
+    contenedor_id: caja.idContenedor,
 });
 
 const cambiosCajaAApi = (cambios: CambiosCaja): CambiosCajaAPI => {
     const api: CambiosCajaAPI = {};
-    if (cambios.ubicacionId !== undefined) api.ubicacion_id = cambios.ubicacionId;
-    if (cambios.contenedorId !== undefined) api.contenedor_id = cambios.contenedorId;
+    if (cambios.idUbicacion !== undefined) api.ubicacion_id = cambios.idUbicacion;
+    if (cambios.idContenedorId !== undefined) api.contenedor_id = cambios.idContenedor;
     return api;
 };
 

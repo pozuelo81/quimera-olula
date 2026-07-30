@@ -1,10 +1,9 @@
 import { CambiarDescuento } from "#/ventas/comun/componentes/moleculas/CambiarDescuento/CambiarDescuento.tsx";
-import { getReportFactura } from "#/ventas/factura/infraestructura.ts";
 import { TotalesVenta } from "#/ventas/venta/vistas/TotalesVenta.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
 import { Detalle, QBoton, Tab, Tabs } from "@olula/componentes/index.js";
 import { EmitirEvento, Entidad } from "@olula/lib/diseño.js";
-import { abrirCajon, imprimir_blob } from "@olula/lib/impresion.ts";
+import { abrirCajon } from "@olula/lib/impresion.ts";
 import { listaEntidadesInicial } from "@olula/lib/ListaEntidades.js";
 import { useModelo } from "@olula/lib/useModelo.js";
 import { useCallback, useEffect, useRef } from "react";
@@ -14,43 +13,16 @@ import { DevolverVentaTpv } from "../devolver/DevolverVentaTpv.tsx";
 import { LineaFactura, PagoVentaTpv, VentaTpv } from "../diseño.ts";
 import { ventaTpvVacia } from "../dominio.ts";
 import { EmitirVentaTpv } from "../emitir/EmitirVentaTpv.tsx";
-import { getReportVale, getReportVenta } from "../infraestructura.ts";
 import { PagarTarjetaVentaTpv } from "../pagar_con_tarjeta/PagarTarjetaVentaTpv.tsx";
 import { PagoValeVentaTpv } from "../pagar_con_vale/PagoValeVentaTpv.tsx";
 import { PagarEfectivoVentaTpv } from "../pagar_en_efectivo/PagarEfectivoVentaTpv.tsx";
 import { TiqueRegaloVentaTpv } from "../tique_regalo/TiqueRegaloVentaTpv.tsx";
 import { PendienteVenta } from "./comps/PendienteVenta.tsx";
-import { ContextoVentaTpv, guardarVenta, metaVentaTpv } from "./detalle.ts";
+import { ContextoVentaTpv, guardarVenta, imprimirTicketOFactura, imprimirVale, metaVentaTpv } from "./detalle.ts";
 import { Lineas } from "./lineas/Lineas.tsx";
 import { getMaquina } from "./maquina.ts";
 import { Pagos } from "./pagos/Pagos.tsx";
 import { TabCliente } from "./tabs/TabCliente.tsx";
-
-const imprimirTicketOFactura = async (venta: VentaTpv, pagos: PagoVentaTpv[]) => {
-    if (venta.cliente) {
-        const blob = await getReportFactura(venta.id);
-        const url = URL.createObjectURL(blob);
-        window.open(url, "_blank");
-    } else {
-        const blob = await getReportVenta(venta.id);
-        console.log('imprimiendo venta');
-        await imprimir_blob(blob);
-        console.log('imprimiendo venta impresa');
-        const pagos_vale = pagos.filter((p) => p.vale && p.saldoVale && p.saldoVale > 0);
-        for (const p of pagos_vale) {
-            console.log("Imprimiendo vale", p.vale);
-            await imprimirVale(p.vale!);
-        }
-    }
-}
-
-const imprimirVale = async (idVale: string) => {
-    console.log("getReportVale llamado con", idVale);
-    const blob = await getReportVale(idVale);
-    console.log("blob recibido", blob?.size, blob?.type);
-    await imprimir_blob(blob);
-    console.log("imprimir_blob completado para vale");
-}
 
 export const DetalleVentaTpv = ({
   id,

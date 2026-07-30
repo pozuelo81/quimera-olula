@@ -44,21 +44,19 @@ export const transformarCriteria = (filtro?: Filtro, orden?: Orden, paginacion?:
 
 const hoy = new Date();
 
-const filtrosEspeciales: Record<string, (campo: string) => ClausulaFiltro> = {
-    "@hoy": (campo: string) => {
-        return [campo, "<>", [hoy, hoy].map(d => d.toISOString().slice(0, 10)).join("_")];
-    },
-    "@ayer": (campo: string) => {
+export const rangoDesdeAtajo: Record<string, () => [Date, Date]> = {
+    "@hoy": () => [hoy, hoy],
+    "@ayer": () => {
         const ayer = new Date(hoy);
         ayer.setDate(hoy.getDate() - 1);
-        return [campo, "<>", [ayer, ayer].map(d => d.toISOString().slice(0, 10)).join("_")];
+        return [ayer, ayer];
     },
-    "@mañana": (campo: string) => {
+    "@mañana": () => {
         const mañana = new Date(hoy);
         mañana.setDate(hoy.getDate() + 1);
-        return [campo, "<>", [mañana, mañana].map(d => d.toISOString().slice(0, 10)).join("_")];
+        return [mañana, mañana];
     },
-    "@esta-semana": (campo: string) => {
+    "@esta-semana": () => {
         const dia = hoy.getDay() || 7;
 
         const primero = new Date(hoy);
@@ -67,9 +65,9 @@ const filtrosEspeciales: Record<string, (campo: string) => ClausulaFiltro> = {
         const ultimo = new Date(hoy);
         ultimo.setDate(hoy.getDate() + (7 - dia));
 
-        return [campo, "<>", [primero, ultimo].map(d => d.toISOString().slice(0, 10)).join("_")];
+        return [primero, ultimo];
     },
-    "@semana-anterior": (campo: string) => {
+    "@semana-anterior": () => {
         const dia = hoy.getDay() || 7;
 
         const primero = new Date(hoy);
@@ -78,9 +76,9 @@ const filtrosEspeciales: Record<string, (campo: string) => ClausulaFiltro> = {
         const ultimo = new Date(hoy);
         ultimo.setDate(hoy.getDate() + (7 - dia) - 7);
 
-        return [campo, "<>", [primero, ultimo].map(d => d.toISOString().slice(0, 10)).join("_")];
+        return [primero, ultimo];
     },
-    "@semana-siguiente": (campo: string) => {
+    "@semana-siguiente": () => {
         const dia = hoy.getDay() || 7;
 
         const primero = new Date(hoy);
@@ -89,9 +87,9 @@ const filtrosEspeciales: Record<string, (campo: string) => ClausulaFiltro> = {
         const ultimo = new Date(hoy);
         ultimo.setDate(hoy.getDate() + (7 - dia) + 7);
 
-        return [campo, "<>", [primero, ultimo].map(d => d.toISOString().slice(0, 10)).join("_")];
+        return [primero, ultimo];
     },
-    "@este-mes": (campo: string) => {
+    "@este-mes": () => {
         const primero = new Date(hoy);
         primero.setDate(1);
 
@@ -99,9 +97,9 @@ const filtrosEspeciales: Record<string, (campo: string) => ClausulaFiltro> = {
         ultimo.setMonth(hoy.getMonth() + 1);
         ultimo.setDate(0);
 
-        return [campo, "<>", [primero, ultimo].map(d => d.toISOString().slice(0, 10)).join("_")];
+        return [primero, ultimo];
     },
-    "@mes-anterior": (campo: string) => {
+    "@mes-anterior": () => {
         const primero = new Date(hoy);
         primero.setMonth(hoy.getMonth() - 1);
         primero.setDate(1);
@@ -109,9 +107,9 @@ const filtrosEspeciales: Record<string, (campo: string) => ClausulaFiltro> = {
         const ultimo = new Date(hoy);
         ultimo.setDate(0);
 
-        return [campo, "<>", [primero, ultimo].map(d => d.toISOString().slice(0, 10)).join("_")];
+        return [primero, ultimo];
     },
-    "@mes-siguiente": (campo: string) => {
+    "@mes-siguiente": () => {
         const primero = new Date(hoy);
         primero.setMonth(hoy.getMonth() + 1);
         primero.setDate(1);
@@ -120,9 +118,9 @@ const filtrosEspeciales: Record<string, (campo: string) => ClausulaFiltro> = {
         ultimo.setMonth(hoy.getMonth() + 2);
         ultimo.setDate(0);
 
-        return [campo, "<>", [primero, ultimo].map(d => d.toISOString().slice(0, 10)).join("_")];
+        return [primero, ultimo];
     },
-    "@este-año": (campo: string) => {
+    "@este-año": () => {
         const primero = new Date(hoy);
         primero.setMonth(0);
         primero.setDate(1);
@@ -131,9 +129,9 @@ const filtrosEspeciales: Record<string, (campo: string) => ClausulaFiltro> = {
         ultimo.setMonth(11);
         ultimo.setDate(31);
 
-        return [campo, "<>", [primero, ultimo].map(d => d.toISOString().slice(0, 10)).join("_")];
+        return [primero, ultimo];
     },
-    "@año-anterior": (campo: string) => {
+    "@año-anterior": () => {
         const primero = new Date(hoy);
         primero.setFullYear(hoy.getFullYear() - 1)
         primero.setMonth(0);
@@ -144,9 +142,9 @@ const filtrosEspeciales: Record<string, (campo: string) => ClausulaFiltro> = {
         ultimo.setMonth(11);
         ultimo.setDate(31);
 
-        return [campo, "<>", [primero, ultimo].map(d => d.toISOString().slice(0, 10)).join("_")];
+        return [primero, ultimo];
     },
-    "@año-siguiente": (campo: string) => {
+    "@año-siguiente": () => {
         const primero = new Date(hoy);
         primero.setFullYear(hoy.getFullYear() + 1)
         primero.setMonth(0);
@@ -157,14 +155,24 @@ const filtrosEspeciales: Record<string, (campo: string) => ClausulaFiltro> = {
         ultimo.setMonth(11);
         ultimo.setDate(31);
 
-        return [campo, "<>", [primero, ultimo].map(d => d.toISOString().slice(0, 10)).join("_")];
+        return [primero, ultimo];
     },
 }
+
+const filtrosEspeciales: Record<string, (campo: string) => ClausulaFiltro> = Object.fromEntries(
+    Object.entries(rangoDesdeAtajo).map(([atajo, calcularRango]) => [
+        atajo,
+        (campo: string) => {
+            const rango = calcularRango();
+            return [campo, "<>", rango.map(d => d.toISOString().slice(0, 10)).join("_")] as ClausulaFiltro;
+        },
+    ])
+)
 
 const transformarFiltrosEspeciales = (clausula: ClausulaFiltro): ClausulaFiltro => {
     const [campo, _, valor] = clausula;
 
-    if (!valor?.startsWith("@")) return clausula;
+    if (typeof valor !== "string" || !valor.startsWith("@")) return clausula;
 
     const clausulaFn = filtrosEspeciales[valor as keyof typeof filtrosEspeciales];
     if (!clausulaFn) return clausula;

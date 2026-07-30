@@ -10,6 +10,7 @@ type QModalProps = {
   onCerrar?: () => void;
   bloquearCierre?: boolean;
   pantallaCompletaMovil?: boolean;
+  anchoEstable?: boolean;
   mostrarCabecera?: boolean;
   mostrarBotonCerrar?: boolean;
 };
@@ -21,6 +22,7 @@ export const QModal = ({
   onCerrar = () => {},
   bloquearCierre = false,
   pantallaCompletaMovil = true,
+  anchoEstable = false,
   mostrarCabecera = true,
   mostrarBotonCerrar = true,
   children,
@@ -32,6 +34,10 @@ export const QModal = ({
 
   if (pantallaCompletaMovil) {
     attrs["data-pantalla-completa-movil"] = "";
+  }
+
+  if (anchoEstable) {
+    attrs["data-ancho-estable"] = "";
   }
 
   if (titulo) {

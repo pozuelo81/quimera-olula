@@ -16,7 +16,7 @@ export const CrearCaja = ({
 }) => {
     const { modelo: nuevaCaja, uiProps, valido } = useModelo(
         metaNuevaCaja,
-        nuevaCajaVacia()
+        nuevaCajaVacia
     );
 
     const crear_ = useCallback(
@@ -44,7 +44,7 @@ export const CrearCaja = ({
             onCerrar={cancelar}
         >
             <quimera-formulario>
-                <Ubicacion label="Ubicación" {...uiProps("ubicacionId")} ref={focus} />
+                <Ubicacion label="Ubicación" {...uiProps("idUbicacion")} ref={focus} />
             </quimera-formulario>
             <div className="botones maestro-botones">
                 <QBoton onClick={crear} deshabilitado={!valido}>

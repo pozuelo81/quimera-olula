@@ -36,6 +36,8 @@ export const CrearOrden = ({
 
     const [crear, cancelar] = useForm(crear_, cancelar_);
 
+    console.log('modelo', modelo);
+
     return (
         <QModal
             abierto={true}
@@ -47,7 +49,6 @@ export const CrearOrden = ({
                 <quimera-formulario>
                     <TipoOrden {...uiProps("tipoOrden")} />
                     <Almacen {...uiProps("almacenId")} />
-                    <QInput label="Fecha" {...uiProps("fecha")} />
                     <QInput label="Abierta" {...uiProps("abierta")} />
                 </quimera-formulario>
 

@@ -42,11 +42,12 @@ export const incluirOrdenCreadaPorId: ProcesarMaestro = async (contexto, payload
         fecha: orden.fecha,
         tipo: orden.tipo,
         abierta: orden.abierta,
-        estado: "",
-        ubicacionOrigenId: orden.ubicacionOrigenId,
-        cajaOrigenId: orden.cajaOrigenId,
-        ubicacionDestinoId: orden.ubicacionDestinoId,
-        cajaDestinoId: orden.cajaDestinoId,
+        estado: orden.estado,
+        descripcion: orden.descripcion,
+        idUbicacionOrigen: orden.idUbicacionOrigen,
+        idCajaOrigen: orden.idCajaOrigen,
+        idUbicacionDestino: orden.idUbicacionDestino,
+        idCajaDestino: orden.idCajaDestino,
     };
     return {
         ...contexto,

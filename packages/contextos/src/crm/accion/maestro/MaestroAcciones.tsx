@@ -1,12 +1,12 @@
-import { EstadoAccion } from "#/crm/comun/componentes/estado_accion.tsx";
-import { TipoAccion } from "#/crm/comun/componentes/tipo_accion.tsx";
+import { opcionesEstadoAccion } from "#/crm/comun/valores/estado_accion.ts";
+import { opcionesTipoAccion } from "#/crm/comun/valores/tipo_accion.ts";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
-import { QAvatar, QIcono, QTarjetaGenerica } from "@olula/componentes/index.js";
 import { Listado } from "@olula/componentes/maestro/Listado.js";
 import { MaestroDetalle } from "@olula/componentes/maestro/MaestroDetalle.tsx";
 import { getMetaFiltroDefecto } from "@olula/componentes/maestro/maestroFiltros/MaestroFiltrosActivoControlado.js";
-import { formatearFechaDate } from "@olula/lib/dominio.js";
+import type { ClausulaFiltro, Orden } from "@olula/lib/diseño.ts";
+import { criteriaDefecto } from "@olula/lib/dominio.ts";
 import { listaActivaEntidadesInicial } from "@olula/lib/ListaActivaEntidades.js";
 import { getUrlParams, useUrlParams } from "@olula/lib/url-params.js";
 import { useEffect } from "react";
@@ -16,19 +16,34 @@ import { Accion } from "../diseño.ts";
 import { metaTablaAccion } from "./maestro.ts";
 import "./MaestroAcciones.css";
 import { getMaquina } from "./maquina.ts";
+import { TarjetaAccionRapida } from "./TarjetaAccionRapida.tsx";
+
+const criteriaBaseAcciones = {
+  ...criteriaDefecto,
+  orden: ["fecha", "DESC"] as unknown as Orden,
+  filtro: [
+    ["estado", "in", ["Pendiente", "Borrador"] as unknown as string],
+  ] as ClausulaFiltro[],
+};
 
 export const MaestroAcciones = () => {
   const { id, criteria } = getUrlParams();
 
+  const criteriaInicial =
+    criteria.filtro.length > 0 ||
+    criteria.orden.toString() !== criteriaDefecto.orden.toString()
+      ? criteria
+      : criteriaBaseAcciones;
+
   const { ctx, emitir } = useMaquina(getMaquina, {
     estado: "INICIAL",
-    acciones: listaActivaEntidadesInicial<Accion>(id, criteria),
+    acciones: listaActivaEntidadesInicial<Accion>(id, criteriaInicial),
   });
 
   useUrlParams(ctx.acciones.activo, ctx.acciones.criteria);
 
   useEffect(() => {
-    emitir("recarga_de_acciones_solicitada", ctx.acciones.criteria);
+    emitir("recarga_de_acciones_solicitada", criteriaInicial);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -46,28 +61,37 @@ export const MaestroAcciones = () => {
                 tipo: {
                   id: "tipo",
                   label: "Tipo",
-                  filtro: (v) => (v ? ["tipo", "=", v as string] : null),
-                  render: (valor, onChange) => (
-                    <TipoAccion
-                      valor={(valor as string) ?? ""}
-                      onChange={(opcion) => onChange(opcion?.valor ?? "")}
-                    />
-                  ),
+                  tipo: "multiseleccion",
+                  opciones: opcionesTipoAccion,
+                  filtro: (v) => {
+                    const valores = Array.isArray(v)
+                      ? v.map(String).filter(Boolean)
+                      : [];
+                    return valores.length
+                      ? ["tipo", "in", valores as unknown as string]
+                      : null;
+                  },
                 },
                 estado: {
                   id: "estado",
                   label: "Estado",
-                  filtro: (v) => (v ? ["estado", "=", v as string] : null),
-                  render: (valor, onChange) => (
-                    <EstadoAccion
-                      valor={(valor as string) ?? ""}
-                      onChange={(opcion) => onChange(opcion?.valor ?? "")}
-                    />
-                  ),
+                  tipo: "multiseleccion",
+                  opciones: opcionesEstadoAccion,
+                  filtro: (v) => {
+                    const valores = Array.isArray(v)
+                      ? v.map(String).filter(Boolean)
+                      : [];
+                    return valores.length
+                      ? ["estado", "in", valores as unknown as string]
+                      : null;
+                  },
                 },
               }}
               criteria={ctx.acciones.criteria}
-              tarjeta={TarjetaCrmAccion}
+              modosDisponibles={["tarjetas"]}
+              tarjeta={(accion) => (
+                <TarjetaAccionRapida accion={accion} publicar={emitir} />
+              )}
               entidades={ctx.acciones.lista}
               totalEntidades={ctx.acciones.total}
               seleccionada={ctx.acciones.activo}
@@ -84,6 +108,9 @@ export const MaestroAcciones = () => {
               onCriteriaChanged={(payload) =>
                 emitir("criteria_cambiado", payload)
               }
+              onSiguientePagina={(payload) =>
+                emitir("siguiente_pagina", payload)
+              }
             />
           </>
         }
@@ -94,33 +121,5 @@ export const MaestroAcciones = () => {
 
       {ctx.estado === "CREANDO" && <CrearAccion publicar={emitir} />}
     </div>
-  );
-};
-
-const iconoTipoAccion = (tipo: string) => {
-  const icono = {
-    Tarea: "tarea",
-    "E-mail": "correo",
-    Teléfono: "telefono",
-    Visita: "casa",
-    Otro: "llaveinglesa",
-  };
-
-  return icono[tipo as keyof typeof icono];
-};
-
-const TarjetaCrmAccion = (accion: Accion) => {
-  return (
-    <QTarjetaGenerica
-      avatar={
-        <QAvatar className={accion.estado}>
-          <QIcono nombre={iconoTipoAccion(accion.tipo)} tamaño="sm" />
-        </QAvatar>
-      }
-      arribaIzquierda={accion.descripcion}
-      arribaDerecha={accion.fecha ? formatearFechaDate(accion.fecha) : ""}
-      abajoIzquierda={accion.estado}
-      abajoDerecha={accion.nombre_cliente}
-    />
   );
 };

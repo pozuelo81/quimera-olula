@@ -637,13 +637,43 @@ export const modeloModificado = <T extends Modelo>(valor_inicial: T, valor: T) =
     )
 }
 
-export const formatearMoneda = (cantidad: number, divisa: string): string => {
+// const aNumeroMoneda = (cantidad: number | string): number | null => {
+//     if (typeof cantidad === "number") {
+//         return Number.isFinite(cantidad) ? cantidad : null;
+//     }
+
+//     const limpio = cantidad
+//         .trim()
+//         .replace(/[^0-9,.-]/g, "")
+//         .replace(/\s+/g, "");
+
+//     if (!limpio) return null;
+
+//     const hayComa = limpio.includes(",");
+//     const hayPunto = limpio.includes(".");
+
+//     const normalizado = hayComa && hayPunto
+//         ? limpio.replace(/\./g, "").replace(/,/g, ".")
+//         : hayComa
+//             ? limpio.replace(/,/g, ".")
+//             : limpio;
+
+//     const numero = Number(normalizado);
+//     return Number.isFinite(numero) ? numero : null;
+// }
+
+export const formatearMoneda = (cantidad: number | string, divisa: string): string => {
+    // const numero = aNumeroMoneda(cantidad);
+    const numero = Number(cantidad);
+    if (isNaN(numero)) return "";
+
     const divisaValida = divisa && divisa.trim() ? divisa.trim().toUpperCase() : "EUR";
     const locale = divisaValida === "EUR" ? "es-ES" : "en-US";
     return new Intl.NumberFormat(locale, {
         style: "currency",
         currency: divisaValida,
-    }).format(cantidad);
+        useGrouping: "always",
+    }).format(numero);
 };
 
 function decimalesPorMoneda(divisa: string): number {

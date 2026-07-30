@@ -39,6 +39,7 @@ export const LineasOrden = ({
                 </QBoton>
             </div>
             <LineasOrdenLista
+                orden={orden}
                 lineas={lineas.lista}
                 seleccionada={lineas.activo?.id}
                 publicar={publicar}

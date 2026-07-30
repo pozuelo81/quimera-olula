@@ -4,7 +4,11 @@ import { QInput } from "../atomos/qinput.tsx";
 import { getIdUnico } from "../helpers.ts";
 import "./qautocompletar.css";
 
-type Opcion = { valor: string; descripcion: string, descripcionOpcion?: string };
+type Opcion = {
+  valor: string;
+  descripcion: string;
+  descripcionOpcion?: string;
+};
 
 export type QAutocompletarProps = Omit<
   FormFieldProps,
@@ -14,7 +18,7 @@ export type QAutocompletarProps = Omit<
   longitudMinima?: number;
   descripcion?: string;
   soloTexto?: boolean;
-  obtenerOpciones: (valor: string) => Promise<Opcion[]>;
+  obtenerOpciones: (texto: string, id?: string) => Promise<Opcion[]>;
   onChange?: (
     opcion: Opcion | null,
     evento: React.ChangeEvent<HTMLElement>
@@ -59,8 +63,8 @@ export const QAutocompletar = ({
       <option key={opcion.valor} value={descripcion}>
         {descripcion}
       </option>
-    );}
-  );
+    );
+  });
 
   const listaId = useRef(nombre + "-datalist-" + getIdUnico());
 
@@ -88,6 +92,17 @@ export const QAutocompletar = ({
   }, [valor]);
 
   useEffect(() => {
+    if (editando.current || !valor || descripcion) return;
+
+    obtenerOpciones("", valor).then((opciones) => {
+      const opcion = opciones.find((o) => o.valor === valor);
+      if (opcion) {
+        setValorDescrito(opcion.descripcion);
+      }
+    });
+  }, [valor, descripcion]);
+
+  useEffect(() => {
     if (!editando.current || opciones.length === 0) return;
 
     const opcion = opciones.find(
@@ -108,7 +123,9 @@ export const QAutocompletar = ({
   const manejarInput = (valor: string, e: React.FormEvent<HTMLElement>) => {
     editando.current = true;
 
-    const opcion = opciones.find((opcion) => (opcion?.descripcionOpcion || opcion.descripcion) === valor);
+    const opcion = opciones.find(
+      (opcion) => (opcion?.descripcionOpcion || opcion.descripcion) === valor
+    );
 
     if (opcion) {
       clearTimeout(temporizador.current);
@@ -136,9 +153,17 @@ export const QAutocompletar = ({
   };
 
   const manejarBlur = (valor: string, e: React.FocusEvent<HTMLElement>) => {
+    const estabaEditando = editando.current;
     editando.current = false;
 
-    const opcion = opciones.find((opcion) => (opcion?.descripcionOpcion || opcion.descripcion) === valor);
+    if (!estabaEditando) {
+      onBlur?.(null, e);
+      return;
+    }
+
+    const opcion = opciones.find(
+      (opcion) => (opcion?.descripcionOpcion || opcion.descripcion) === valor
+    );
 
     if (opcion) {
       valorReal.current!.value = opcion.valor;
@@ -173,11 +198,13 @@ export const QAutocompletar = ({
           opcional={opcional}
           deshabilitado={deshabilitado}
           nombre=""
+          tipo="autocompletar"
           lista={listaId.current}
           autocompletar="off"
           onInput={manejarInput}
           onBlur={manejarBlur}
           onChange={manejarChange}
+          placeholder={props.placeholder}
           valor={valorDescrito}
           soloTexto={soloTexto}
         />

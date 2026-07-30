@@ -1,6 +1,11 @@
 import { OlulaWordmark } from "@olula/componentes/tema/Olula.jsx";
 import { FactoryCtx } from "@olula/lib/factory_ctx.tsx";
-import { useContext } from "react";
+import {
+  PANEL_LATERAL_ABIERTO_EVENT,
+  notificarPanelLateralAbierto,
+  solicitarTogglePanelLateral,
+} from "@olula/lib/panel_lateral_events.ts";
+import { useContext, useEffect } from "react";
 import { Link, useLocation } from "react-router";
 import { QIcono } from "../atomos/qicono.tsx";
 import "./Cabecera.css";
@@ -18,6 +23,10 @@ export type CabeceraProps = {
   AccionesCabecera?: () => React.ReactNode;
   MenuUsuario?: () => React.ReactNode;
   ExtraLogo?: () => React.ReactNode;
+  /** Si la app registra Componentes.panel_asistente (ver Plantilla.tsx) — controla si
+   * se muestra el icono que lo abre. En apps que no lo registran, no hay nada que
+   * abrir, así que el icono no debe aparecer. */
+  mostrarAsistente?: boolean;
 };
 
 export const CabeceraBase = ({
@@ -35,9 +44,21 @@ export const CabeceraBase = ({
   AccionesCabecera,
   MenuUsuario,
   ExtraLogo,
+  mostrarAsistente = false,
 }: CabeceraProps) => {
-  const { toggleMenu } = useMenuControl();
+  const { menuAbierto, toggleMenu, cerrarMenu } = useMenuControl();
   const autenticado = estaAutentificado();
+
+  useEffect(() => {
+    // El panel lateral del asistente (packages/contextos, fuera de este árbol de
+    // MenuProvider) avisa por evento cuando se abre, para que el menú de usuario se
+    // cierre — misma zona de pantalla, no deben convivir abiertos a la vez.
+    const alAbrirPanelLateral = (e: Event) => {
+      if ((e as CustomEvent<string>).detail === "asistente") cerrarMenu("usuario");
+    };
+    window.addEventListener(PANEL_LATERAL_ABIERTO_EVENT, alAbrirPanelLateral);
+    return () => window.removeEventListener(PANEL_LATERAL_ABIERTO_EVENT, alAbrirPanelLateral);
+  }, [cerrarMenu]);
 
   console.log("Logo", Logo);
   return (
@@ -67,12 +88,28 @@ export const CabeceraBase = ({
             {AccionesCabecera ? <AccionesCabecera /> : null}
           </div>
         </div>
+        {autenticado && mostrarAsistente && (
+          <>
+            <button
+              id="boton-asistente"
+              aria-label="Abrir asistente"
+              onClick={() => solicitarTogglePanelLateral("asistente")}
+            ></button>
+            <label htmlFor="boton-asistente" id="etiqueta-asistente-abierto">
+              <QIcono nombre="asistente" tamaño="sm" />
+            </label>
+          </>
+        )}
         {autenticado && (
           <>
             <button
               id="boton-menu-usuario"
               aria-label="Abrir menú usuario"
-              onClick={() => toggleMenu("usuario")}
+              onClick={() => {
+                const yaAbierto = menuAbierto.usuario;
+                toggleMenu("usuario");
+                if (!yaAbierto) notificarPanelLateralAbierto("usuario");
+              }}
             ></button>
             <label
               htmlFor="boton-menu-usuario"
@@ -102,6 +139,7 @@ export const Cabecera = (props: CabeceraProps) => {
     ?.cabecera_menu_usuario as () => React.ReactNode;
   const ExtraLogo = app.Componentes
     ?.cabecera_extra_logo as () => React.ReactNode;
+  const mostrarAsistente = Boolean(app.Componentes?.panel_asistente);
   const cProps: CabeceraProps = {
     ...props,
     NotificacionesCabecera:
@@ -113,6 +151,7 @@ export const Cabecera = (props: CabeceraProps) => {
     MenuUsuario: MenuUsuario || props.MenuUsuario,
     ExtraLogo: ExtraLogo || props.ExtraLogo,
     Titulo: props.Titulo,
+    mostrarAsistente,
   };
 
   const { pathname } = useLocation();

@@ -23,12 +23,12 @@ export const Ubicacion = ({
   ...props
 }: UbicacionProps) => {
 
-    console.log("Valor ubicacion", valor)
-
-    const obtenerOpciones = async (texto: string) => {
+    const obtenerOpciones = async (texto: string, id?: string) => {
         const criteria: Criteria = {
             ...criteriaDefecto,
-            filtro: [["codigo", "~", texto]],
+            filtro: id
+                ? [["id", "=", id]]
+                : [["codigo", "~", texto]],
             orden: ["codigo", "ASC"],
         };
 

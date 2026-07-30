@@ -3,15 +3,26 @@ import { Criteria, Entidad, Modelo, RespuestaLista } from "@olula/lib/diseño.ts
 export interface Caja extends Entidad {
     id: string;
     lpn: string;
-    ubicacionId: string;
-    contenedorId?: string | null;
+    idUbicacion: string;
+    ubicacion: string;
+    idContenedor?: string | null;
 }
 
 export interface MovimientoCaja extends Entidad {
     id: string;
+    idLote: string;
+    cantidad: string;
+    fechaHora: Date;
+    idUbicacion: string;
+    ubicacion: string;
+}
+
+export interface MaterialCaja extends Entidad {
+    id: string;
     sku: string;
     descripcion: string;
     cantidad: number;
+    movimientos: MovimientoCaja[];
 }
 
 // Caja con su contenido completo (árbol de materiales + subcajas)
@@ -19,11 +30,11 @@ export interface CajaContenido extends Caja {
     contenido: ComponenteCaja[];
 }
 
-export type ComponenteCaja = CajaContenido | MovimientoCaja;
+export type ComponenteCaja = CajaContenido | MaterialCaja;
 
 export interface NuevaCaja extends Modelo {
-    ubicacionId: string;
-    contenedorId?: string | null;
+    idUbicacion: string;
+    idContenedor?: string | null;
 }
 
 export type CambiosCaja = Partial<Caja>;

@@ -1,4 +1,5 @@
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
+import { QIcono } from "@olula/componentes/atomos/qicono.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
 import { Listado } from "@olula/componentes/maestro/Listado.tsx";
 import { MaestroDetalle } from "@olula/componentes/maestro/MaestroDetalle.tsx";
@@ -37,9 +38,15 @@ export const MaestroConDetalleUbicacion = () => {
                         <h2>Ubicaciones</h2>
                         <div className="maestro-botones">
                             <QBoton onClick={() => emitir("crear")}>Nueva</QBoton>
-                            <QBoton onClick={cambiarLayout}>
-                                {layout === "TARJETA" ? "Cambiar a TABLA" : "Cambiar a TARJETA"}
-                            </QBoton>
+                            <span
+                                className="cambio-modo-icono"
+                                onClick={cambiarLayout}
+                            >
+                                <QIcono
+                                    nombre={layout === "TABLA" ? "lista" : "tabla"}
+                                    tamaño="md"
+                                />
+                            </span>
                         </div>
                         <Listado<Ubicacion>
                             metaTabla={metaTablaUbicacion}
@@ -76,7 +83,7 @@ const TarjetaUbicacion = (ubicacion: Ubicacion) => {
     return (
         <div className="tarjeta-ubicacion" key={ubicacion.id}>
             <div>{ubicacion.codigo}</div>
-            <div>{ubicacion.almacenId}</div>
+            <div>{ubicacion.zona}</div>
         </div>
     );
 };
