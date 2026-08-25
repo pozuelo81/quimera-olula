@@ -12,6 +12,7 @@ Cómo está estructurado el código y qué patrones seguimos.
 |-----------|-------------|
 | [Guía DDD de vistas](./arquitectura/ddd_vistas.md) | Filosofía principal: capas diseño/dominio/infraestructura/vistas, máquinas de estado, patrón maestro/detalle |
 | [Sobrecarga por cliente](./arquitectura/sobrecarga.md) | Inyección de dependencias con Factory para personalizar componentes por app |
+| [El ecosistema Quimera Olula](./arquitectura/ecosistema.md) | Cómo encajan este frontend, el backend `olula_servidor` (FastAPI/CQRS) y el servidor `olula_mcp` (tools para agentes de IA) |
 
 ---
 

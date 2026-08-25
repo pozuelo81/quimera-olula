@@ -1,0 +1,20 @@
+.TabFirma {
+
+    /* Fila 1: Fecha de firma (4) + Lugar de firma (8) = 12 */
+    quimera-input[nombre="fechaFirma"] {
+        grid-column: span 4;
+    }
+
+    quimera-input[nombre="lugarFirma"] {
+        grid-column: span 8;
+    }
+
+    /* Fila 2: Fecha último adeudo (6) + Fecha de caducidad (6) = 12 */
+    quimera-input[nombre="fechaUltimoAdeudo"] {
+        grid-column: span 6;
+    }
+
+    quimera-input[nombre="fechaCaducidad"] {
+        grid-column: span 6;
+    }
+}

@@ -3,9 +3,17 @@ import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
 import { MetaTabla } from "@olula/componentes/index.js";
 import { Listado } from "@olula/componentes/maestro/Listado.js";
 import { MaestroDetalle } from "@olula/componentes/maestro/MaestroDetalle.tsx";
+import { MetaFiltro } from "@olula/componentes/maestro/maestroFiltros/MaestroFiltrosActivoControlado.js";
 import { listaActivaEntidadesInicial } from "@olula/lib/ListaActivaEntidades.js";
 import { getUrlParams, useUrlParams } from "@olula/lib/url-params.js";
 import { useEffect } from "react";
+import {
+  filtroAgente,
+  filtroAlmacen,
+  filtroCliente,
+  filtroCodigo,
+  filtroFechaDocumento,
+} from "../../comun/filtros.tsx";
 import { CrearFactura } from "../crear/CrearFactura.tsx";
 import { DetalleFactura } from "../detalle/DetalleFactura.tsx";
 import { Factura } from "../diseño.ts";
@@ -30,6 +38,14 @@ export const MaestroConDetalleFactura = () => {
 
   const metaTablaFactura = metaTablaBase as MetaTabla<Factura>;
 
+  const metaFiltroFactura: MetaFiltro = {
+    codigo: filtroCodigo,
+    cliente_id: filtroCliente,
+    agente_id: filtroAgente,
+    fecha: filtroFechaDocumento,
+    almacen_id: filtroAlmacen,
+  };
+
   return (
     <div className="Factura">
       <MaestroDetalle<Factura>
@@ -38,8 +54,8 @@ export const MaestroConDetalleFactura = () => {
             <h2>Facturas</h2>
             <Listado<Factura>
               metaTabla={metaTablaFactura}
+              metaFiltro={metaFiltroFactura}
               criteria={ctx.facturas.criteria}
-              modo={"tabla"}
               entidades={ctx.facturas.lista}
               totalEntidades={ctx.facturas.total}
               seleccionada={ctx.facturas.activo}

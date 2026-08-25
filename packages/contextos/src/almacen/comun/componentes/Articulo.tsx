@@ -15,6 +15,7 @@ interface ArticuloProps {
   deshabilitado?: boolean;
   opcional?: boolean;
   ref?: React.RefObject<HTMLInputElement | null>;
+  soloLectura?: boolean;
   onChange: (opcion: { valor: string; descripcion: string } | null) => void;
 }
 
@@ -29,16 +30,18 @@ export const Articulo = ({
   const [descripcionResuelta, setDescripcionResuelta] = useState(descripcion);
 
   useEffect(() => {
-    setDescripcionResuelta(descripcion);
-  }, [descripcion]);
-
-  useEffect(() => {
-    if (!valor || descripcion) return;
-
+    if (!valor) {
+      setDescripcionResuelta(descripcion);
+      return;
+    }
+    if (descripcion) {
+      setDescripcionResuelta(descripcion);
+      return;
+    }
     getArticulo(valor).then((articulo) =>
       setDescripcionResuelta(articulo.descripcion)
     );
-  }, [valor, descripcion]);
+  }, [valor]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const obtenerOpciones = async (texto: string) => {
     const criteria = {

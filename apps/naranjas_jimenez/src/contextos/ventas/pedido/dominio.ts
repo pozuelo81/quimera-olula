@@ -31,7 +31,7 @@ const numeroARomano = (num: string): string => {
 
 export const formateaCategoria = (categoria: string) => numeroARomano(categoria)
 
-import { pedidoVacio } from "#/ventas/pedido/detalle/dominio.ts";
+import { pedidoVacio } from "#/ventas/pedido/detalle/detalle.ts";
 import { QIcono } from "@olula/componentes/index.js";
 import { PedidoNrj } from "./diseño.ts";
 

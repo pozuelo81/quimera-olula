@@ -40,6 +40,7 @@ type MaestroProps<T extends Entidad> = {
   seleccionada: T | null;
   onSeleccion: (seleccionada: T) => void;
   modo?: Modo;
+  modoInicial?: Modo;
   modosDisponibles?: Modo[];
   onModoChanged?: (modo: Modo) => void;
   onCriteriaChanged: (criteria: Criteria) => void;
@@ -58,12 +59,13 @@ export const ListadoSemiControlado = <T extends Entidad>({
   seleccionada,
   onSeleccion,
   modo,
+  modoInicial,
   modosDisponibles,
   onModoChanged,
   onCriteriaChanged,
 }: MaestroProps<T>) => {
   const [criteria, setCriteria] = useState<Criteria>(criteriaInicial);
-  const [modoEstado, setModoEstado] = useState<Modo>(modo ?? "tarjetas");
+  const [modoEstado, setModoEstado] = useState<Modo>(modo ?? modoInicial ?? "tabla");
   const modoInterno = modo ?? modoEstado;
 
   const puedeTabla = metaTabla !== undefined;

@@ -128,6 +128,12 @@ function PedidoGenerarPreparaciones({ callbackChanged, callbackPedidoEnviadoPda,
 
   const dataLineas = lineas.idList.map(id => lineas.dict[id]);
 
+  const hayLineasParaCerrar = dataLineas.some(linea =>
+    !linea.cerradaPDA &&
+    (linea.shCantAlbaran === 0 || linea.shCantAlbaran == null) &&
+    parseFloat(linea.canServida) < parseFloat(linea.cantidad)
+  );
+
   useEffect(() => {
     dispatch({
       type: "onGuardarCallbacks",
@@ -277,6 +283,12 @@ function PedidoGenerarPreparaciones({ callbackChanged, callbackPedidoEnviadoPda,
                 icon="send"
                 disabled={pedido.buffer?.estadoPda !== "Preparado" || status.enviandoPda}
                 busy={status.enviandoPda}
+              />
+              <QBoxButton
+                id="cerrarLineasNoInformadas"
+                title="Cerrar líneas sin cantidad"
+                icon="lock"
+                disabled={!hayLineasParaCerrar}
               />
               <QBoxButton
                 id="quitarTrabajador"

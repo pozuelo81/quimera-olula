@@ -1,11 +1,14 @@
 import "./_forminput.css";
-import { Etiqueta, FormFieldProps, Validacion } from "./_forminput.tsx";
+import { Etiqueta, FormFieldProps, Validacion, useEditando } from "./_forminput.tsx";
+import { QIcono } from "./qicono.tsx";
 
-type Opcion = { valor: string; descripcion: string };
+type Opcion = { valor: string; descripcion: string;[dato: string]: unknown };
 
 export type QSelectProps = Omit<FormFieldProps, "onChange" | "onBlur"> & {
   opciones: Opcion[] | Opcion[][];
-  soloTexto?: boolean;
+  soloLectura?: boolean;
+  modificado?: boolean;
+  enlace?: string;
   onChange?: (
     opcion: Opcion | null,
     evento: React.ChangeEvent<HTMLElement>
@@ -30,21 +33,43 @@ export const QSelect = ({
   valido,
   opcional,
   condensado,
-  soloTexto,
+  soloLectura,
+  modificado,
+  enlace,
   ref,
   onChange,
   onBlur,
   evaluarCambio,
 }: QSelectProps) => {
-  if (soloTexto) {
+  const { editandoHandlers } = useEditando();
+
+  if (soloLectura) {
     const descripcion = opciones
       .flat()
       .find((o) => o.valor === valor)?.descripcion;
+    const enlaceHref = enlace && valor
+      ? enlace.includes("{id}")
+        ? enlace.replace("{id}", encodeURIComponent(valor))
+        : `${enlace.replace(/\/$/, "")}/${valor}`
+      : null;
     return (
-      <quimera-select solo-texto="" nombre={nombre} condensado={condensado}>
+      <quimera-select solo-lectura="" nombre={nombre} condensado={condensado}>
         <label>
           <Etiqueta label={label} />
-          <span className="valor-solo-texto">{descripcion || "—"}</span>
+          <span className="valor-solo-lectura">
+            {descripcion || "—"}
+            {enlaceHref && (
+              <a
+                className="enlace-solo-lectura"
+                href={enlaceHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Abrir ${label ?? "ficha"}`}
+              >
+                <QIcono nombre="arriba_derecha" tamaño="sm" />
+              </a>
+            )}
+          </span>
         </label>
       </quimera-select>
     );
@@ -57,6 +82,7 @@ export const QSelect = ({
     opcional,
     condensado,
     deshabilitado,
+    modificado,
   };
 
   const renderOpciones = (opciones: Opcion[] | Opcion[][]) =>
@@ -97,7 +123,7 @@ export const QSelect = ({
   };
 
   return (
-    <quimera-select {...attrs}>
+    <quimera-select {...attrs} {...editandoHandlers}>
       <label>
         <Etiqueta label={label} />
         <select

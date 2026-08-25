@@ -22,10 +22,10 @@ export const DetalleAlbaranarPedido = () => {
   const { app } = useContext(FactoryCtx);
   const urlPedido =
     (app.Ventas?.albaranar_url_pedido as UrlPorId | undefined) ??
-    ((id: string) => `/ventas/pedido/${id}`);
+    ((id: string) => `/ventas/pedido?id=${id}`);
   const urlAlbaran =
     (app.Ventas?.albaranar_url_albaran as UrlPorId | undefined) ??
-    ((id: string) => `/ventas/albaran/${id}`);
+    ((id: string) => `/ventas/albaran?id=${id}`);
 
   const { ctx, emitir } = useMaquina(getMaquina, contextoVacio, async () => {});
 
@@ -82,7 +82,7 @@ export const DetalleAlbaranarPedido = () => {
               albaranCreado && navigate(urlAlbaran(albaranCreado.id))
             }
           >
-            Ir al albarán creado
+            Ir al albarán {albaranCreado?.codigo}
           </QBoton>
         </div>
       </QModal>

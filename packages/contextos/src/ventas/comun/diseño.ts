@@ -11,7 +11,6 @@ export type ClienteVentaNoRegistrado = {
         codPostal: string,
         ciudad: string,
         provincia: string,
-        idProvincia: string,
         idPais: string,
     }
 }

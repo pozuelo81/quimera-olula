@@ -5,7 +5,7 @@ export interface Direccion {
     otros: string;
     cod_postal: string;
     ciudad: string;
-    provincia_id: number;
+    provincia_id: string;
     provincia: string;
     pais_id: string;
     apartado: string;

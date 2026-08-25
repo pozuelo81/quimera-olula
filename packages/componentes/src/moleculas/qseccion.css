@@ -1,0 +1,57 @@
+.qseccion {
+  border: 2px solid var(--color-borde, #ddd);
+  border-radius: 0.25rem;
+  padding: 0.5rem;
+  box-sizing: border-box;
+  margin-block: 0.25rem;
+}
+
+/* ── Estado inactivo: el usuario puede pulsar para editar ──────────────── */
+.qseccion--inactiva {
+  cursor: pointer;
+}
+
+.qseccion--inactiva:hover,
+.qseccion--inactiva:focus-visible {
+  border-color: var(--color-primario, #4a90d9);
+  outline: none;
+}
+
+/* ── Estado activo: borde de énfasis ──────────────────────────────────── */
+.qseccion--activa {
+  border-color: var(--color-primario, #4a90d9);
+  cursor: default;
+}
+
+/* ── Solo lectura: borde suave, sin interacción ───────────────────────── */
+.qseccion--solo-lectura {
+  cursor: default;
+  border-color: var(--color-borde-suave, #eee);
+}
+
+/* ── Etiqueta de categoría (overline) ─────────────────────────────────── */
+.qseccion__titulo {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-texto-suave, #888);
+  margin-bottom: 0.25rem;
+  /* La etiqueta no debe recibir el cursor de la sección inactiva */
+  pointer-events: none;
+}
+
+/* ── Vista resumen ────────────────────────────────────────────────────── */
+.qseccion__resumen {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+/* ── Botones Guardar / Cancelar ───────────────────────────────────────── */
+.qseccion__botones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}

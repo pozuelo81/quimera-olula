@@ -1,0 +1,57 @@
+import { ProcesarContexto } from "@olula/lib/diseño.ts";
+import { ejecutarListaProcesos, MetaModelo } from "@olula/lib/dominio.ts";
+import { ReciboVenta } from "../diseño.js";
+import { getReciboVenta } from "../infraestructura.js";
+import { ContextoDetalleReciboVenta, EstadoDetalleReciboVenta } from "./diseño.js";
+
+type ProcesarDetalle = ProcesarContexto<EstadoDetalleReciboVenta, ContextoDetalleReciboVenta>;
+
+const pipeRecibo = ejecutarListaProcesos<EstadoDetalleReciboVenta, ContextoDetalleReciboVenta>;
+
+export const metaReciboVenta: MetaModelo<ReciboVenta> = {
+    campos: {
+        codigo: { tipo: "texto" },
+        estado: { tipo: "texto" },
+        importe: { tipo: "moneda" },
+        fechaEmision: { tipo: "fecha" },
+        fechaVencimiento: { tipo: "fecha" },
+        clienteId: { tipo: "texto" },
+        idFiscal: { tipo: "texto" },
+        facturaId: { tipo: "texto" },
+    },
+    editable: () => false,
+};
+
+export const reciboVentaInicial = (): ReciboVenta => ({
+    id: '',
+    facturaId: '',
+    codigo: '',
+    fechaEmision: null,
+    fechaVencimiento: null,
+    estado: '',
+    importe: 0,
+    clienteId: '',
+    idFiscal: '',
+});
+
+export const contextoDetalleReciboVentaInicial: ContextoDetalleReciboVenta = {
+    estado: 'INICIAL',
+    recibo: reciboVentaInicial(),
+};
+
+export const cargarReciboVenta: (_: string) => ProcesarDetalle =
+    (idRecibo) => async (contexto) => {
+        const recibo = await getReciboVenta(idRecibo);
+        return pipeRecibo(contexto, [
+            async (ctx) => ({ ...ctx, recibo }),
+            'ABIERTO',
+        ]);
+    };
+
+export const cargarContexto: ProcesarDetalle = async (contexto, payload) => {
+    const idRecibo = payload as string;
+    if (idRecibo) {
+        return cargarReciboVenta(idRecibo)(contexto);
+    }
+    return { ...contexto, estado: 'INICIAL', recibo: reciboVentaInicial() };
+};

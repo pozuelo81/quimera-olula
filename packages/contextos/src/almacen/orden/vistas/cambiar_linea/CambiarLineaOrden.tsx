@@ -42,7 +42,7 @@ export const CambiarLineaOrden = ({
                 <quimera-formulario>
                     <QInput label="SKU" {...uiProps("sku")} />
                     <QInput label="Cantidad prevista" {...uiProps("cantidadPrevista")} />
-                    <QInput label="Cantidad real" {...uiProps("cantidadReal")} soloTexto />
+                    <QInput label="Cantidad real" {...uiProps("cantidadReal")} soloLectura />
                 </quimera-formulario>
                 <div className="botones maestro-botones">
                     <QBoton onClick={guardar} deshabilitado={!valido}>

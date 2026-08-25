@@ -17,7 +17,6 @@ export interface ModeloClienteVentaNoRegistrado extends Modelo {
     otros?: string;
     codPostal: string;
     ciudad?: string;
-    idProvincia?: string;
     provincia?: string;
     idPais?: string;
     apartado?: string;
@@ -28,17 +27,6 @@ export const clienteRegistradoVacio: ModeloClienteVentaRegistrado = {
     idCliente: "",
     idDireccion: "",
     nombre: "",
-}
-
-export const clienteRegistradoDesdeVenta = (venta?: VentaTpv): ModeloClienteVentaRegistrado => {
-
-    return venta?.cliente?.id
-        ? {
-            idCliente: venta.cliente.id,
-            idDireccion: venta.cliente.idDireccion ?? "",
-            nombre: venta.cliente.nombre,
-        }
-        : clienteRegistradoVacio;
 }
 
 export const clienteNoRegistradoDesdeVenta = (venta?: VentaTpv): ModeloClienteVentaNoRegistrado => {
@@ -62,7 +50,6 @@ export const clienteVentaNoRegistradoVacio: ModeloClienteVentaNoRegistrado = {
     otros: "",
     codPostal: "",
     ciudad: "",
-    idProvincia: "",
     provincia: "",
     idPais: "",
     apartado: "",

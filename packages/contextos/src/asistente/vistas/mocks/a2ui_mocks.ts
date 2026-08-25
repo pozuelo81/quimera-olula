@@ -165,12 +165,12 @@ export const getMockRespuestaIa = (consulta: ConsultaIa): RespuestaIa => {
 
     if (texto.includes("pedido")) {
         return {
-            respuesta: "Puedo hacerlo desde el formulario de pedidos: te llevo allí.",
+            respuesta: "Puedo hacerlo desde el formulario de pedidos — pulsa el botón para ir allí.",
             threadId,
             a2uiMessages: [],
             capacidadesHash,
             necesitaCapacidades: false,
-            accionNavegacion: { ruta: "/ventas/pedido", parametros: {} },
+            accionNavegacion: { ruta: "/ventas/pedido", parametros: {}, descripcion: "Gestiona pedidos" },
             adjuntos: [],
         };
     }

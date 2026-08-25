@@ -1,3 +1,4 @@
+import { CamposDireccionVenta } from "#/ventas/comun/componentes/CamposDireccionVenta.tsx";
 import { Cliente } from "#/ventas/comun/componentes/cliente.tsx";
 import { DirCliente } from "#/ventas/comun/componentes/dirCliente.tsx";
 import { ClienteVenta } from "#/ventas/venta/diseño.ts";
@@ -5,10 +6,10 @@ import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput, QModal } from "@olula/componentes/index.js";
 import { Modelo } from "@olula/lib/diseño.js";
 import { HookModelo, useModelo } from "@olula/lib/useModelo.ts";
-import { useEffect } from "react";
+import { useMemo } from "react";
 import "./CambioClienteVenta.css";
 import { CambioCliente } from "./diseño.ts";
-import { cambioClienteVacio, metaCambioCliente } from "./dominio.ts";
+import { metaCambioCliente, metaCambioClienteNoRegistrado } from "./dominio.ts";
 
 export interface VentaConCliente extends Modelo {
   id: string;
@@ -21,7 +22,6 @@ export interface CambioClienteProps<T extends VentaConCliente> {
   onGuardar: (cambios: CambioCliente) => Promise<void>;
   onCancelar?: () => void;
   titulo?: string;
-  inicializarDesdeVenta?: boolean;
   permitirClienteNoRegistrado?: boolean;
 }
 
@@ -34,33 +34,59 @@ export const CambioClienteVenta = <T extends VentaConCliente>({
   onGuardar,
   onCancelar,
   titulo = "Cambiar cliente",
-  inicializarDesdeVenta = false,
   permitirClienteNoRegistrado = true,
 }: CambioClienteProps<T>) => {
-  const { modelo, uiProps, valido, init } = useModelo(
-    metaCambioCliente,
-    cambioClienteVacio
+  const { cliente_id, nombre_cliente, direccion_id, id_fiscal, direccion } =
+    venta.modelo.cliente;
+
+  /*
+   * Memoizado campo a campo: `venta.modelo.cliente` cambia de identidad en
+   * cada refresco del documento y `useModelo` reinicia el formulario cuando el
+   * modelo inicial cambia, así que un objeto nuevo por render borraría lo
+   * tecleado al salir de cualquier campo.
+   */
+  const cambioInicial = useMemo(
+    (): CambioCliente => ({
+      cliente_id: cliente_id ?? "",
+      nombre_cliente: nombre_cliente ?? "",
+      direccion_id: direccion_id ?? "",
+      id_fiscal: id_fiscal ?? "",
+      tipo_via: direccion?.tipo_via ?? "",
+      nombre_via: direccion?.nombre_via ?? "",
+      numero: direccion?.numero ?? "",
+      otros: direccion?.otros ?? "",
+      cod_postal: direccion?.cod_postal ?? "",
+      ciudad: direccion?.ciudad ?? "",
+      provincia: direccion?.provincia ?? "",
+      pais_id: direccion?.pais_id ?? "",
+      apartado: direccion?.apartado ?? "",
+      telefono: direccion?.telefono ?? "",
+    }),
+    [
+      cliente_id,
+      nombre_cliente,
+      direccion_id,
+      id_fiscal,
+      direccion?.tipo_via,
+      direccion?.nombre_via,
+      direccion?.numero,
+      direccion?.otros,
+      direccion?.cod_postal,
+      direccion?.ciudad,
+      direccion?.provincia,
+      direccion?.pais_id,
+      direccion?.apartado,
+      direccion?.telefono,
+    ]
   );
 
-  useEffect(() => {
-    if (!activo) return;
-
-    const cliente = venta.modelo.cliente;
-    init({
-      cliente_id: cliente.cliente_id ?? "",
-      nombre_cliente: cliente.nombre_cliente ?? "",
-      direccion_id: cliente.direccion_id ?? "",
-      id_fiscal: cliente.id_fiscal ?? "",
-      tipo_via: cliente.direccion?.tipo_via ?? "",
-      nombre_via: cliente.direccion?.nombre_via ?? "",
-      ciudad: cliente.direccion?.ciudad ?? "",
-    });
-  }, [activo, init, inicializarDesdeVenta, venta.modelo.cliente]);
-
-  const clienteRegistrado = esClienteRegistrado(
-    venta.modelo.cliente.cliente_id
-  );
+  const clienteRegistrado = esClienteRegistrado(cliente_id);
   const clienteNoRegistrado = !clienteRegistrado && permitirClienteNoRegistrado;
+
+  const { modelo, uiProps, valido } = useModelo(
+    clienteRegistrado ? metaCambioCliente : metaCambioClienteNoRegistrado,
+    cambioInicial
+  );
 
   const cambiosClienteRegistrado = (): CambioCliente => ({
     cliente_id: modelo.cliente_id,
@@ -72,22 +98,20 @@ export const CambioClienteVenta = <T extends VentaConCliente>({
     id_fiscal: modelo.id_fiscal,
     tipo_via: modelo.tipo_via,
     nombre_via: modelo.nombre_via,
+    numero: modelo.numero,
+    otros: modelo.otros,
+    cod_postal: modelo.cod_postal,
     ciudad: modelo.ciudad,
+    provincia: modelo.provincia,
+    pais_id: modelo.pais_id,
+    apartado: modelo.apartado,
+    telefono: modelo.telefono,
   });
 
-  const puedeGuardarNoRegistrado = !!(modelo.nombre_cliente ?? "").trim();
-
   const guardar = async () => {
-    const cambios = clienteRegistrado
-      ? cambiosClienteRegistrado()
-      : cambiosClienteNoRegistrado();
-    await onGuardar(cambios);
-    init(cambioClienteVacio);
-  };
-
-  const cancelar = () => {
-    onCancelar?.();
-    init(cambioClienteVacio);
+    await onGuardar(
+      clienteRegistrado ? cambiosClienteRegistrado() : cambiosClienteNoRegistrado()
+    );
   };
 
   return (
@@ -95,9 +119,9 @@ export const CambioClienteVenta = <T extends VentaConCliente>({
       abierto={activo}
       nombre="mostrar"
       titulo={titulo}
-      onCerrar={cancelar}
+      onCerrar={onCancelar}
     >
-      <div className="CambioCliente">
+      <div className="CambioCliente campos-direccion">
         <quimera-formulario>
           {clienteNoRegistrado ? (
             <>
@@ -106,9 +130,7 @@ export const CambioClienteVenta = <T extends VentaConCliente>({
                 {...uiProps("nombre_cliente")}
               />
               <QInput label="ID Fiscal" {...uiProps("id_fiscal")} />
-              <QInput label="Tipo de Vía" {...uiProps("tipo_via")} />
-              <QInput label="Nombre de la Vía" {...uiProps("nombre_via")} />
-              <QInput label="Ciudad" {...uiProps("ciudad")} />
+              <CamposDireccionVenta uiProps={uiProps} />
             </>
           ) : (
             <>
@@ -125,12 +147,7 @@ export const CambioClienteVenta = <T extends VentaConCliente>({
         </quimera-formulario>
 
         <div className="botones maestro-botones">
-          <QBoton
-            onClick={guardar}
-            deshabilitado={
-              clienteNoRegistrado ? !puedeGuardarNoRegistrado : !valido
-            }
-          >
+          <QBoton onClick={guardar} deshabilitado={!valido}>
             Guardar
           </QBoton>
         </div>

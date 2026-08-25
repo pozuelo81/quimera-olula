@@ -6,6 +6,8 @@ type Opcion = { valor: string; descripcion: string };
 
 export type QRadioProps = Omit<FormFieldProps, "onChange" | "onBlur"> & {
   opciones: Opcion[];
+  soloLectura?: boolean;
+  modificado?: boolean;
   onChange?: (
     opcion: Opcion | null,
     evento: React.ChangeEvent<HTMLInputElement>
@@ -25,9 +27,27 @@ export const QRadio = ({
   valido,
   opcional,
   condensado,
+  soloLectura,
+  modificado,
   onChange,
   evaluarCambio,
 }: QRadioProps) => {
+  if (soloLectura) {
+    const opcionSeleccionada = opciones.find((o) => o.valor === valor);
+    return (
+      <quimera-radio solo-lectura="" condensado={condensado}>
+        <fieldset>
+          <legend>
+            <Etiqueta label={label} />
+          </legend>
+          <span className="valor-solo-lectura">
+            {opcionSeleccionada?.descripcion || "—"}
+          </span>
+        </fieldset>
+      </quimera-radio>
+    );
+  }
+
   const attrs = {
     erroneo,
     advertido,
@@ -35,6 +55,7 @@ export const QRadio = ({
     opcional,
     condensado,
     deshabilitado,
+    modificado,
   };
 
   const manejarChange = (e: React.ChangeEvent<HTMLInputElement>) => {

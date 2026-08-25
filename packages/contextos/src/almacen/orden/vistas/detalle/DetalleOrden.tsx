@@ -99,10 +99,10 @@ export const DetalleOrden = ({
             <div className="DetalleOrden">
                 <quimera-formulario>
                     <QInput label="Descripción" {...orden.uiProps("descripcion")}/>
-                    <TipoOrden {...orden.uiProps("tipo")} soloTexto />
-                    <Almacen {...orden.uiProps("almacenId")} soloTexto />
-                    <QInput label="Fecha" {...orden.uiProps("fecha")} soloTexto />
-                    <QInput label="Abierta" {...orden.uiProps("abierta")} soloTexto />
+                    <TipoOrden {...orden.uiProps("tipo")} soloLectura />
+                    <Almacen {...orden.uiProps("almacenId")} soloLectura />
+                    <QInput label="Fecha" {...orden.uiProps("fecha")} soloLectura />
+                    <QInput label="Abierta" {...orden.uiProps("abierta")} soloLectura />
                     {mostrarOrigen && (
                         <Caja
                             {...orden.uiProps("idCajaOrigen")}

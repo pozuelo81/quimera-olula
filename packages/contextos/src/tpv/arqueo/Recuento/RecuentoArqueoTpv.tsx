@@ -159,17 +159,17 @@ export const RecuentoArqueoTpv = ({
           <h4>Teórico</h4>
           
 
-          <QInput label="Efectivo inicial" nombre="efectivoInicial" valor={moneda(arqueo.efectivoInicial)} soloTexto tipo='numero'/>
-          <QInput label="Pagos efectivo" nombre="pagosEfectivo" valor={moneda(arqueo.pagosEfectivo)} soloTexto tipo='numero'/>
-          <QInput label="Movimientos efectivo" nombre="movimientosEfectivo" valor={moneda(totalMovimientos(arqueo.movimientos))} soloTexto tipo='numero'/>
-          <QInput label="Efectivo" nombre="totalEfectivo" valor={moneda(totalEfectivo(arqueo))} soloTexto tipo='numero'/>
-          <QInput label="Tarjeta" nombre="totalTarjeta" valor={moneda(arqueo.pagosTarjeta)} soloTexto tipo='numero'/>
-          <QInput label="Vale" nombre="totalVale" valor={moneda(arqueo.pagosVale)} soloTexto tipo='numero'/>
+          <QInput label="Efectivo inicial" nombre="efectivoInicial" valor={moneda(arqueo.efectivoInicial)} soloLectura tipo='numero'/>
+          <QInput label="Pagos efectivo" nombre="pagosEfectivo" valor={moneda(arqueo.pagosEfectivo)} soloLectura tipo='numero'/>
+          <QInput label="Movimientos efectivo" nombre="movimientosEfectivo" valor={moneda(totalMovimientos(arqueo.movimientos))} soloLectura tipo='numero'/>
+          <QInput label="Efectivo" nombre="totalEfectivo" valor={moneda(totalEfectivo(arqueo))} soloLectura tipo='numero'/>
+          <QInput label="Tarjeta" nombre="totalTarjeta" valor={moneda(arqueo.pagosTarjeta)} soloLectura tipo='numero'/>
+          <QInput label="Vale" nombre="totalVale" valor={moneda(arqueo.pagosVale)} soloLectura tipo='numero'/>
 
           <h4>Diferencia</h4>
-          <QInput label="Efectivo" nombre="difEfectivo" valor={moneda(modelo.recuentoEfectivo - totalEfectivo(arqueo))} soloTexto tipo='numero'/>
-          <QInput label="Tarjeta" nombre="difTarjeta" valor={moneda(modelo.recuentoTarjeta - arqueo.pagosTarjeta)} soloTexto tipo='numero'/>
-          <QInput label="Vale" nombre="difVale" valor={moneda(modelo.recuentoVales - arqueo.pagosVale)} soloTexto tipo='numero'/>
+          <QInput label="Efectivo" nombre="difEfectivo" valor={moneda(modelo.recuentoEfectivo - totalEfectivo(arqueo))} soloLectura tipo='numero'/>
+          <QInput label="Tarjeta" nombre="difTarjeta" valor={moneda(modelo.recuentoTarjeta - arqueo.pagosTarjeta)} soloLectura tipo='numero'/>
+          <QInput label="Vale" nombre="difVale" valor={moneda(modelo.recuentoVales - arqueo.pagosVale)} soloLectura tipo='numero'/>
         </quimera-formulario>
 
         <div className="botones maestro-botones ">

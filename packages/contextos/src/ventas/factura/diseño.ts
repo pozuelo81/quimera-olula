@@ -1,11 +1,21 @@
-import { Filtro, Orden, Paginacion, RespuestaLista } from "@olula/lib/diseño.ts";
+import { CambioAgente } from "#/ventas/comun/componentes/moleculas/CambiarAgente/diseño.ts";
+import { CambioDivisa } from "#/ventas/comun/componentes/moleculas/CambiarDivisa/diseño.ts";
+import { Entidad, Filtro, Orden, Paginacion, RespuestaLista } from "@olula/lib/diseño.ts";
 import { ListaActivaEntidades } from "@olula/lib/ListaActivaEntidades.js";
-import { CambioClienteVenta, ClienteVenta, LineaVenta, NuevaLineaVenta, Venta } from "../venta/diseño.ts";
+import { AltaLineaVenta, CambioClienteVenta, ClienteVenta, LineaVenta, NuevaLineaVenta, Venta } from "../venta/diseño.ts";
 
 export interface Factura extends Venta {
     cliente: ClienteVenta;
+    estadoExpedicion: string;
     editable?: boolean;
+    por_comision: number;
     lineas?: LineaFactura[];
+    hora?: string;
+    almacen_id?: string;
+    nombre_almacen?: string;
+    // automatica?: boolean;
+    servicios?: boolean;
+    rectificativa_id?: string | null;
 }
 export interface LineaFactura extends LineaVenta {
     otro_campo?: string;
@@ -21,7 +31,6 @@ export type NuevaFactura = {
     otros?: string;
     cod_postal?: string;
     ciudad?: string;
-    provincia_id?: string;
     pais_id?: string;
     apartado?: string;
     telefono?: string;
@@ -42,9 +51,7 @@ export type GetReportFactura = (id: string) => Promise<Blob>;
 
 export type PostFactura = (factura: NuevaFactura) => Promise<string>;
 
-export type PostLinea = (id: string, linea: NuevaLineaVenta) => Promise<string>;
-
-export type PatchFactura = (id: string, factura: Factura) => Promise<void>;
+export type PostLinea = (id: string, linea: AltaLineaVenta) => Promise<string>;
 
 export type PatchClienteFactura = (id: string, cambio: CambioClienteFactura) => Promise<void>;
 
@@ -56,6 +63,21 @@ export type PatchCantidadLinea = (id: string, linea: LineaFactura, cantidad: num
 
 export type DeleteLinea = (id: string, lineaId: string) => Promise<void>;
 
+export type PatchCambiarDivisa = (id: string, cambio: CambioDivisa) => Promise<void>;
+
+export type PatchCambiarAgente = (id: string, cambio: CambioAgente) => Promise<void>;
+
+export interface ReciboFactura extends Entidad {
+    id: string;
+    codigo: string;
+    fecha_emision: string;
+    fecha_vencimiento: string;
+    estado: string;
+    importe: number;
+}
+
+export type GetRecibosFactura = (facturaId: string) => Promise<ReciboFactura[]>;
+
 
 export type EstadoFactura = (
     'INICIAL'
@@ -63,6 +85,8 @@ export type EstadoFactura = (
     | 'BORRANDO_FACTURA'
     | 'CAMBIANDO_CLIENTE'
     | 'CAMBIANDO_DESCUENTO'
+    | 'CAMBIANDO_DIVISA'
+    | 'CAMBIANDO_AGENTE'
     | 'CREANDO_LINEA'
     | 'CAMBIANDO_LINEA'
     | 'BORRANDO_LINEA'

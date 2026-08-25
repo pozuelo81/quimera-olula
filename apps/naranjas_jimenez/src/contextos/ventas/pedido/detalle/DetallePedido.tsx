@@ -1,10 +1,11 @@
 import { BorrarPedido } from "#/ventas/pedido/borrar/BorrarPedido.tsx";
-import { editable, getMetaPedido } from "#/ventas/pedido/detalle/dominio.ts";
+import { editable, getMetaPedido } from "#/ventas/pedido/detalle/detalle.ts";
 
-import { Lineas } from "#/ventas/pedido/detalle/Lineas/Lineas.tsx";
+import { Lineas } from "#/ventas/pedido/detalle/lineas/Lineas.tsx";
 import { getMaquina } from "#/ventas/pedido/detalle/maquina.ts";
 import { TabObservaciones } from "#/ventas/pedido/detalle/TabObservaciones.tsx";
 import { Pedido } from "#/ventas/pedido/diseño.ts";
+import { tituloDocumentoVenta } from "#/ventas/venta/dominio.ts";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QDate } from "@olula/componentes/atomos/qdate.tsx";
 import { Detalle } from "@olula/componentes/detalle/Detalle.tsx";
@@ -28,6 +29,7 @@ const metaPedidoNrj = {
   campos: {
     ...getMetaPedido<PedidoNrj>().campos,
     portes_cliente: { tipo: "checkbox" as const, requerido: false },
+    agente_id: { bloqueado: false },
   },
 };
 
@@ -62,7 +64,8 @@ export const DetallePedidoNrj = ({
 
   const { estado, lineaActiva } = ctx;
 
-  const titulo = (pedido: Pedido) => pedido.codigo || "Nuevo Pedido";
+  const titulo = (pedido: Pedido) =>
+    tituloDocumentoVenta(pedido, "Nuevo Pedido");
 
   const handleGuardar = useCallback(() => {
     emitir("edicion_de_pedido_lista", pedido.modelo);

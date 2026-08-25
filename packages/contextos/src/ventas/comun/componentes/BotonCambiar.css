@@ -1,0 +1,29 @@
+.BotonCambiar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 2.5rem;
+    height: 2.5rem;
+    background: transparent;
+    border: 1px solid var(--gris-2, #d0d5dd);
+    border-radius: var(--redondeo-borde-xs, 8px);
+    color: var(--color-texto-secundario, #667085);
+    cursor: pointer;
+}
+
+.BotonCambiar:hover:not(:disabled) {
+    background: var(--color-superficie, #f0f0f0);
+    color: var(--color-primario, #1570ef);
+    border-color: var(--color-primario, #1570ef);
+}
+
+.BotonCambiar:focus-visible {
+    outline: 2px solid var(--color-primario, #1570ef);
+    outline-offset: 2px;
+}
+
+.BotonCambiar:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}

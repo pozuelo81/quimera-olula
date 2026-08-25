@@ -109,6 +109,12 @@ function PedidoCompra({ callbackChanged, idPedido, initPedido, useStyles }) {
 
   const dataLineas = lineas.idList.map(id => lineas.dict[id]);
 
+  const hayLineasParaCerrar = dataLineas.some(linea =>
+    !linea.cerradaPDA &&
+    (linea.shCantAlbaran === 0 || linea.shCantAlbaran == null) &&
+    parseFloat(linea.totalEnAlbaran) < parseFloat(linea.cantidad)
+  );
+
   useEffect(() => {
     util.publishEvent(pedido.event, callbackChanged);
   }, [pedido.event.serial]);
@@ -213,6 +219,12 @@ function PedidoCompra({ callbackChanged, idPedido, initPedido, useStyles }) {
                 title="Generar Albaran"
                 icon="article"
                 disabled={procesandoGenerarAlbaran || pedido.buffer?.estadoPda !== "Listo PDA"}
+              />
+              <QBoxButton
+                id="cerrarLineasNoInformadas"
+                title="Cerrar líneas sin cantidad"
+                icon="lock"
+                disabled={!hayLineasParaCerrar}
               />
             </>
           }

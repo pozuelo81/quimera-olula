@@ -1,6 +1,6 @@
 import { QSelect } from "@olula/componentes/atomos/qselect.tsx";
 import { formatearDireccionUnaLinea } from "@olula/lib/dominio.ts";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getDirecciones } from "../../cliente/infraestructura.ts";
 interface DireccionesProps {
   clienteId: string | undefined;
@@ -24,6 +24,11 @@ export const DirCliente = ({
     { valor: string; descripcion: string }[]
   >([]);
 
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
+  const valorRef = useRef(valor);
+  valorRef.current = valor;
+
   useEffect(() => {
     const fetchDirecciones = async () => {
       if (!clienteId) {
@@ -34,10 +39,21 @@ export const DirCliente = ({
       const direcciones = await getDirecciones(clienteId);
       const opciones = direcciones.map((direccion) => ({
         valor: direccion.id,
-        // descripcion: `${direccion.tipo_via} ${direccion.nombre_via}, ${direccion.ciudad}`,
         descripcion: formatearDireccionUnaLinea(direccion),
       }));
       setOpcionesDireccion(opciones);
+
+      // Al cambiar de cliente el direccion_id anterior no se limpia, así que
+      // solo se respeta si pertenece a este cliente.
+      if (opciones.some((o) => o.valor === valorRef.current)) return;
+
+      const facturacion = direcciones.find((d) => d.dir_facturacion);
+      if (!facturacion) return;
+
+      onChangeRef.current({
+        valor: facturacion.id,
+        descripcion: formatearDireccionUnaLinea(facturacion),
+      });
     };
 
     fetchDirecciones();

@@ -1,0 +1,19 @@
+.DetalleLineaExpandido {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--espaciado-s) var(--espaciado-xl);
+    padding: var(--espaciado-xs) 0;
+}
+
+.DetalleLineaExpandido .detalle-linea-campo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-xxs);
+    min-width: 0;
+}
+
+.DetalleLineaExpandido .detalle-linea-etiqueta {
+    font-size: var(--tamaño-letra-xs);
+    color: var(--color-texto-secundario);
+    font-weight: var(--grosor-letra-5);
+}

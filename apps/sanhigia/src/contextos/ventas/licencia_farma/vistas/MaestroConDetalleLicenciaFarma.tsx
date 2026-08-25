@@ -164,8 +164,9 @@ export const MaestroConDetalleLicenciaFarma = () => {
         }
       />
       <QModal
-        nombre="modal"
+        nombre="altaLicenciaFarma"
         abierto={estado === "alta"}
+        titulo="Nueva Licencia Farma"
         onCerrar={() => emitir("ALTA_CANCELADA")}
       >
         <AltaLicenciaFarma emitir={emitir} />

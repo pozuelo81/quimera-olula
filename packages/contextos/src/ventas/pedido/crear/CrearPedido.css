@@ -1,5 +1,14 @@
+/* Los campos de dirección se posicionan en CamposDireccionVenta.css (.campos-direccion). */
 .Pedido .CrearPedido {
     quimera-autocompletar[nombre="ClientePedido"] {
         grid-column: span 12;
+    }
+
+    quimera-input[nombre="nombre_cliente"] {
+        grid-column: span 8;
+    }
+
+    quimera-input[nombre="id_fiscal"] {
+        grid-column: span 4;
     }
 }

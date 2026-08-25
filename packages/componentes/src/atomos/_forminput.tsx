@@ -234,3 +234,26 @@ export const Validacion = ({
 
   return <span className="texto-validacion">{textoValidacion}</span>;
 };
+
+export const useEditando = () => {
+  const editando = useRef(false);
+
+  return {
+    editandoHandlers: {
+      onFocusCapture: (e: React.FocusEvent) => {
+        editando.current = false;
+        e.currentTarget.removeAttribute("data-editando");
+      },
+      onInputCapture: (e: React.FormEvent) => {
+        if (!editando.current) {
+          editando.current = true;
+          e.currentTarget.setAttribute("data-editando", "");
+        }
+      },
+      onBlurCapture: (e: React.FocusEvent) => {
+        editando.current = false;
+        e.currentTarget.removeAttribute("data-editando");
+      },
+    },
+  };
+};

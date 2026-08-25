@@ -1,6 +1,8 @@
+import { empresaActual } from "#/valores/empresaActual.ts";
 import UrlsCrmClass from "@olula/ctx/crm/comun/urls.ts";
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
 import { Filtro, Orden, Paginacion, RespuestaLista } from "@olula/lib/diseño.ts";
+import { normalizarIban } from "@olula/lib/iban.ts";
 import { criteriaQuery } from "@olula/lib/infraestructura.ts";
 import UrlsVentasClass from "../comun/urls.ts";
 import { Cliente, CrmContacto, CuentaBanco, DirCliente, GetCliente, NuevaCuentaBanco, NuevaDireccion, NuevoCrmContacto, PatchCliente, PostCliente } from "./diseño.ts";
@@ -8,7 +10,9 @@ import { Cliente, CrmContacto, CuentaBanco, DirCliente, GetCliente, NuevaCuentaB
 const UrlsVentas = new UrlsVentasClass();
 const UrlsCrm = new UrlsCrmClass();
 
-type ClienteApi = Cliente & { fecha_baja: string | null };
+type ClienteApi = Cliente & {
+  fecha_baja: string | null;
+};
 const clienteFromAPI = (c: ClienteApi): Cliente => ({
   ...c,
   fecha_baja: c.fecha_baja ? new Date(Date.parse(c.fecha_baja)) : null,
@@ -60,11 +64,10 @@ const dirClienteToAPI = (d: DirCliente): DireccionAPI => (
   }
 )
 
-const CuentaBancoToAPI = (c: CuentaBanco): CuentaBancoAPIPatch => ({
+const CuentaBancoToAPI = (c: NuevaCuentaBanco): CuentaBancoAPIPatch => ({
   descripcion: c.descripcion,
   cuenta: {
-    iban: c.iban,
-    bic: c.bic,
+    iban: normalizarIban(c.iban),
   },
 });
 
@@ -126,7 +129,8 @@ export const deleteCliente = async (id: string): Promise<void> =>
   await RestAPI.delete(`${UrlsVentas.CLIENTE}/${id}`, "Error al borrar cliente");
 
 export const postCliente: PostCliente = async (cliente) => {
-  return await RestAPI.post(UrlsVentas.CLIENTE, cliente, "Error al guardar el cliente").then((respuesta) => respuesta.id);
+  const payload = { ...cliente, empresa_id: empresaActual() };
+  return await RestAPI.post(UrlsVentas.CLIENTE, payload, "Error al guardar el cliente").then((respuesta) => respuesta.id);
 }
 
 export const getDireccion = async (clienteId: string, direccionId: string): Promise<DirCliente> =>
@@ -152,6 +156,9 @@ export const postDireccion = async (clienteId: string, direccion: NuevaDireccion
 export const setDirFacturacion = async (clienteId: string, direccionId: string): Promise<void> =>
   RestAPI.patch(`${UrlsVentas.CLIENTE}/${clienteId}/direccion/${direccionId}/facturacion`, {}, "Error al establecer dirección de facturación");
 
+export const setDirEnvio = async (clienteId: string, direccionId: string): Promise<void> =>
+  RestAPI.patch(`${UrlsVentas.CLIENTE}/${clienteId}/direccion/${direccionId}/envio`, {}, "Error al establecer dirección de envío");
+
 
 export const actualizarDireccion = async (clienteId: string, direccion: DirCliente): Promise<void> =>
   RestAPI.patch(
@@ -168,20 +175,14 @@ export const getCuentasBanco = async (clienteId: string): Promise<CuentaBanco[]>
     respuesta.datos.map(cuentaBancoFromAPI)
   );
 
-export const getCuentaBanco = async (clienteId: string, cuentaId: string): Promise<CuentaBanco> =>
-  await RestAPI.get<{ datos: CuentaBancoAPI }>(`${UrlsVentas.CLIENTE}/${clienteId}/cuenta_banco/${cuentaId}`).then((respuesta) =>
-    cuentaBancoFromAPI(respuesta.datos)
-  );
-
 export const postCuentaBanco = async (clienteId: string, cuenta: NuevaCuentaBanco): Promise<string> => {
-  return await RestAPI.post(`${UrlsVentas.CLIENTE}/${clienteId}/cuenta_banco`, CuentaBancoToAPI(cuenta as CuentaBanco)).then((respuesta) => respuesta.id);
+  return await RestAPI.post(`${UrlsVentas.CLIENTE}/${clienteId}/cuenta_banco`, CuentaBancoToAPI(cuenta)).then((respuesta) => respuesta.id);
 };
 
 export const patchCuentaBanco = async (clienteId: string, cuenta: CuentaBanco): Promise<void> => {
   const payload = {
     cuenta: {
-      iban: cuenta.iban,
-      bic: cuenta.bic,
+      iban: normalizarIban(cuenta.iban),
     },
   };
   await RestAPI.patch(`${UrlsVentas.CLIENTE}/${clienteId}/cuenta_banco/${cuenta.id}`, payload, "Error al actualizar cuenta bancaria");
@@ -200,12 +201,21 @@ export const domiciliarCuenta = async (clienteId: string, cuentaId: string): Pro
   await RestAPI.patch(`${UrlsVentas.CLIENTE}/${clienteId}/cuenta_domiciliacion`, payload, "Error al domiciliar cuenta");
 };
 
+export const asignarCuentaRemesa = async (clienteId: string, cuentaId: string): Promise<void> =>
+  await RestAPI.patch(`${UrlsVentas.CLIENTE}/${clienteId}/cuenta_remesa`, { cuenta_remesa: cuentaId }, "Error al asignar la cuenta de remesa");
+
 export type CuentaBancoAPI = {
   id: string;
   cuenta: {
-    descripcion: string;
-    iban: string;
-    bic: string;
+    descripcion: string | null;
+    iban: string | null;
+    bic: string | null;
+    codigo_cuenta: string | null;
+    pais_id: string | null;
+    entidad: string | null;
+    agencia: string | null;
+    digito_control: string | null;
+    cuenta: string | null;
   };
 };
 
@@ -213,16 +223,21 @@ export type CuentaBancoAPIPatch = {
   descripcion: string;
   cuenta: {
     iban: string;
-    bic: string;
   };
 };
 
 
 export const cuentaBancoFromAPI = (c: CuentaBancoAPI): CuentaBanco => ({
   id: c.id,
-  descripcion: c.cuenta.descripcion,
-  iban: c.cuenta.iban,
-  bic: c.cuenta.bic,
+  descripcion: c.cuenta.descripcion ?? "",
+  iban: c.cuenta.iban ?? "",
+  bic: c.cuenta.bic ?? "",
+  codigo_cuenta: c.cuenta.codigo_cuenta ?? "",
+  pais_id: c.cuenta.pais_id ?? "",
+  entidad: c.cuenta.entidad ?? "",
+  agencia: c.cuenta.agencia ?? "",
+  digito_control: c.cuenta.digito_control ?? "",
+  cuenta: c.cuenta.cuenta ?? "",
 });
 
 export const getCrmContactosCliente = async (clienteId: string): Promise<CrmContacto[]> =>
@@ -235,9 +250,6 @@ export const postCrmContacto = async (contacto: NuevoCrmContacto): Promise<strin
   };
   return await RestAPI.post(`${UrlsCrm.CONTACTO}`, payload, "Error al crear contacto").then((respuesta) => respuesta.id);
 };
-
-export const getCrmContacto = async (contactoId: string): Promise<CrmContacto> =>
-  await RestAPI.get<{ datos: CrmContacto }>(`${UrlsCrm.CONTACTO}/${contactoId}`).then((respuesta) => respuesta.datos);
 
 export const getCrmContactos = async (filtro: Filtro, orden: Orden): Promise<CrmContacto[]> => {
   const q = criteriaQuery(filtro, orden);

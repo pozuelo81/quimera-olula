@@ -1,19 +1,33 @@
-import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { Detalle } from "@olula/componentes/detalle/Detalle.tsx";
 import { Tab, Tabs } from "@olula/componentes/detalle/tabs/Tabs.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
 import { QuimeraAcciones } from "@olula/componentes/index.js";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
+import { imprimir_blob } from "@olula/lib/impresion.ts";
 import { useModelo } from "@olula/lib/useModelo.js";
 import { useCallback, useEffect } from "react";
 import { useParams } from "react-router";
+import { IndicadorGuardado } from "../../comun/componentes/IndicadorGuardado.tsx";
+import { CambiarAgente } from "../../comun/componentes/moleculas/CambiarAgente/CambiarAgente.tsx";
 import { CambiarDescuento } from "../../comun/componentes/moleculas/CambiarDescuento/CambiarDescuento.tsx";
+import { CambiarDivisa } from "../../comun/componentes/moleculas/CambiarDivisa/CambiarDivisa.tsx";
+import "../../comun/estilos/campos.css";
+import "../../comun/estilos/detalle_documento.css";
 import { TotalesVenta } from "../../venta/vistas/TotalesVenta.tsx";
 import { BorrarAlbaran } from "../borrar/BorrarAlbaran.tsx";
 import { Albaran } from "../diseño.ts";
-import { albaranVacio, editable, metaAlbaran } from "../dominio.ts";
+import {
+  albaranVacio,
+  editable,
+  metaAlbaran,
+  tituloAlbaran,
+} from "../dominio.ts";
+import { FacturaGenerada } from "../facturar/FacturaGenerada.tsx";
+import { FacturarAlbaran } from "../facturar/FacturarAlbaran.tsx";
+import { getReportAlbaran } from "../infraestructura.ts";
+import { EstadoAlbaran } from "../vistas/EstadoAlbaran.tsx";
 import "./DetalleAlbaran.css";
-import { Lineas } from "./Lineas/Lineas.tsx";
+import { Lineas } from "./lineas/Lineas.tsx";
 import { getMaquina } from "./maquina.ts";
 import { TabCliente } from "./TabCliente/TabCliente.tsx";
 import { TabDatos } from "./TabDatos.tsx";
@@ -36,38 +50,59 @@ export const DetalleAlbaran = ({
       albaran: albaranVacio(),
       albaranInicial: albaranVacio(),
       lineaActiva: null,
+      facturaCreada: null,
     },
     publicar
   );
 
-  const albaran = useModelo(metaAlbaran, ctx.albaran);
-  const { modificado, valido } = albaran;
+  const autoGuardar = useCallback(
+    async (modelo: Albaran) => {
+      await emitir("edicion_de_albaran_lista", modelo);
+    },
+    [emitir]
+  );
+
+  const albaran = useModelo(metaAlbaran, ctx.albaran, autoGuardar);
 
   useEffect(() => {
     emitir("albaran_id_cambiado", albaranId, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [albaranId]);
 
-  const { estado, lineaActiva } = ctx;
+  const { estado, lineaActiva, facturaCreada } = ctx;
 
-  const titulo = (albaran: Albaran) => albaran.codigo || "Nuevo Albarán";
-
-  const handleGuardar = useCallback(() => {
-    emitir("edicion_de_albaran_lista", albaran.modelo);
-  }, [emitir, albaran]);
-
-  const handleCancelar = useCallback(() => {
-    emitir("edicion_de_albaran_cancelada");
-  }, [emitir]);
+  const titulo = (albaran: Albaran) => (
+    <span className="titulo-documento">
+      <EstadoAlbaran facturado={albaran.facturado} />
+      {tituloAlbaran(albaran)}
+    </span>
+  );
 
   if (!ctx.albaran.id) return;
 
+  const esEditable = editable(ctx.albaran);
+
+  const imprimir = async () => {
+    const blob = await getReportAlbaran(ctx.albaran.id);
+    imprimir_blob(blob);
+  };
+
   const acciones = [
+    {
+      texto: "Facturar",
+      onClick: () => emitir("facturar_solicitado"),
+      deshabilitado: !esEditable,
+    },
+    {
+      texto: "Imprimir",
+      onClick: imprimir,
+    },
     {
       icono: "eliminar",
       texto: "Borrar",
       advertencia: true,
       onClick: () => emitir("borrar_solicitado"),
+      deshabilitado: !esEditable,
     },
   ];
 
@@ -79,9 +114,14 @@ export const DetalleAlbaran = ({
       entidad={ctx.albaran}
       cerrarDetalle={() => emitir("albaran_deseleccionado", null)}
     >
-      {editable(ctx.albaran) && (
+      <div className="fila-acciones-documento">
+        <IndicadorGuardado
+          modificado={albaran.modificado}
+          error={albaran.errorGuardado}
+          guardados={albaran.guardados}
+        />
         <QuimeraAcciones acciones={acciones} vertical />
-      )}
+      </div>
 
       <Tabs>
         <Tab label="Cliente">
@@ -89,7 +129,7 @@ export const DetalleAlbaran = ({
         </Tab>
 
         <Tab label="Datos">
-          <TabDatos albaran={albaran} />
+          <TabDatos albaran={albaran} estado={estado} publicar={emitir} />
         </Tab>
 
         <Tab label="Observaciones">
@@ -97,21 +137,27 @@ export const DetalleAlbaran = ({
         </Tab>
       </Tabs>
 
-      {editable(ctx.albaran) && modificado && (
-        <div className="botones maestro-botones">
-          <QBoton onClick={handleGuardar} deshabilitado={!valido}>
-            Guardar Cambios
-          </QBoton>
-          <QBoton tipo="reset" variante="texto" onClick={handleCancelar}>
-            Cancelar
-          </QBoton>
-        </div>
-      )}
-
       <TotalesVenta modeloVenta={albaran} publicar={emitir} />
 
       {estado === "CAMBIANDO_DESCUENTO" && (
         <CambiarDescuento publicar={emitir} venta={ctx.albaran} />
+      )}
+
+      {estado === "CAMBIANDO_DIVISA" && (
+        <CambiarDivisa
+          publicar={emitir}
+          divisaId={ctx.albaran.divisa_id}
+          tasaConversion={ctx.albaran.tasa_conversion}
+        />
+      )}
+
+      {estado === "CAMBIANDO_AGENTE" && (
+        <CambiarAgente
+          publicar={emitir}
+          agenteId={ctx.albaran.agente_id}
+          nombreAgente={ctx.albaran.nombre_agente}
+          porComision={ctx.albaran.por_comision}
+        />
       )}
 
       <Lineas
@@ -123,6 +169,14 @@ export const DetalleAlbaran = ({
 
       {estado === "BORRANDO_ALBARAN" && (
         <BorrarAlbaran albaran={ctx.albaran} publicar={emitir} />
+      )}
+
+      {estado === "FACTURANDO_ALBARAN" && (
+        <FacturarAlbaran albaran={ctx.albaran} publicar={emitir} />
+      )}
+
+      {estado === "FACTURA_CREADA" && facturaCreada && (
+        <FacturaGenerada factura={facturaCreada} publicar={emitir} />
       )}
     </Detalle>
   );

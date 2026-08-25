@@ -10,6 +10,7 @@ export * from "./atomos/qkanban.tsx";
 export * from "./atomos/qradio.tsx";
 export * from "./atomos/qselect.tsx";
 export * from "./atomos/qtabla.tsx";
+export * from "./atomos/qtarjeta_resumen.tsx";
 export * from "./atomos/qtarjetas.tsx";
 export * from "./atomos/qtextarea.tsx";
 export * from "./moleculas/qtarjeta_generica.tsx";
@@ -21,6 +22,7 @@ export * from "./moleculas/qacordeon.tsx";
 export * from "./moleculas/qeditor_enriquecido.tsx";
 export * from "./moleculas/qmodal.tsx";
 export * from "./moleculas/qmodalconfirmacion.tsx";
+export * from "./moleculas/qseccion.tsx";
 export * from "./moleculas/qtexto_enriquecido/index.ts";
 
 export * from "./menu/menu-lateral.tsx";

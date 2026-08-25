@@ -1,15 +1,18 @@
+import { empresaActual } from "#/valores/empresaActual.ts";
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
 import { Direccion, Filtro, Orden, Paginacion } from "@olula/lib/diseño.ts";
 import { FactoryObj } from "@olula/lib/factory_ctx.tsx";
 import { criteriaQuery } from "@olula/lib/infraestructura.ts";
 import ApiUrls from "../comun/urls.ts";
-import { direccionVacia } from "../venta/dominio.ts";
-import { DeleteLinea, GetLineasPedido, GetPedido, GetPedidos, LineaPedido, PatchArticuloLinea, PatchCantidadLinea, PatchClientePedido, PatchLinea, Pedido, PostLinea, PostPedido } from "./diseño.ts";
+import { direccionVacia, payloadCambioCliente } from "../venta/dominio.ts";
+import { altaLineaApi, articuloDeLinea } from "../venta/infraestructura.ts";
+import { DeleteLinea, GetLineasPedido, GetPedido, GetPedidos, GetReportPedido, LineaPedido, PatchArticuloLinea, PatchCambiarAgente, PatchCambiarDivisa, PatchCantidadLinea, PatchClientePedido, PatchLinea, Pedido, PostLinea, PostPedido } from "./diseño.ts";
 
 export interface LineaPedidoAPI {
   id: string;
   referencia: string | null;
   descripcion: string;
+  descripcion_articulo: string | null
   cantidad: number;
   pvp_unitario: number;
   dto_porcentual: number;
@@ -17,12 +20,20 @@ export interface LineaPedidoAPI {
   pvp_total: number;
   grupo_iva_producto_id: string;
   iva_incluido: boolean;
+  tipo_irpf: number;
+  tipo_recargo: number;
+  tipo_iva: number;
+  por_comision: number;
+  importe_comision: number;
 };
 
 interface PedidoAPI {
   id: string;
   codigo: string;
   fecha: string;
+  fecha_salida: string | null;
+  almacen_id: string;
+  nombre_almacen: string;
   cliente_id: string;
   nombre_cliente: string;
   id_fiscal: string;
@@ -36,12 +47,14 @@ interface PedidoAPI {
   neto: number;
   total_iva: number;
   total_irpf: number;
+  total_recargo: number;
   total_divisa_empresa: number;
   por_descuento: number;
   neto_sin_dto: number;
   forma_pago_id: string;
   nombre_forma_pago: string;
   grupo_iva_negocio_id: string;
+  por_comision: number;
   observaciones: string;
   servido: string;
 }
@@ -61,7 +74,10 @@ const lineaPedidoDesdeApi: LineaPedidoDesdeApi = (l) => {
   return (infra?.linea_desde_api ?? lineaPedidoDesdeApiBase)(l)
 };
 
-const lineaPedidoDesdeApiBase: LineaPedidoDesdeApi = (l) => l as LineaPedido;
+const lineaPedidoDesdeApiBase: LineaPedidoDesdeApi = (l) => ({
+  ...l,
+  descripcionArticulo: l.descripcion_articulo
+} as LineaPedido);
 
 export const ventasPedidoInfra: VentasPedidoInfra = {
   linea_desde_api: lineaPedidoDesdeApiBase
@@ -70,6 +86,7 @@ export const ventasPedidoInfra: VentasPedidoInfra = {
 export const pedidoDesdeAPI = (p: PedidoAPI): Pedido => ({
   ...p,
   fecha: new Date(Date.parse(p.fecha)),
+  fecha_salida: p.fecha_salida ? new Date(Date.parse(p.fecha_salida)) : null,
   dtoPorcentual: p.por_descuento,
   netoSinDto: p.neto_sin_dto,
   cliente: {
@@ -89,6 +106,9 @@ export const getPedido: GetPedido = async (id) => {
     });
 }
 
+export const getReportPedido: GetReportPedido = async (id) =>
+  RestAPI.blob(`${baseUrl}/${id}/report`, "Error al obtener el report del pedido");
+
 export const getPedidos: GetPedidos = async (
   filtro: Filtro,
   orden: Orden,
@@ -102,11 +122,8 @@ export const getPedidos: GetPedidos = async (
 
 export const postPedido: PostPedido = async (pedido) => {
   const payload = {
-    cliente: {
-      cliente_id: pedido.cliente_id,
-      direccion_id: pedido.direccion_id
-    },
-    empresa_id: pedido.empresa_id
+    cliente: payloadCambioCliente(pedido),
+    empresa_id: empresaActual()
   }
   return await RestAPI.post(baseUrl, payload, "Error al crear pedido").then((respuesta) => respuesta.id);
 }
@@ -114,12 +131,7 @@ export const postPedido: PostPedido = async (pedido) => {
 
 export const patchCambiarCliente: PatchClientePedido = async (id, cambio) => {
   await RestAPI.patch(`${baseUrl}/${id}`, {
-    cambios: {
-      cliente: {
-        cliente_id: cambio.cliente_id,
-        direccion_id: cambio.direccion_id
-      }
-    }
+    cambios: { cliente: payloadCambioCliente(cambio) }
   }, "Error al cambiar cliente del pedido");
 }
 
@@ -129,6 +141,26 @@ export const patchCambiarDescuento = async (id: string, dto_porcentual: number):
       por_descuento: dto_porcentual,
     }
   }, "Error al cambiar descuento del pedido");
+}
+
+export const patchCambiarDivisa: PatchCambiarDivisa = async (id, cambio) => {
+  await RestAPI.patch(`${baseUrl}/${id}`, {
+    cambios: {
+      divisa: {
+        divisa_id: cambio.divisa_id,
+        tasa_conversion: cambio.tasa_conversion,
+      }
+    }
+  }, "Error al cambiar divisa del pedido");
+}
+
+export const patchCambiarAgente: PatchCambiarAgente = async (id, cambio) => {
+  await RestAPI.patch(`${baseUrl}/${id}`, {
+    cambios: {
+      agente_id: cambio.agente_id,
+      por_comision: cambio.por_comision,
+    }
+  }, "Error al cambiar agente del pedido");
 }
 
 export const getLineas: GetLineasPedido = async (id) =>
@@ -141,10 +173,7 @@ export const getLineas: GetLineasPedido = async (id) =>
 
 export const postLinea: PostLinea = async (id, linea) => {
   return await RestAPI.post(`${baseUrl}/${id}/linea`, {
-    lineas: [{
-      articulo_id: linea.referencia,
-      cantidad: linea.cantidad
-    }]
+    lineas: [altaLineaApi(linea)]
   }, "Error al crear linea de pedido").then((respuesta) => {
     const miRespuesta = respuesta as unknown as { ids: string[] };
     return miRespuesta.ids[0];
@@ -165,13 +194,14 @@ export const patchArticuloLinea: PatchArticuloLinea = async (id, lineaId, refere
 export const patchLinea: PatchLinea = async (id, linea) => {
   const payload = {
     cambios: {
-      articulo: {
-        articulo_id: linea.referencia
-      },
+      articulo: articuloDeLinea(linea),
       cantidad: linea.cantidad,
       pvp_unitario: linea.pvp_unitario,
       dto_porcentual: linea.dto_porcentual,
+      dto_lineal: linea.dto_lineal,
       grupo_iva_producto_id: linea.grupo_iva_producto_id,
+      tipo_irpf: linea.tipo_irpf,
+      comision: linea.por_comision,
     },
   }
   await RestAPI.patch(`${baseUrl}/${id}/linea/${linea.id}`, payload, "Error al actualizar línea de pedido");
@@ -180,9 +210,6 @@ export const patchLinea: PatchLinea = async (id, linea) => {
 export const patchCantidadLinea: PatchCantidadLinea = async (id, linea, cantidad) => {
   const payload = {
     cambios: {
-      articulo: {
-        articulo_id: linea.referencia
-      },
       cantidad: cantidad,
     },
   }
@@ -206,27 +233,7 @@ export const patchPedido = async (id: string, pedido: Pedido) => {
 };
 
 
-export const payloadPatchPedido = (pedido: Pedido) => {
-  const payload = {
-    cambios: {
-      agente_id: pedido.agente_id,
-      divisa: {
-        divisa_id: pedido.divisa_id,
-        tasa_conversion: pedido.tasa_conversion,
-      },
-      fecha: pedido.fecha,
-      cliente_id: pedido.cliente.cliente_id,
-      nombre_cliente: pedido.cliente.nombre_cliente,
-      id_fiscal: pedido.cliente.id_fiscal,
-      direccion_id: pedido.cliente.direccion_id,
-      forma_pago_id: pedido.forma_pago_id,
-      grupo_iva_negocio_id: pedido.grupo_iva_negocio_id,
-      observaciones: pedido.observaciones,
-    },
-  };
-
-  return payload;
-}
+export { payloadPatchPedido } from "./infraestructura_base.ts";
 
 export const borrarPedido = async (id: string) => {
   await RestAPI.delete(`${baseUrl}/${id}`, "Error al borrar pedido");

@@ -1,4 +1,8 @@
 .Albaran .TabObservaciones {
+    quimera-checkbox[nombre="de_abono"] {
+        grid-column: span 12;
+    }
+
     quimera-textarea[nombre="observaciones"] {
         grid-column: span 12;
     }

@@ -9,7 +9,6 @@ export type CambioCliente = {
     otros?: string;
     cod_postal?: string;
     ciudad?: string;
-    provincia_id?: number | null;
     provincia?: string;
     pais_id?: string;
     apartado?: string;

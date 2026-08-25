@@ -14,6 +14,7 @@ export interface RespuestaWhoAmI {
     permisos: Permiso[];
     plugins: Record<string, string>;
     usuario_id: string;
+    empresas: { id: string; nombre: string }[];
 }
 
 type PeticionLogin = { id: string; password: string; };

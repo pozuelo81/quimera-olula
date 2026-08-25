@@ -69,8 +69,10 @@
   "git.confirmSync": false,
   "git.autofetch": true,
   // typescript
-  "typescript.updateImportsOnFileMove.enabled": "always",
-  "typescript.preferences.importModuleSpecifierEnding": "js",
+  "js/ts.tsdk.path": "node_modules/typescript/lib",
+  "js/ts.tsdk.promptToUseWorkspaceVersion": false,
+  "js/ts.updateImportsOnFileMove.enabled": "always",
+  "js/ts.preferences.importModuleSpecifierEnding": "js",
   // copilot
   "github.copilot.editor.enableAutoCompletions": true
 }

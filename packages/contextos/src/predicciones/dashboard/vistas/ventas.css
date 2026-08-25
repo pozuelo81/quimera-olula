@@ -1,0 +1,79 @@
+.dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.dashboard h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.dashboard-seccion-cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dashboard-periodo {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.dashboard-tarjetas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+.dashboard-seccion {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.dashboard-fila {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.dashboard-fila-principal {
+    flex: 7;
+    min-width: 0;
+}
+
+.dashboard-fila-secundaria {
+    flex: 3;
+    min-width: 0;
+}
+
+@media (max-width: 900px) {
+    .dashboard-fila {
+        flex-direction: column;
+    }
+}
+
+.dashboard-seccion h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.dashboard-grafico {
+    background: var(--color-fondo, #fff);
+    border: 1px solid var(--color-borde, #e0e0e0);
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.dashboard-grafico-cargando {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 400px;
+    color: var(--color-texto-secundario, #888);
+}

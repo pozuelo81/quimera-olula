@@ -1,14 +1,23 @@
+/* ============================================================
+   Base de estilos para TODOS los controles de formulario.
+   Single source of truth — los CSS por componente solo añaden
+   overrides específicos de layout (radio, checkbox, textarea).
+   ============================================================ */
+
 quimera-input,
 quimera-select,
 quimera-date,
 quimera-textarea,
-quimera-checkbox {
-    --color-borde: var(--color-texto-secundario);
-    --color-focus: var(--color-primario-claro);
+quimera-checkbox,
+quimera-radio,
+quimera-autocompletar {
+    --color-borde: var(--color-borde-sutil);
+    --color-focus: var(--color-fondo-focus);
     --color-validacion: var(--color-texto-deshabilitado);
     display: block;
     width: 100%;
 
+    /* ---- Label contenedor ---- */
     label {
         display: flex;
         flex-direction: column;
@@ -27,26 +36,23 @@ quimera-checkbox {
             }
         }
 
-        input,
-        select {
+        /* ---- Controles nativos: Estado REPOSO (subrayado) ---- */
+        input:not([type="checkbox"]):not([type="radio"]),
+        select,
+        textarea {
             outline: 0;
             color: var(--color-texto-primario);
-            border: none;
-            border-bottom: var(--tamaño-borde-s) solid var(--color-borde);
+            border: var(--tamaño-borde-s) solid transparent;
+            border-bottom-color: var(--color-borde);
             padding: var(--espaciado-xxs);
             font-size: var(--tamaño-letra-m);
+            min-height: var(--altura-control);
+            line-height: var(--altura-linea-normal);
             background-color: transparent;
+            box-sizing: border-box;
             transition: background-color var(--transicion-rapida),
                         border-color var(--transicion-rapida),
-                        box-shadow var(--transicion-rapida);
-
-            &:focus {
-                background-color: var(--color-focus);
-                border-color: var(--color-primario);
-                border-radius: var(--redondeo-borde-xs);
-                color: var(--color-texto-primario);
-                box-shadow: 0 2px 0 0 var(--color-primario);
-            }
+                        border-width var(--transicion-rapida);
 
             &::placeholder {
                 color: var(--color-texto-deshabilitado);
@@ -61,6 +67,29 @@ quimera-checkbox {
             }
         }
 
+        /* ---- Valor solo lectura (soloLectura) ---- */
+        .valor-solo-lectura {
+            font-size: var(--tamaño-letra-m);
+            color: var(--color-texto-primario);
+            padding: var(--espaciado-xxs);
+            line-height: var(--altura-linea-normal);
+            min-height: var(--altura-control);
+            box-sizing: border-box;
+
+            .enlace-solo-lectura {
+                display: inline;
+                margin-left: var(--espaciado-xxs);
+                color: var(--color-texto-secundario);
+                pointer-events: auto;
+                vertical-align: middle;
+
+                &:hover {
+                    color: var(--color-texto-primario);
+                }
+            }
+        }
+
+        /* ---- Texto de validación ---- */
         .texto-validacion {
             margin-top: var(--espaciado-xxs);
             color: var(--color-validacion);
@@ -69,9 +98,41 @@ quimera-checkbox {
         }
     }
 
+    /* ============================================================
+       Estado ENFOCADO — recuadro completo, fondo sutil
+       ============================================================ */
+    &:focus-within:not([solo-lectura]):not([deshabilitado]) {
+        label input:not([type="checkbox"]):not([type="radio"]),
+        label select,
+        label textarea {
+            background-color: var(--color-focus);
+            border-color: var(--color-borde-focus);
+            border-radius: var(--redondeo-borde-xs);
+        }
+    }
 
+    /* ============================================================
+       Estado EN EDICIÓN — recuadro resaltado (borde grueso)
+       ============================================================ */
+    &[data-editando]:focus-within:not([solo-lectura]):not([deshabilitado]) {
+        label input:not([type="checkbox"]):not([type="radio"]),
+        label select,
+        label textarea {
+            border-color: var(--color-borde-editando);
+            border-width: var(--grosor-borde-editando);
+        }
+    }
+
+    /* ============================================================
+       Indicadores de estado (prioridad: erroneo > advertido > modificado)
+       ============================================================ */
     &[modificado] {
         --color-borde: var(--color-accion);
+    }
+
+    &[advertido] {
+        --color-borde: var(--color-advertencia);
+        --color-validacion: var(--color-advertencia);
     }
 
     &[erroneo] {
@@ -80,45 +141,57 @@ quimera-checkbox {
         --color-validacion: var(--color-error);
     }
 
-    &[advertido] {
-        --color-borde: var(--color-advertencia);
-        /* --color-focus: var(--color-advertencia-claro); */
-        --color-validacion: var(--color-advertencia);
-    }
-
     &[valido] {
         --color-borde: var(--color-exito);
-        /* --color-focus: var(--color-exito-claro); */
         --color-validacion: var(--color-exito);
     }
 
-    &[solo-texto] {
+    /* Sobreescribir color de foco cuando hay indicadores de estado */
+    &[modificado]:focus-within:not([solo-lectura]):not([deshabilitado]) {
+        label input:not([type="checkbox"]):not([type="radio"]),
+        label select,
+        label textarea {
+            border-color: var(--color-accion);
+        }
+    }
+
+    &[erroneo]:focus-within:not([solo-lectura]):not([deshabilitado]) {
+        label input:not([type="checkbox"]):not([type="radio"]),
+        label select,
+        label textarea {
+            border-color: var(--color-error);
+            background-color: var(--color-error-claro);
+        }
+    }
+
+    /* ============================================================
+       Estado SOLO LECTURA (no editable) — texto limpio, sin decoración
+       ============================================================ */
+    &[solo-lectura] {
         pointer-events: none;
 
         label {
             color: var(--color-texto-secundario);
         }
 
-        .valor-solo-texto {
-            font-size: var(--tamaño-letra-m);
-            color: var(--color-texto-primario);
-            padding: var(--espaciado-xxs);
-            line-height: var(--altura-linea-normal);
-            min-height: 1.5em;
+        label input:not([type="checkbox"]):not([type="radio"]),
+        label select,
+        label textarea {
+            display: none;
         }
     }
 
-    &[opcional] label .etiqueta .etiqueta-opcional {
-        display: inline;
-    }
-
+    /* ============================================================
+       Estado DESHABILITADO
+       ============================================================ */
     &[deshabilitado] {
         span {
             color: var(--color-texto-deshabilitado);
         }
 
-        input,
-        select {
+        input:not([type="checkbox"]):not([type="radio"]),
+        select,
+        textarea {
             background-color: var(--color-deshabilitado);
             color: var(--negro);
             border-color: transparent;
@@ -129,6 +202,16 @@ quimera-checkbox {
         pointer-events: none;
     }
 
+    /* ============================================================
+       Opcional
+       ============================================================ */
+    &[opcional] label .etiqueta .etiqueta-opcional {
+        display: inline;
+    }
+
+    /* ============================================================
+       Condensado
+       ============================================================ */
     &[condensado] {
         .etiqueta {
             font-size: var(--tamaño-letra-xs);
@@ -138,8 +221,9 @@ quimera-checkbox {
             }
         }
 
-        input,
-        select {
+        input:not([type="checkbox"]):not([type="radio"]),
+        select,
+        textarea {
             font-size: var(--tamaño-letra-s);
             color: var(--color-primario);
         }
@@ -148,12 +232,15 @@ quimera-checkbox {
             font-size: var(--tamaño-letra-xs);
         }
 
-        .valor-solo-texto {
+        .valor-solo-lectura {
             font-size: var(--tamaño-letra-s);
         }
     }
 }
 
+/* ============================================================
+   Overrides específicos de quimera-select
+   ============================================================ */
 quimera-select {
     min-width: 0;
     justify-self: stretch;
@@ -171,6 +258,9 @@ quimera-select {
     }
 }
 
+/* ============================================================
+   Overrides específicos de quimera-input
+   ============================================================ */
 quimera-input {
 
     label {
@@ -214,7 +304,7 @@ quimera-input {
             text-align: right;
         }
 
-        .valor-solo-texto {
+        .valor-solo-lectura {
             text-align: right;
         }
     }

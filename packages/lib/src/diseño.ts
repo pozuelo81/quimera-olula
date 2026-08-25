@@ -64,6 +64,7 @@ export interface Direccion extends Modelo {
     provincia_id: number;
     provincia: string;
     pais_id: string;
+    pais?: string;
     apartado: string;
     telefono: string;
 };

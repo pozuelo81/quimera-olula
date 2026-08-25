@@ -5,7 +5,7 @@ import { EmitirEvento } from "@olula/lib/diseño.js";
 import { useFocus } from "@olula/lib/useFocus.ts";
 import { useForm } from "@olula/lib/useForm.js";
 import { useModelo } from "@olula/lib/useModelo.ts";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { ModLin } from "../diseño.js";
 import { metaNuevaLineaModulo, nuevaLineaModuloVacia } from "../dominio.js";
 import { postLineaModulo } from "../infraestructura.js";
@@ -17,9 +17,13 @@ export const CrearLineaModulo = ({
     modLin: ModLin;
     publicar: EmitirEvento;
 }) => {
+    // El modelo inicial SIEMPRE va memoizado: useModelo lo reinicia cuando cambia
+    // su identidad, así que crearlo en línea entra en bucle al escribir.
+    const inicial = useMemo(nuevaLineaModuloVacia, []);
+
     const { modelo, uiProps, valido } = useModelo(
         metaNuevaLineaModulo,
-        nuevaLineaModuloVacia()
+        inicial
     );
 
     const crear_ = useCallback(

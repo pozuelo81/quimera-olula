@@ -1,4 +1,11 @@
 .Presupuesto {
+
+    th.estado,
+    td.estado {
+        width: 2.5rem;
+        text-align: center;
+    }
+
     td.codigo {
         text-align: center;
         width: 20%;

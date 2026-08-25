@@ -19,11 +19,13 @@ export const PaisSelector = ({
   deshabilitado = false,
   onChange,
 }: PaisSelectorProps) => {
-  const obtenerOpciones = async (valor: string) => {
-    if (valor.length < 2) return [];
+  // El segundo argumento llega cuando QAutocompletar tiene un id sin descripción
+  // y necesita resolver su nombre (ej. la dirección ya guardada de un documento).
+  const obtenerOpciones = async (texto: string, id?: string) => {
+    if (!id && texto.length < 2) return [];
 
     const criteria = {
-      filtro: ["nombre", "~", valor],
+      filtro: id ? [["id", "=", id]] : ["nombre", "~", texto],
       orden: ["id"],
     };
 

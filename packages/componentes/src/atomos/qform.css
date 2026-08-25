@@ -11,14 +11,17 @@ quimera-formulario {
     quimera-input,
     quimera-autocompletar,
     quimera-select,
-    quimera-radio {
+    quimera-radio,
+    quimera-textarea,
+    quimera-checkbox {
         grid-column: 1 / span 12;
         width: 100%;
         min-width: 0;
         justify-self: stretch;
 
         input,
-        select {
+        select,
+        textarea {
             width: 100%;
         }
     }
@@ -47,6 +50,7 @@ quimera-formulario {
         quimera-textarea,
         quimera-boton,
         quimera-checkbox,
+        quimera-radio,
         div {
             grid-column: 1 / -1 !important;
         }

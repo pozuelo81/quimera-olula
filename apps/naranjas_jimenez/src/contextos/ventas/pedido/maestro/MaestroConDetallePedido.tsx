@@ -76,6 +76,9 @@ export const MaestroConDetallePedidoNrj = () => {
   const { ctx, emitir } = useMaquina(getMaquina, {
     estado: "INICIAL",
     pedidos: listaActivaEntidadesInicial<PedidoNrj>(id, criteriaBase),
+    seleccionados: [],
+    albaranesCreados: [],
+    fallidos: [],
   });
 
   useUrlParams(ctx.pedidos.activo, ctx.pedidos.criteria);
@@ -118,11 +121,12 @@ export const MaestroConDetallePedidoNrj = () => {
       />
 
       <QModal
-        nombre="modal"
+        nombre="altaPedido"
         abierto={ctx.estado === "CREANDO_PEDIDO"}
+        titulo="Nuevo Pedido"
         onCerrar={() => emitir("creacion_pedido_cancelada")}
       >
-        <CrearPedido publicar={emitir} />
+        {ctx.estado === "CREANDO_PEDIDO" && <CrearPedido publicar={emitir} />}
       </QModal>
     </div>
   );

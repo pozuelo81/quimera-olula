@@ -40,7 +40,6 @@ export const CrearPedidoNrj = ({
 
   return (
     <div className="CrearPedido">
-      <h2>Nuevo Pedido</h2>
       <quimera-formulario>
         <Cliente
           {...nuevoPedido.uiProps("cliente_id", "nombre")}

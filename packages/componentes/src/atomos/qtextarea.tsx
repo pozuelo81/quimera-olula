@@ -1,4 +1,5 @@
-import { Etiqueta, FormFieldProps, Validacion } from "./_forminput.tsx";
+import "./_forminput.css";
+import { Etiqueta, FormFieldProps, Validacion, useEditando } from "./_forminput.tsx";
 import "./qtextarea.css";
 
 type TextAreaProps = Omit<
@@ -19,6 +20,8 @@ type TextAreaProps = Omit<
   ) => void;
   onKeyDown?: React.KeyboardEventHandler<HTMLTextAreaElement>;
   rows?: number;
+  soloLectura?: boolean;
+  modificado?: boolean;
   evaluarCambio?: () => void;
 };
 
@@ -34,6 +37,8 @@ export const QTextArea = ({
   valido,
   opcional,
   condensado,
+  soloLectura,
+  modificado,
   ref,
   onChange,
   onBlur,
@@ -41,6 +46,19 @@ export const QTextArea = ({
   evaluarCambio,
   ...props
 }: TextAreaProps) => {
+  const { editandoHandlers } = useEditando();
+
+  if (soloLectura) {
+    return (
+      <quimera-textarea solo-lectura="" nombre={nombre} condensado={condensado}>
+        <label>
+          <Etiqueta label={label} />
+          <span className="valor-solo-lectura">{valor || "—"}</span>
+        </label>
+      </quimera-textarea>
+    );
+  }
+
   const attrs = {
     nombre,
     erroneo,
@@ -49,15 +67,8 @@ export const QTextArea = ({
     opcional,
     condensado,
     deshabilitado,
+    modificado,
   };
-
-  // const inputAttrs = {
-  //   nombre,
-  //   deshabilitado,
-  //   opcional,
-  //   tipo,
-  //   ...props,
-  // };
 
   const manejarFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
     e.target.select();
@@ -77,7 +88,7 @@ export const QTextArea = ({
   };
 
   return (
-    <quimera-textarea {...attrs}>
+    <quimera-textarea {...attrs} {...editandoHandlers}>
       <label>
         <Etiqueta label={label} />
         <textarea

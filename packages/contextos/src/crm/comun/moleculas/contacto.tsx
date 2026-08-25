@@ -7,6 +7,11 @@ import { ContextoContactoCrm, getMaquina } from "./contacto.ts";
 
 const maquina = getMaquina();
 
+// Constantes de módulo: useModelo reinicia el modelo cuando cambia la identidad
+// del inicial, así que un literal en línea entra en bucle al escribir.
+const metaVacia = {};
+const modeloVacio = {};
+
 export const MoleculaContacto = ({
   contactoId = null,
 }: // onChange,
@@ -16,7 +21,7 @@ export const MoleculaContacto = ({
 }) => {
   const { intentar } = useContext(ContextoError);
 
-  const contacto = useModelo({}, {});
+  const contacto = useModelo(metaVacia, modeloVacio);
   // const { uiProps, init, valido, modificado } = contacto;
 
   const [ctx, setCtx] = useState<ContextoContactoCrm>({

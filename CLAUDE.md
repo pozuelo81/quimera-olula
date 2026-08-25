@@ -16,6 +16,10 @@ pnpm run ci        # Run all CI checks (lint + type-check + tests)
 pnpm test          # Run tests in continuous watch mode
 ```
 
+`pnpm type-check` lanza 18 procesos `tsc`, uno por paquete, y cada app comprueba además el
+código fuente completo de `contextos`. Aun con la caché incremental tarda ~50 s. Para validar
+un cambio local usa el filtro por paquete; deja el barrido completo para antes de un PR.
+
 ### Per app/package (replace `<nombre_app>` with the package name, e.g. `olula`)
 ```bash
 pnpm run --filter @olula/<nombre_app> dev        # Dev server
@@ -23,6 +27,9 @@ pnpm run --filter @olula/<nombre_app> build      # Production build
 pnpm run --filter @olula/<nombre_app> test       # Run tests
 pnpm run --filter @olula/<nombre_app> type-check # Type check
 ```
+
+Nombres reales de los paquetes compartidos: `@olula/lib`, `@olula/componentes`, `@olula/ctx`
+(este último es `packages/contextos`, ojo que no se llama `@olula/contextos`).
 
 ### Running a single test file
 ```bash

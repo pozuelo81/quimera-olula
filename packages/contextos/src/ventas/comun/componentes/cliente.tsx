@@ -9,6 +9,7 @@ interface ClienteProps {
   label?: string;
   deshabilitado?: boolean;
   opcional?: boolean;
+  enlace?: string;
   ref?: React.RefObject<HTMLInputElement | null>;
   onChange?: (opcion: { valor: string; descripcion: string } | null) => void;
 }
@@ -19,12 +20,15 @@ export const Cliente = ({
   nombre = "cliente_id",
   label = "Cliente",
   deshabilitado = false,
+  enlace = "/ventas/cliente?id={id}",
   onChange,
   ...props
 }: ClienteProps) => {
-  const obtenerOpciones = async (texto: string) => {
+  const clienteRegistrado = !!valor && valor !== "None";
+
+  const obtenerOpciones = async (texto: string, id?: string) => {
     const criteria = {
-      filtro: ["nombre", "~", texto],
+      filtro: id ? [["id", "=", id]] : ["nombre", "~", texto],
       orden: ["id"],
     };
 
@@ -51,8 +55,9 @@ export const Cliente = ({
       onChange={onChange}
       valor={valor}
       obtenerOpciones={obtenerOpciones}
+      enlace={clienteRegistrado ? enlace : undefined}
       descripcion={descripcion}
-      deshabilitado={deshabilitado}
+      soloLectura={deshabilitado}
       {...props}
     />
   );

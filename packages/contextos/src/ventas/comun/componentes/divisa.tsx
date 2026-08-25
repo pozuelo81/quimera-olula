@@ -1,5 +1,5 @@
 import { QSelect } from "@olula/componentes/atomos/qselect.tsx";
-import { obtenerOpcionesSelector } from "@olula/lib/infraestructura.ts";
+import { obtenerDatosSelector } from "@olula/lib/infraestructura.ts";
 import { useEffect, useState } from "react";
 
 interface DivisasProps {
@@ -12,6 +12,7 @@ interface DivisasProps {
 type OpcionDivisa = {
   valor: string;
   descripcion: string;
+  tasa_conversion?: number;
 }
 
 export const Divisa = ({
@@ -25,12 +26,16 @@ export const Divisa = ({
 
   useEffect(() => {
     const cargarOpcionesDivisa = async () => {
-      const opciones = await obtenerOpcionesSelector("divisa")();
-      const opcionesMapeadas = opciones.map((opcion) => ({
-        valor: opcion[0],
-        descripcion: opcion[1],
-        // tasa_conversion: i * 3.02
-      }));
+      const datos = await obtenerDatosSelector("divisa")();
+      const opcionesMapeadas = datos.map(
+        ({ descripcion, tasa_conversion, ...resto }) => ({
+          valor: String(Object.values(resto).at(0) ?? ""),
+          descripcion: descripcion as string,
+          ...(tasa_conversion === undefined || tasa_conversion === null
+            ? {}
+            : { tasa_conversion: Number(tasa_conversion) }),
+        })
+      );
       setOpcionesDivisa(opcionesMapeadas);
     };
 

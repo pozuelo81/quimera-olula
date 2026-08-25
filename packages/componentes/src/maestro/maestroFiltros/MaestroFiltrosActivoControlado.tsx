@@ -116,7 +116,7 @@ export const filtroMesAnyo = (
   return [id, "<>", `${desde}_${hasta}`];
 };
 
-type MetaCampoFiltro = {
+export type MetaCampoFiltro = {
   id: string;
   /** Nombre del campo en la API (snake_case). Si difiere de `id`, permite la hidratación
    * automática desde URL sin necesidad de declarar `fromFiltro`. */
@@ -401,7 +401,7 @@ export const MaestroFiltrosActivoControlado = ({
     );
 
   return (
-    <div className="MaestroFiltrosControlado">
+    <div className="MaestroFiltrosControlado" data-abierto="true">
       <QBoton tamaño="pequeño" onClick={() => setMostar(false)}>
         Cerrar filtros
       </QBoton>

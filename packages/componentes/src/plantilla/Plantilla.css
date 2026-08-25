@@ -25,6 +25,12 @@
         &>*:not(menu-lateral):not(menu-usuario):not(panel-asistente) {
             /* padding: 1rem; */
             flex-grow: 1;
+            /* Sin esto, el valor por defecto de un flex item (min-width:auto) le impide
+               encoger por debajo del ancho de su contenido — en pantallas maestro-detalle
+               anchas (p. ej. ventas/presupuesto), al abrir panel-asistente (384px fijo) la
+               suma superaba el ancho de la ventana y el sobrante se recortaba en silencio
+               por el overflow-x:hidden de esta sección, en vez de dejar sitio al panel. */
+            min-width: 0;
         }
 
         @media screen and (max-width: 768px) {

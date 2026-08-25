@@ -36,9 +36,13 @@ export const CambioClienteNrj = ({
   };
 
   return (
-    <QModal abierto={true} nombre="mostrar" onCerrar={cancelar}>
+    <QModal
+      abierto={true}
+      nombre="cambioCliente"
+      titulo="Cambiar cliente"
+      onCerrar={cancelar}
+    >
       <div className="CambioCliente">
-        <h2>Cambiar cliente</h2>
         <quimera-formulario>
           <Cliente
             {...uiProps("cliente_id", "nombre_cliente")}

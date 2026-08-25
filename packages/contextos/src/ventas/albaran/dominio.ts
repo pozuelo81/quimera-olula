@@ -1,16 +1,14 @@
-import { empresaActual } from "#/valores/empresaActual.ts";
 import { MetaTabla } from "@olula/componentes/index.js";
-import { MetaModelo, modeloEsEditable, modeloEsValido } from "@olula/lib/dominio.ts";
+import { MetaModelo, modeloEsEditable } from "@olula/lib/dominio.ts";
 import {
-    cambioClienteVentaVacio,
     clienteVentaVacio,
-    metaCambioClienteVenta,
     metaLineaVenta,
     metaNuevaLineaVenta,
     metaNuevaVenta,
     metaVenta,
     nuevaLineaVentaVacia,
     nuevaVentaVacia,
+    tituloDocumentoVenta,
     ventaVacia
 } from "../venta/dominio.ts";
 import {
@@ -21,52 +19,94 @@ import {
     NuevoAlbaran,
 } from "./diseño.ts";
 
+// La columna de estado la añade delante MaestroConDetalleAlbaran.
 export const metaTablaAlbaran: MetaTabla<Albaran> = [
     {
         id: "codigo",
         cabecera: "Código",
+        prioridad: "alta",
     },
     {
         id: "nombre_cliente",
         cabecera: "Cliente",
+        prioridad: "alta",
         render: (a) => a.cliente.nombre_cliente,
+    },
+    {
+        id: "fecha",
+        cabecera: "Fecha",
+        tipo: "fecha",
+        prioridad: "alta",
     },
     {
         id: "total",
         cabecera: "Total",
         tipo: "moneda",
+        prioridad: "alta",
+        divisa: (albaran) => albaran.divisa_id,
+    },
+    {
+        id: "nombre_agente",
+        cabecera: "Agente",
+        prioridad: "baja",
+    },
+    {
+        id: "almacen_id",
+        cabecera: "Almacén",
+        prioridad: "baja",
+        render: (a) => a.nombre_almacen || a.almacen_id,
+    },
+    {
+        id: "de_abono",
+        cabecera: "Abono",
+        tipo: "booleano",
+        prioridad: "baja",
+        render: (a) => (a.de_abono ? "Sí" : ""),
     },
 ];
 
 export const albaranVacio = (): Albaran => ({
     ...ventaVacia,
     cliente: clienteVentaVacio,
-    idfactura: null,
+    facturado: false,
+    por_comision: 0,
+    hora: '',
+    almacen_id: '',
+    nombre_almacen: '',
+    de_abono: false,
     lineas: [],
 })
 
-export const nuevoAlbaranVacio: NuevoAlbaran = nuevaVentaVacia;
+export const tituloAlbaran = (albaran: Albaran): string => {
+    const titulo = tituloDocumentoVenta(albaran, "Nuevo Albarán");
+    return albaran.de_abono ? `${titulo} · Abono` : titulo;
+}
 
-export const cambioClienteAlbaranVacio: CambioClienteAlbaran = cambioClienteVentaVacio;
+export const nuevoAlbaranVacio: NuevoAlbaran = nuevaVentaVacia;
 
 export const nuevaLineaAlbaranVacia: NuevaLineaAlbaran = nuevaLineaVentaVacia;
 
 export const metaNuevoAlbaran: MetaModelo<NuevoAlbaran> = metaNuevaVenta;
 
-export const metaCambioClienteAlbaran: MetaModelo<CambioClienteAlbaran> = metaCambioClienteVenta;
-
 export const metaAlbaran: MetaModelo<Albaran> = {
     campos: {
         ...metaVenta.campos,
         fecha: { tipo: "fecha", requerido: false },
+        hora: { tipo: "hora", requerido: false },
+        almacen_id: { requerido: true },
+        nombre_almacen: { bloqueado: true },
+        de_abono: { tipo: "checkbox", requerido: false },
+        divisa_id: { requerido: true, bloqueado: true },
+        tasa_conversion: { tipo: "numero", requerido: true, bloqueado: true },
+        agente_id: { bloqueado: true },
+        por_comision: { tipo: "decimal", requerido: false, decimales: 2, positivo: true, maximo: 100, bloqueado: true },
     },
     editable: (albaran: Albaran, _?: string) => {
-        return !albaran.idfactura;
+        return !albaran.facturado;
     },
 };
 
 export const editable = modeloEsEditable<Albaran>(metaAlbaran);
-export const albaranValido = modeloEsValido<Albaran>(metaAlbaran);
 
 export const metaLineaAlbaran: MetaModelo<LineaAlbaran> = metaLineaVenta;
 
@@ -75,12 +115,6 @@ export const metaNuevaLineaAlbaran: MetaModelo<NuevaLineaAlbaran> = metaNuevaLin
 const albaranVacioObjeto: Albaran = albaranVacio();
 
 export const albaranVacioContexto = (): Albaran => ({ ...albaranVacioObjeto });
-
-export const nuevoClienteRegistradoVacio: NuevoAlbaran = {
-    cliente_id: "",
-    direccion_id: "",
-    empresa_id: empresaActual(),
-} as NuevoAlbaran;
 
 export const cambioClienteVacio = (): CambioClienteAlbaran => ({
     cliente_id: "",

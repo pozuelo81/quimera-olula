@@ -39,6 +39,7 @@ type VentaTpvAPI = {
     neto: number;
     total_iva: number;
     total_irpf: number;
+    total_recargo: number;
     total_divisa_empresa: number;
     forma_pago_id: string;
     nombre_forma_pago: string;

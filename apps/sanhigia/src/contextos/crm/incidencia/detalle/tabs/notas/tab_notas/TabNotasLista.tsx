@@ -1,4 +1,5 @@
 import { QBoton, QIcono } from "@olula/componentes/index.js";
+import { formatearFechaString } from "@olula/lib/dominio.js";
 import { Nota } from "../diseño.ts";
 import "./TabNotasLista.css";
 
@@ -28,7 +29,7 @@ export const TabNotasLista = ({
             <div className="NotaMeta">
               <span className="NotaAgente">{nota.agenteId}</span>
               <span className="NotaFecha">
-                {new Date(nota.fecha).toLocaleDateString("es-ES")}
+                {formatearFechaString(nota.fecha)}
               </span>
             </div>
             <QBoton

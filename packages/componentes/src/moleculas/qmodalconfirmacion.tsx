@@ -55,12 +55,12 @@ export const QModalConfirmacion = ({
     <QModal
       nombre={nombre}
       abierto={abierto}
+      titulo={titulo}
       onCerrar={cancelar}
       bloquearCierre={guardando}
       mostrarBotonCerrar={!guardando}
       pantallaCompletaMovil={pantallaCompletaMovil}
     >
-      <h2>{titulo}</h2>
       <div className="mensaje" style={{ whiteSpace: "pre-line" }}>
         {mensaje}
       </div>

@@ -1,0 +1,11 @@
+.tarjeta-recibo-venta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.tarjeta-recibo-venta-importe {
+    font-variant-numeric: tabular-nums;
+}

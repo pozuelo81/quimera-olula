@@ -5,8 +5,7 @@ export type EstadoCliente =
     | "ABIERTO"
     | "BAJANDO_CLIENTE"
     | "BORRANDO_CLIENTE"
-    | "EDITANDO_CLIENTE"
-    | "GUARDANDO_CLIENTE"
+    | "CAMBIANDO_ID_FISCAL"
 
 export type ContextoCliente = {
     estado: EstadoCliente;

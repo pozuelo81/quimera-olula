@@ -4,11 +4,12 @@ import {
   FormInput,
   FormInputProps,
   Validacion,
+  useEditando,
 } from "./_forminput.tsx";
 
 export type QInputProps = FormInputProps & {
   modificado?: boolean;
-  soloTexto?: boolean;
+  soloLectura?: boolean;
 };
 
 export const QInput = ({
@@ -23,19 +24,21 @@ export const QInput = ({
   condensado,
   tipo,
   modificado,
-  soloTexto,
+  soloLectura,
   valor,
   ...props
 }: QInputProps) => {
-  if (soloTexto) {
+  const { editandoHandlers } = useEditando();
+
+  if (soloLectura) {
     return (
-      <quimera-input solo-texto="" nombre={nombre} tipo={tipo} condensado={condensado}>
+      <quimera-input solo-lectura="" nombre={nombre} tipo={tipo} condensado={condensado}>
         <label>
           <Etiqueta label={label} />
           {tipo === "checkbox" ? (
             <input type="checkbox" checked={valor === "true"} disabled readOnly />
           ) : (
-            <span className="valor-solo-texto">{valor || "—"}</span>
+            <span className="valor-solo-lectura">{valor || "—"}</span>
           )}
         </label>
       </quimera-input>
@@ -64,7 +67,7 @@ export const QInput = ({
   };
 
   return (
-    <quimera-input {...attrs}>
+    <quimera-input {...attrs} {...editandoHandlers}>
       <label>
         <Etiqueta label={label} />
         <FormInput {...inputAttrs} />

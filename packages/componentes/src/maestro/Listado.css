@@ -45,6 +45,23 @@
         gap: var(--espaciado-s);
     }
 
+    /* Filtros abiertos: la cabecera se dedica entera al panel de filtros.
+       Cuelga de .listado-cabecera para no afectar a listados anidados en el Detalle.
+       Aplica a Listado y a ListadoSemiControlado: comparten este CSS. */
+    .listado-cabecera:has(.MaestroFiltrosControlado[data-abierto]) {
+        align-items: flex-start;
+
+        .listado-cabecera-izquierda {
+            flex-basis: 100%;
+            align-items: flex-start;
+        }
+
+        .listado-cabecera-derecha,
+        .listado-descarga {
+            display: none;
+        }
+    }
+
     .cambio-modo {
         display: inline-flex;
         align-self: center;

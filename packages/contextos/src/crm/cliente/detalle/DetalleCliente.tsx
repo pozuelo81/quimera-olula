@@ -1,4 +1,5 @@
-import { TabCrmContactos } from "#/ventas/cliente/detalle/CRMContactos/TabCrmContactos.tsx";
+import { TabCrmContactos } from "#/ventas/cliente/detalle/crm_contactos/TabCrmContactos.tsx";
+import { CambiarIdFiscal } from "#/ventas/comun/componentes/moleculas/CambiarIdFiscal/CambiarIdFiscal.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
 import { Detalle, QBoton, Tab, Tabs } from "@olula/componentes/index.js";
 import { QuimeraAcciones } from "@olula/componentes/moleculas/qacciones.tsx";
@@ -68,7 +69,7 @@ export const DetalleCliente = ({
 
           <Tabs>
             <Tab label="General">
-              <TabGeneral cliente={cliente} emitir={publicar} />
+              <TabGeneral cliente={cliente} emitir={emitir} />
             </Tab>
 
             <Tab label="Contactos">
@@ -100,6 +101,13 @@ export const DetalleCliente = ({
                 Cancelar
               </QBoton>
             </div>
+          )}
+          {ctx.estado === "CAMBIANDO_ID_FISCAL" && (
+            <CambiarIdFiscal
+              publicar={emitir}
+              tipoIdFiscal={ctx.cliente.tipo_id_fiscal}
+              idFiscal={ctx.cliente.id_fiscal}
+            />
           )}
           {ctx.estado === "BORRANDO" && (
             <BorrarCliente publicar={emitir} cliente={modelo} />

@@ -1,5 +1,6 @@
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QModal } from "@olula/componentes/moleculas/qmodal.tsx";
+import { formatearFechaDate } from "@olula/lib/dominio.js";
 import { FacturaDevolucion, LineaFacturaDevolucion } from "../../diseño.ts";
 import { TablaLineasDevolucion } from "../lineas_devolucion/TablaLineasDevolucion.tsx";
 
@@ -40,7 +41,7 @@ export const PasoConfigurarDevolucionModal = ({
             <h4>{factura.cabeceraFactura.nombrecliente}</h4>
             <h4>
               {factura.cabeceraFactura.fecha
-                ? factura.cabeceraFactura.fecha.toLocaleDateString()
+                ? formatearFechaDate(factura.cabeceraFactura.fecha)
                 : "-"}
             </h4>
             <h4>{formatoMoneda.format(factura.cabeceraFactura.total)}</h4>

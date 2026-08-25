@@ -67,7 +67,7 @@ type UiProps = {
     opcional: boolean
     valido: boolean
     modificado: boolean
-    soloTexto: boolean
+    soloLectura: boolean
     onChange: (valor: ValorControl) => void
     evaluarCambio: () => void
     descripcion?: string

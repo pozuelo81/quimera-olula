@@ -1,6 +1,6 @@
 import { ProcesarContexto } from "@olula/lib/diseño.js";
 import { cambiarItem, cargar, listaSeleccionableVacia } from "@olula/lib/entidad.ts";
-import { pedidoVacioObjeto } from "../../pedido/detalle/dominio.ts";
+import { pedidoVacioObjeto } from "../../pedido/detalle/detalle.ts";
 import { getLineas, getPedido } from "../../pedido/infraestructura.ts";
 import { LineaAlbaranarPedido, Tramo } from "../diseño.ts";
 import { patchAlbaranarPedido } from "../infraestructura.ts";

@@ -1,0 +1,20 @@
+.TabDatos,
+.TabCliente {
+
+    quimera-input[deshabilitado] input,
+    quimera-autocompletar quimera-input[deshabilitado] input,
+    quimera-select[deshabilitado] select {
+        background-color: var(--color-superficie-sunken);
+        color: var(--color-texto-primario);
+        border: 1px dashed var(--color-borde-fuerte);
+        border-radius: var(--redondeo-borde-xs);
+        box-shadow: none;
+        cursor: default;
+    }
+
+    quimera-input[deshabilitado] .etiqueta,
+    quimera-autocompletar quimera-input[deshabilitado] .etiqueta,
+    quimera-select[deshabilitado] .etiqueta {
+        color: var(--color-texto-secundario);
+    }
+}

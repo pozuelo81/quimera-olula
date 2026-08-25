@@ -1,0 +1,24 @@
+.indicador-guardado {
+    display: inline-block;
+    padding: var(--espaciado-xxs) var(--espaciado-s);
+    border-radius: var(--redondeo-borde-xs);
+    font-size: var(--tamaño-letra-xs);
+    font-weight: var(--grosor-letra-5);
+    white-space: nowrap;
+}
+
+.indicador-guardado.pendiente {
+    background-color: var(--color-accion-claro);
+    color: var(--color-texto-primario);
+}
+
+.indicador-guardado.guardado {
+    background-color: var(--color-exito-claro);
+    color: var(--color-texto-primario);
+}
+
+.indicador-guardado.error {
+    background-color: var(--color-error-claro);
+    color: var(--color-texto-primario);
+    cursor: help;
+}

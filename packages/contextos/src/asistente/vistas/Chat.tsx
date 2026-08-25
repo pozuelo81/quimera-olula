@@ -3,18 +3,24 @@ import { obtenerAdjuntoHilo } from "#/asistente/infraestructura.ts";
 import { useAsistenteContext } from "#/asistente/vistas/AsistenteRuntimeProvider.tsx";
 import { HistorialHilos } from "#/asistente/vistas/HistorialHilos.tsx";
 import { useGrabacionAudio } from "#/asistente/vistas/useGrabacionAudio.ts";
+import { useCapturaFoto } from "#/asistente/vistas/useCapturaFoto.ts";
 import { renderMarkdown } from "@a2ui/markdown-it";
 import { A2uiSurface, MarkdownContext } from "@a2ui/react/v0_9";
+import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { MessagePrimitive, ThreadPrimitive, useMessage } from "@assistant-ui/react";
 import {
     IconBolt,
     IconBoltOff,
+    IconCamera,
     IconFileTypePdf,
     IconFileTypeXls,
     IconHistory, IconMicrophone, IconPaperclip,
     IconPlayerStop, IconPlus, IconRobot, IconSend, IconTrash, IconUser, IconX,
 } from "@tabler/icons-react";
-import { useCallback, useRef, useState, type ChangeEvent, type KeyboardEvent, type RefObject } from "react";
+import {
+    useCallback, useEffect, useRef, useState,
+    type ChangeEvent, type KeyboardEvent, type ReactNode, type RefObject,
+} from "react";
 import "./Chat.css";
 
 interface Props {
@@ -200,9 +206,15 @@ const leerArchivoComoBase64 = (archivo: File): Promise<string> =>
 function Compositor({ texto, setTexto, textareaRef }: CompositorProps) {
     const { isRunning, enviarMensaje, cancelarMensaje } = useAsistenteContext();
     const { soportado: microSoportado, grabando, iniciar: iniciarGrabacion, detener: detenerGrabacion } = useGrabacionAudio();
+    const {
+        soportado: fotoSoportada, abierta: camaraAbierta, error: errorCamara,
+        videoRef, abrir: abrirCamara, cerrar: cerrarCamara, capturar: capturarFoto,
+    } = useCapturaFoto();
     const [adjuntoPendiente, setAdjuntoPendiente] = useState<AdjuntoMensaje | null>(null);
     const [errorAdjunto, setErrorAdjunto] = useState<string | null>(null);
+    const [menuAdjuntarAbierto, setMenuAdjuntarAbierto] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const menuAdjuntarRef = useRef<HTMLDivElement>(null);
 
     const enviar = useCallback(async () => {
         const recortado = texto.trim();
@@ -262,9 +274,31 @@ function Compositor({ texto, setTexto, textareaRef }: CompositorProps) {
         [adjuntarDocumento]
     );
 
+    // Cierra el menú "Adjuntar" al hacer click fuera de él (fuera del botón y del popup).
+    useEffect(() => {
+        if (!menuAdjuntarAbierto) return;
+        const cerrarSiFuera = (e: MouseEvent) => {
+            if (menuAdjuntarRef.current && !menuAdjuntarRef.current.contains(e.target as Node)) {
+                setMenuAdjuntarAbierto(false);
+            }
+        };
+        document.addEventListener("mousedown", cerrarSiFuera);
+        return () => document.removeEventListener("mousedown", cerrarSiFuera);
+    }, [menuAdjuntarAbierto]);
+
+    const hacerFoto = useCallback(() => {
+        const foto = capturarFoto();
+        if (foto) {
+            setErrorAdjunto(null);
+            setAdjuntoPendiente({ nombre: "foto.jpg", tipoMime: foto.tipoMime, datosBase64: foto.datosBase64 });
+        }
+    }, [capturarFoto]);
+
     return (
         <div className="asistente-chat__compositor">
-            {errorAdjunto && <p className="asistente-chat__error-adjunto">{errorAdjunto}</p>}
+            {(errorAdjunto || errorCamara) && (
+                <p className="asistente-chat__error-adjunto">{errorAdjunto || errorCamara}</p>
+            )}
 
             {adjuntoPendiente && (
                 <AdjuntoPendientePreview adjunto={adjuntoPendiente} onQuitar={() => setAdjuntoPendiente(null)} />
@@ -286,16 +320,51 @@ function Compositor({ texto, setTexto, textareaRef }: CompositorProps) {
                 />
 
                 {!adjuntoPendiente && (
-                    <button
-                        type="button"
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={isRunning || grabando}
-                        aria-label="Adjuntar documento"
-                        title="Adjuntar Excel o PDF"
-                        className="asistente-chat__boton asistente-chat__boton--adjuntar"
-                    >
-                        <IconPaperclip size={17} />
-                    </button>
+                    <div className="asistente-chat__adjuntar-wrapper" ref={menuAdjuntarRef}>
+                        {menuAdjuntarAbierto && (
+                            <div className="asistente-chat__menu-adjuntar" role="menu">
+                                <button
+                                    type="button"
+                                    role="menuitem"
+                                    onClick={() => {
+                                        setMenuAdjuntarAbierto(false);
+                                        fileInputRef.current?.click();
+                                    }}
+                                    className="asistente-chat__menu-adjuntar-opcion"
+                                >
+                                    <IconPaperclip size={16} />
+                                    Adjuntar documento
+                                </button>
+                                {fotoSoportada && (
+                                    <button
+                                        type="button"
+                                        role="menuitem"
+                                        onClick={async () => {
+                                            setMenuAdjuntarAbierto(false);
+                                            setErrorAdjunto(null);
+                                            await abrirCamara();
+                                        }}
+                                        className="asistente-chat__menu-adjuntar-opcion"
+                                    >
+                                        <IconCamera size={16} />
+                                        Hacer foto
+                                    </button>
+                                )}
+                            </div>
+                        )}
+                        <button
+                            type="button"
+                            onClick={() => setMenuAdjuntarAbierto(v => !v)}
+                            disabled={isRunning || grabando}
+                            aria-label="Adjuntar"
+                            aria-haspopup="menu"
+                            aria-expanded={menuAdjuntarAbierto}
+                            title="Adjuntar documento o hacer una foto"
+                            className="asistente-chat__boton asistente-chat__boton--adjuntar"
+                        >
+                            <IconPaperclip size={17} />
+                        </button>
+                    </div>
                 )}
 
                 <textarea
@@ -346,6 +415,32 @@ function Compositor({ texto, setTexto, textareaRef }: CompositorProps) {
                     </button>
                 )}
             </form>
+
+            {camaraAbierta && (
+                <div className="asistente-chat__camara-overlay" role="dialog" aria-label="Hacer una foto">
+                    <div className="asistente-chat__camara-ventana">
+                        <video ref={videoRef} autoPlay playsInline muted className="asistente-chat__camara-video" />
+                        <div className="asistente-chat__camara-acciones">
+                            <button
+                                type="button"
+                                onClick={cerrarCamara}
+                                aria-label="Cancelar"
+                                title="Cancelar"
+                                className="asistente-chat__camara-cancelar"
+                            >
+                                <IconX size={18} />
+                            </button>
+                            <button
+                                type="button"
+                                onClick={hacerFoto}
+                                aria-label="Hacer la foto"
+                                title="Hacer la foto"
+                                className="asistente-chat__camara-disparador"
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
@@ -357,12 +452,15 @@ interface AdjuntoPendientePreviewProps {
 
 function AdjuntoPendientePreview({ adjunto, onQuitar }: AdjuntoPendientePreviewProps) {
     const esAudio = adjunto.tipoMime.startsWith("audio/");
+    const esImagen = adjunto.tipoMime.startsWith("image/");
     const dataUrl = `data:${adjunto.tipoMime};base64,${adjunto.datosBase64}`;
 
     return (
         <div className="asistente-chat__adjunto-pendiente">
             {esAudio ? (
                 <audio controls src={dataUrl} className="asistente-chat__adjunto-audio" />
+            ) : esImagen ? (
+                <img src={dataUrl} alt={adjunto.nombre} className="asistente-chat__adjunto-imagen" />
             ) : (
                 <div className="asistente-chat__adjunto-chip">
                     {adjunto.tipoMime === "application/pdf" ? <IconFileTypePdf size={18} /> : <IconFileTypeXls size={18} />}
@@ -422,22 +520,23 @@ interface AdjuntoMensajeVistaProps {
 
 function AdjuntoMensajeVista({ adjunto }: AdjuntoMensajeVistaProps) {
     const { threadIdActivo } = useAsistenteContext();
-    const [urlAudio, setUrlAudio] = useState<string | null>(
+    const [urlMedia, setUrlMedia] = useState<string | null>(
         adjunto.datosBase64 ? `data:${adjunto.tipoMime};base64,${adjunto.datosBase64}` : null
     );
     const [cargando, setCargando] = useState(false);
     const esAudio = adjunto.tipoMime.startsWith("audio/");
+    const esImagen = adjunto.tipoMime.startsWith("image/");
 
-    const reproducir = useCallback(async () => {
-        if (urlAudio || !adjunto.id || !threadIdActivo) return;
+    const cargarMedia = useCallback(async () => {
+        if (urlMedia || !adjunto.id || !threadIdActivo) return;
         setCargando(true);
         try {
             const blob = await obtenerAdjuntoHilo(threadIdActivo, adjunto.id);
-            setUrlAudio(URL.createObjectURL(blob));
+            setUrlMedia(URL.createObjectURL(blob));
         } finally {
             setCargando(false);
         }
-    }, [urlAudio, adjunto.id, threadIdActivo]);
+    }, [urlMedia, adjunto.id, threadIdActivo]);
 
     const descargar = useCallback(async () => {
         let url: string | null = null;
@@ -463,17 +562,33 @@ function AdjuntoMensajeVista({ adjunto }: AdjuntoMensajeVistaProps) {
     }, [adjunto, threadIdActivo]);
 
     if (esAudio) {
-        return urlAudio ? (
-            <audio controls src={urlAudio} className="asistente-chat__adjunto-audio-mensaje" />
+        return urlMedia ? (
+            <audio controls src={urlMedia} className="asistente-chat__adjunto-audio-mensaje" />
         ) : (
             <button
                 type="button"
                 className="asistente-chat__adjunto-cargar"
-                onClick={reproducir}
+                onClick={cargarMedia}
                 disabled={cargando}
             >
                 <IconMicrophone size={14} />
                 {cargando ? "Cargando…" : "Reproducir nota de voz"}
+            </button>
+        );
+    }
+
+    if (esImagen) {
+        return urlMedia ? (
+            <img src={urlMedia} alt={adjunto.nombre} className="asistente-chat__adjunto-imagen-mensaje" />
+        ) : (
+            <button
+                type="button"
+                className="asistente-chat__adjunto-cargar"
+                onClick={cargarMedia}
+                disabled={cargando}
+            >
+                <IconCamera size={14} />
+                {cargando ? "Cargando…" : "Ver foto"}
             </button>
         );
     }
@@ -489,14 +604,76 @@ function AdjuntoMensajeVista({ adjunto }: AdjuntoMensajeVistaProps) {
 function AssistantMessage() {
     return (
         <MessagePrimitive.Root className="asistente-chat__mensaje asistente-chat__mensaje--asistente">
-            <div className="asistente-chat__burbuja-fila">
-                <div className="asistente-chat__avatar">
-                    <IconRobot size={13} />
-                </div>
-                <AssistantMessageContent />
-            </div>
+            <AssistantMessageBurbujaFila />
             <AssistantMessageA2ui />
+            <AssistantMessageAccionNavegacion />
         </MessagePrimitive.Root>
+    );
+}
+
+/** Componentes A2UI "autoexplicativos": ya traen su propio título y detalles
+ * (confirmación de una acción / resultado de ejecutarla / resultado de una pregunta
+ * agregada), así que mostrar también la burbuja de texto del LLM al lado es puramente
+ * redundante — a veces literalmente la misma frase (ver _a2ui_tarjeta_confirmacion/
+ * _resultado_escritura_a2ui_str/_a2ui_str_metrica en el backend, que usan el mismo
+ * texto tanto para "respuesta" como para el título de la tarjeta). */
+const COMPONENTES_AUTOEXPLICATIVOS = new Set(["TarjetaConfirmacion", "TarjetaResultado", "TarjetaMetrica"]);
+
+function AssistantMessageBurbujaFila() {
+    const messageId = useMessage(m => m.id);
+    const { a2uiSurfaces, messageSurfaceMap } = useAsistenteContext();
+    // Tools como mostrar_tabla no dejan ningún texto de acompañamiento (el LLM solo
+    // devuelve el bloque a2ui) — sin esto se veía una burbuja vacía (avatar + hueco en
+    // blanco) encima de la tabla. Solo se comprueba cuando el mensaje ya ha terminado:
+    // mientras está "running" con texto aún vacío, hace falta la burbuja para los tres
+    // puntos de "escribiendo…" (ver AssistantMessageContent/mostrarPuntos).
+    const sinTextoYaTerminado = useMessage(m => {
+        if (m.status?.type === "running") return false;
+        const texto = m.content.filter(p => p.type === "text").map(p => (p as { text: string }).text).join("");
+        return texto.trim().length === 0;
+    });
+
+    const surfaceIds = messageSurfaceMap[messageId] ?? [];
+    const ocultarTexto = sinTextoYaTerminado || a2uiSurfaces.some(
+        s => surfaceIds.includes(s.id) &&
+            Array.from(s.componentsModel.entries).some(([, c]) => COMPONENTES_AUTOEXPLICATIVOS.has(c.type))
+    );
+
+    if (ocultarTexto) return null;
+
+    return (
+        <div className="asistente-chat__burbuja-fila">
+            <div className="asistente-chat__avatar">
+                <IconRobot size={13} />
+            </div>
+            <AssistantMessageContent />
+        </div>
+    );
+}
+
+function AssistantMessageAccionNavegacion() {
+    const messageId = useMessage(m => m.id);
+    const { accionNavegacionPorMensaje, enviarAccion } = useAsistenteContext();
+    const accion = accionNavegacionPorMensaje[messageId];
+
+    if (!accion) return null;
+
+    const navegar = () => {
+        void enviarAccion({
+            name: "navegar",
+            surfaceId: "",
+            sourceComponentId: "",
+            timestamp: new Date().toISOString(),
+            context: { ruta: accion.ruta, parametros: accion.parametros ?? {} },
+        });
+    };
+
+    return (
+        <div className="asistente-chat__navegacion">
+            <QBoton variante="borde" onClick={navegar}>
+                {accion.descripcion ?? "Ir a la pantalla solicitada"}
+            </QBoton>
+        </div>
     );
 }
 
@@ -520,6 +697,12 @@ function AssistantMessageA2ui() {
     );
 }
 
+// El LLM a veces envuelve un valor destacado en negrita markdown ("**21.534,68 €**")
+// dentro del texto plano de la respuesta (fuera de los bloques a2ui, que sí pasan por
+// renderMarkdown) — sin esto se veían los "**" literales en vez de negrita real.
+const renderTextoConNegrita = (texto: string): ReactNode =>
+    texto.split(/\*\*(.+?)\*\*/g).map((parte, i) => (i % 2 === 1 ? <strong key={i}>{parte}</strong> : parte));
+
 function AssistantMessageContent() {
     const mostrarPuntos = useMessage(m => {
         if (m.status?.type !== "running") return false;
@@ -540,7 +723,11 @@ function AssistantMessageContent() {
                 </span>
             ) : (
                 <MessagePrimitive.Content
-                    components={{ Text: ({ text }) => <span className="asistente-chat__texto-pre">{text}</span> }}
+                    components={{
+                        Text: ({ text }) => (
+                            <span className="asistente-chat__texto-pre">{renderTextoConNegrita(text)}</span>
+                        ),
+                    }}
                 />
             )}
         </div>

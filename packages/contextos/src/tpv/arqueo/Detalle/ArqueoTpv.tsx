@@ -91,7 +91,7 @@ export const DetalleArqueoTpv = ({
           <QInput
             label="Fecha/hora cierre"
             {...uiProps("fechahoraCierre")}
-            soloTexto
+            soloLectura
           />
         </quimera-formulario>
 

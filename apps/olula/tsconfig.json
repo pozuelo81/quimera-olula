@@ -11,5 +11,10 @@
         ".",
         "../../eslint.config.js",
         "../../vite.config.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist",
+        "dev-dist"
     ]
 }

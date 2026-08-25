@@ -27,3 +27,63 @@
         justify-content: flex-end;
     }
 }
+
+/* Panel abierto: ocupa el ancho que le deja la cabecera y reparte los campos
+   en columnas. El techo real lo sigue marcando el cap de .Maestro según
+   modoDisposicion (30% / 50% / 100%). */
+.MaestroFiltrosControlado[data-abierto] {
+    /* Único parámetro a tocar si el reparto no convence. */
+    --filtro-columna-min: 200px;
+
+    max-width: none;
+    flex: 1 1 auto;
+    min-width: 0;
+
+    quimera-formulario {
+        /* auto-FILL, no auto-fit: con auto-fit las pistas vacías colapsan y un
+           listado con pocos filtros los estira a media cabecera. Con auto-fill
+           las pistas se mantienen y cada campo ocupa una.
+           El track mínimo es el mayor entre --filtro-columna-min y un tercio del
+           ancho, así en pantalla-completa nunca salen más de 3 columnas.
+           min(100%, ...) evita desbordar si el panel es más estrecho que el mínimo. */
+        grid-template-columns: repeat(auto-fill,
+                minmax(min(100%,
+                        max(var(--filtro-columna-min),
+                            (100% - 2 * var(--gap-formulario)) / 3)),
+                    1fr));
+        padding-bottom: var(--espaciado-s);
+    }
+
+    quimera-formulario>.campo-filtro {
+        grid-column: auto;
+        min-width: 0;
+    }
+
+    /* El campo y sus extras (botón x, "Manual") van siempre en la misma línea:
+       qform.css le pone width:100% al input, así que hay que dejarlo encoger. */
+    quimera-formulario>.campo-filtro> :not(quimera-boton) {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    quimera-formulario>.campo-filtro>quimera-boton {
+        flex: 0 0 auto;
+    }
+
+    .interval {
+        flex-wrap: wrap;
+    }
+
+    footer {
+        margin-top: var(--espaciado-s);
+        gap: var(--espaciado-s);
+    }
+}
+
+/* Bajo 768px qform.css fuerza `grid-column: 1 / -1 !important` a todos los hijos.
+   Declaramos 1 track para que auto-fit no deje columnas fantasma. */
+@media (max-width: 768px) {
+    .MaestroFiltrosControlado[data-abierto] quimera-formulario {
+        grid-template-columns: 1fr;
+    }
+}

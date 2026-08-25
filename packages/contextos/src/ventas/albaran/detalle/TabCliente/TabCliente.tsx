@@ -1,8 +1,8 @@
 import { Cliente } from "#/ventas/comun/componentes/cliente.tsx";
-import { DirCliente } from "#/ventas/comun/componentes/dirCliente.tsx";
+import { formatearDireccionVenta } from "#/ventas/comun/dominio.ts";
 import { CambioClienteVenta } from "#/ventas/comun/componentes/moleculas/CambioClienteVenta/CambioClienteVenta.tsx";
 import { CambioCliente } from "#/ventas/comun/componentes/moleculas/CambioClienteVenta/diseño.ts";
-import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
+import { BotonCambiar } from "#/ventas/comun/componentes/BotonCambiar.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { ProcesarEvento } from "@olula/lib/useMaquina.js";
 import { HookModelo } from "@olula/lib/useModelo.ts";
@@ -47,34 +47,24 @@ export const TabCliente = ({
 
         {clienteEditable && (
           <div className="TabCliente-accion">
-            <QBoton onClick={() => publicar("cambio_cliente_solicitado")}>
-              Cambiar Cliente
-            </QBoton>
+            <BotonCambiar
+              titulo="Cambiar cliente y dirección"
+              onClick={() => publicar("cambio_cliente_solicitado")}
+            />
           </div>
         )}
 
-        {modelo.cliente.cliente_id !== null ? (
-          <DirCliente
-            clienteId={modelo.cliente.cliente_id ?? undefined}
-            nombre="direccion_id"
-            valor={modelo.cliente.direccion_id ?? ""}
-            deshabilitado={!clienteEditable}
-            onChange={() => {}}
-          />
-        ) : (
-          <QInput
-            deshabilitado={true}
-            label="Direccion"
-            nombre="direccion_cliente"
-            valor={`${modelo.cliente.direccion.tipo_via} ${modelo.cliente.direccion.nombre_via}, ${modelo.cliente.direccion.ciudad}`}
-          />
-        )}
+        <QInput
+          deshabilitado={true}
+          label="Dirección"
+          nombre="direccion_cliente"
+          valor={formatearDireccionVenta(modelo.cliente.direccion)}
+        />
       </quimera-formulario>
 
       {clienteEditable && estado === "CAMBIANDO_CLIENTE" && (
         <CambioClienteVenta
           venta={albaran}
-          inicializarDesdeVenta={true}
           onGuardar={onGuardarCambioCliente}
           onCancelar={() => publicar("cambio_cliente_cancelado")}
         />

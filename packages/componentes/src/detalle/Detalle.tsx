@@ -1,12 +1,12 @@
 import { Entidad } from "@olula/lib/diseño.ts";
-import { PropsWithChildren, useEffect } from "react";
+import { PropsWithChildren, ReactNode, useEffect } from "react";
 import { QBoton } from "../atomos/qboton.tsx";
 import { QIcono } from "../atomos/qicono.tsx";
 import "./detalle.css";
 
 interface DetalleProps<T extends Entidad> {
   id: string | undefined;
-  obtenerTitulo?: (entidad: T) => string;
+  obtenerTitulo?: (entidad: T) => ReactNode;
   entidad: T | null;
   setEntidad: (entidad: T) => void;
   cargar?: (id: string) => Promise<T>;

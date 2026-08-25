@@ -225,6 +225,14 @@
     flex-direction: column;
     gap: 0.5rem;
     margin: 0.5rem 0 0 2.25rem;
+
+    h2 {
+        font-size: var(--tamaño-letra-mediana, 1rem);
+    }
+}
+
+.asistente-chat__navegacion {
+    margin: 0.5rem 0 0 2.25rem;
 }
 
 .asistente-chat__puntos {
@@ -349,6 +357,118 @@
     display: none;
 }
 
+.asistente-chat__adjuntar-wrapper {
+    position: relative;
+    display: flex;
+}
+
+.asistente-chat__menu-adjuntar {
+    position: absolute;
+    bottom: calc(100% + 0.375rem);
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    padding: 0.375rem;
+    border-radius: 0.75rem;
+    background: #ffffff;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12), inset 0 0 0 1px #e5e7eb;
+    z-index: 20;
+}
+
+.asistente-chat__menu-adjuntar-opcion {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border: none;
+    border-radius: 0.5rem;
+    background: transparent;
+    color: #374151;
+    font-size: 0.8125rem;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.asistente-chat__menu-adjuntar-opcion:hover {
+    background: #f3f4f6;
+}
+
+.asistente-chat__camara-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(17, 24, 39, 0.6);
+    z-index: 50;
+}
+
+.asistente-chat__camara-ventana {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 1rem;
+    background: #111827;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+    max-width: min(28rem, 92vw);
+    width: 100%;
+}
+
+.asistente-chat__camara-video {
+    width: 100%;
+    max-height: 70vh;
+    border-radius: 0.75rem;
+    background: #000000;
+    object-fit: cover;
+}
+
+.asistente-chat__camara-acciones {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    width: 100%;
+}
+
+.asistente-chat__camara-disparador {
+    height: 3.5rem;
+    width: 3.5rem;
+    border-radius: 9999px;
+    border: 3px solid #ffffff;
+    background: #ffffff;
+    box-shadow: 0 0 0 2px #111827;
+    cursor: pointer;
+}
+
+.asistente-chat__camara-disparador:hover {
+    background: #e5e7eb;
+}
+
+.asistente-chat__camara-cancelar {
+    position: absolute;
+    left: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 2.25rem;
+    width: 2.25rem;
+    border-radius: 9999px;
+    border: none;
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    cursor: pointer;
+}
+
+.asistente-chat__camara-cancelar:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
 .asistente-chat__error-adjunto {
     margin: 0 0 0.5rem;
     font-size: 0.75rem;
@@ -370,6 +490,13 @@
     flex: 1;
     height: 2.25rem;
     min-width: 0;
+}
+
+.asistente-chat__adjunto-imagen {
+    max-height: 6rem;
+    max-width: 8rem;
+    border-radius: 0.5rem;
+    object-fit: cover;
 }
 
 .asistente-chat__adjunto-chip {
@@ -418,6 +545,13 @@
 .asistente-chat__adjunto-audio-mensaje {
     max-width: 16rem;
     height: 2.25rem;
+}
+
+.asistente-chat__adjunto-imagen-mensaje {
+    max-width: 12rem;
+    max-height: 12rem;
+    border-radius: 0.75rem;
+    object-fit: cover;
 }
 
 .asistente-chat__adjunto-cargar,

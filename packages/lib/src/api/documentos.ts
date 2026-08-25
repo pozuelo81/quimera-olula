@@ -169,7 +169,7 @@ export const DocumentosAPI = {
      * @param vinculoId Id del vínculo: id del objeto de negocio, o id de la carpeta padre
      */
     async crearCarpeta(nombre: string, vinculoTipo: string, vinculoId: string): Promise<string> {
-        console.log('mimensaje_formData', vinculoTipo, vinculoId);
+        // console.log('mimensaje_formData', vinculoTipo, vinculoId);
         const respuesta = await RestAPI.post(
             `${DOCUMENTAL_BASE_URL}/carpeta`,
             {

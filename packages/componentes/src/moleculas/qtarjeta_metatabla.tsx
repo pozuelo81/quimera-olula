@@ -5,6 +5,7 @@ import {
   formatearFechaString,
   formatearHoraString,
   formatearMoneda,
+  resolverDivisa,
 } from "@olula/lib/dominio.ts";
 import { ReactNode, isValidElement, useMemo } from "react";
 import { MetaTabla } from "../atomos/qtabla.tsx";
@@ -124,7 +125,7 @@ const valorColumna = <T extends Entidad>(
   const valorFormateado = formatearValor(
     valorBruto,
     columna.tipo,
-    columna.divisa
+    resolverDivisa(columna.divisa, entidad)
   );
 
   if (isValidElement(valorFormateado)) {

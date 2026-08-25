@@ -6,6 +6,7 @@ import {
   formatearFechaString,
   formatearHoraString,
   formatearMoneda,
+  resolverDivisa,
 } from "@olula/lib/dominio.ts";
 import { ComponentType, Fragment, ReactNode, useState } from "react";
 import { QBoton } from "./qboton.tsx";
@@ -25,7 +26,7 @@ type MetaColumna<T extends Entidad> = {
   prioridad?: "alta" | "media" | "baja";
   esTitulo?: boolean;
   tipo?: TipoColumna;
-  divisa?: string;
+  divisa?: string | ((entidad: T) => string);
   ancho?: string; // Ancho específico para esta columna
   render?: (entidad: T) => string | ReactNode;
 };
@@ -125,7 +126,11 @@ const fila = <T extends Entidad>(
       cargando && typeof entidad[id] == "string"
         ? (entidad[id] as string)
         : (render?.(entidad as T) ??
-          a_string(entidad[id] as string, tipo, divisa));
+          a_string(
+            entidad[id] as string,
+            tipo,
+            resolverDivisa(divisa, entidad as T)
+          ));
 
     return (
       <td

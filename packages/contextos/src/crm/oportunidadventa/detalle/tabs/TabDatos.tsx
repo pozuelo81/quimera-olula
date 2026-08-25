@@ -23,7 +23,7 @@ export const TabDatos = ({
           <QInput
             label="Cliente"
             nombre="cliente"
-            soloTexto
+            soloLectura
             valor={modelo.nombre_cliente ?? modelo.cliente_id ?? ""}
           />
         )}
@@ -32,7 +32,7 @@ export const TabDatos = ({
           <QInput
             label="Lead"
             nombre="lead"
-            soloTexto
+            soloLectura
             valor={
               modelo.nombre_cliente ??
               modelo.nombre_tarjeta ??
@@ -46,7 +46,7 @@ export const TabDatos = ({
           <QInput
             label="Contacto"
             nombre="contacto"
-            soloTexto
+            soloLectura
             valor={modelo.nombre_contacto ?? modelo.contacto_id ?? ""}
           />
         )}

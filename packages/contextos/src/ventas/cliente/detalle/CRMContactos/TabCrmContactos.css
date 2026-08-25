@@ -1,9 +1,0 @@
-.Cliente .TabCrmContactos {
-    quimera-input[nombre="nombre"] {
-        grid-column: 1 / span 6;
-    }
-
-    quimera-input[nombre="email"] {
-        grid-column: span 6;
-    }
-}

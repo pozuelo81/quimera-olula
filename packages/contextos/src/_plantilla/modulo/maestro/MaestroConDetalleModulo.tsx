@@ -1,5 +1,4 @@
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
-import { QIcono } from "@olula/componentes/atomos/qicono.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
 import { MetaTabla } from "@olula/componentes/index.js";
 import { Listado } from "@olula/componentes/maestro/Listado.js";
@@ -7,7 +6,6 @@ import { MaestroDetalle } from "@olula/componentes/maestro/MaestroDetalle.tsx";
 import { criteriaDefecto } from "@olula/lib/dominio.js";
 import { listaActivaEntidadesInicial } from "@olula/lib/ListaActivaEntidades.js";
 import { getUrlParams, useUrlParams } from "@olula/lib/url-params.js";
-import { useLayout } from "@olula/lib/useLayout.js";
 import { useEffect, useMemo } from "react";
 import { CrearModulo } from "../crear/CrearModulo.js";
 import { DetalleModulo } from "../detalle/DetalleModulo.js";
@@ -40,21 +38,22 @@ const metaTablaModulo: MetaTabla<Modulo> = [
  * Componente principal: listado (maestro) + detalle.
  *
  * Patrones aplicados:
- *   - useLayout        → alterna entre vista TARJETA y TABLA
  *   - useUrlParams     → escribe activo y criteria en la URL al cambiar
  *   - getUrlParams     → lee el estado inicial desde la URL (deep link)
  *   - listaActivaEntidadesInicial → inicializa con ID y criteria de la URL
- *   - Listado          → gestiona criteria internamente; emite onCriteriaChanged y onSiguientePagina
- *   - MaestroDetalle   → recibe layout para adaptar la disposición en móvil
+ *   - Listado          → gestiona criteria y modo (tabla/tarjetas) internamente;
+ *                        emite onCriteriaChanged y onSiguientePagina
  *   - CREANDO          → modal de alta; crear_modulo_solicitado → CREANDO → modulo_creado|alta_de_modulo_cancelada → INICIAL
+ *
+ * Modo de vista: NO pasar la prop `modo`. Con `modo` controlado, Listado oculta su
+ * propio icono de cambio de modo y obliga a añadir uno externo que cae en otra fila,
+ * desalineado del filtro. Usando `modoInicial` el icono va en la cabecera del Listado,
+ * alineado con el filtro y las acciones.
  */
 export const MaestroConDetalleModulo = () => {
 
     // Criteria base del módulo (orden por defecto, etc.)
     const criteriaBase = useMemo(() => criteriaDefecto, []);
-
-    // Alterna entre vista TARJETA y TABLA; en móvil siempre usa TARJETA
-    const { layout, cambiarLayout } = useLayout("TARJETA");
 
     // Lee el activo y criteria iniciales desde la URL
     const { id, criteria } = getUrlParams();
@@ -82,21 +81,10 @@ export const MaestroConDetalleModulo = () => {
                 Maestro={
                     <>
                         <h2>Módulos</h2>
-                        <div className="maestro-botones">
-                            <span
-                                className="cambio-modo-icono"
-                                onClick={cambiarLayout}
-                            >
-                                <QIcono
-                                    nombre={layout === "TABLA" ? "lista" : "tabla"}
-                                    tamaño="md"
-                                />
-                            </span>
-                        </div>
                         <Listado<Modulo>
                             metaTabla={metaTablaModulo}
                             criteria={modulos.criteria}
-                            modo={layout === "TARJETA" ? "tarjetas" : "tabla"}
+                            modoInicial="tarjetas"
                             tarjeta={TarjetaModulo}
                             entidades={modulos.lista}
                             totalEntidades={modulos.total}
@@ -115,7 +103,6 @@ export const MaestroConDetalleModulo = () => {
                     </>
                 }
                 Detalle={<DetalleModulo id={modulos.activo} publicar={emitir} />}
-                layout={layout}
                 seleccionada={modulos.activo}
                 modoDisposicion="maestro-50"
             />

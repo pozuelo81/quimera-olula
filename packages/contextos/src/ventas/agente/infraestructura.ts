@@ -4,9 +4,16 @@ import { criteriaQuery } from "@olula/lib/infraestructura.ts";
 import { Agente } from "./diseño.ts";
 
 const baseUrlVentas = `/ventas/agente`;
-type AgenteApi = Agente;
+type AgenteApi = {
+    id: string;
+    nombre: string;
+    por_comision?: number;
+};
 
-const agenteDesdeAgenteApi = (a: AgenteApi): Agente => a
+const agenteDesdeAgenteApi = (a: AgenteApi): Agente => ({
+    ...a,
+    por_comision: Number(a.por_comision ?? 0),
+})
 
 export const getAgentes = async (filtro: Filtro, orden: Orden): Promise<Agente[]> => {
     const q = criteriaQuery(filtro, orden);

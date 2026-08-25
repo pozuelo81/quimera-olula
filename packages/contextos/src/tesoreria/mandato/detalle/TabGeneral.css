@@ -1,0 +1,33 @@
+.TabGeneral {
+
+    /* Fila 1: Referencia (6) + Tipo (3) + Tipo de pago (3) = 12 */
+    quimera-input[nombre="referencia"] {
+        grid-column: span 6;
+    }
+
+    quimera-input[nombre="tipo"] {
+        grid-column: span 3;
+    }
+
+    quimera-input[nombre="tipoPago"] {
+        grid-column: span 3;
+    }
+
+    /* Fila 3: Cliente (9) + Nº de efectos (3) = 12 */
+    quimera-input[nombre="clienteId"] {
+        grid-column: span 9;
+    }
+
+    quimera-input[nombre="numEfectos"] {
+        grid-column: span 3;
+    }
+
+    /* Fila 4: Cuenta (6) + Cuenta del cliente (6) = 12 */
+    quimera-input[nombre="cuentaId"] {
+        grid-column: span 6;
+    }
+
+    quimera-input[nombre="cuentaClienteId"] {
+        grid-column: span 6;
+    }
+}

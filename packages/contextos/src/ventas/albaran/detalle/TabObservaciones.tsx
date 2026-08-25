@@ -1,3 +1,4 @@
+import { QCheckbox } from "@olula/componentes/atomos/qcheckbox.tsx";
 import { QTextArea } from "@olula/componentes/atomos/qtextarea.tsx";
 import { HookModelo } from "@olula/lib/useModelo.ts";
 import { Albaran } from "../diseño.ts";
@@ -13,6 +14,7 @@ export const TabObservaciones = ({ albaran }: TabObservacionesProps) => {
   return (
     <div className="TabObservaciones">
       <quimera-formulario>
+        <QCheckbox label="Abono" {...uiProps("de_abono")} />
         <QTextArea
           label="Observaciones"
           rows={5}

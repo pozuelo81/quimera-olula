@@ -1,3 +1,4 @@
+import { QCheckbox } from "@olula/componentes/atomos/qcheckbox.tsx";
 import { QTextArea } from "@olula/componentes/atomos/qtextarea.tsx";
 import { HookModelo } from "@olula/lib/useModelo.ts";
 import { Factura } from "../diseño.ts";
@@ -8,7 +9,7 @@ interface TabClienteProps {
 }
 
 export const TabObservaciones = ({ factura }: TabClienteProps) => {
-  const { uiProps } = factura;
+  const { uiProps, modelo } = factura;
 
   return (
     <>
@@ -17,6 +18,14 @@ export const TabObservaciones = ({ factura }: TabClienteProps) => {
           label="Observaciones"
           rows={5}
           {...uiProps("observaciones")}
+        />
+        <QCheckbox label="Automática" {...uiProps("automatica")} deshabilitado opcional={false} />
+        <QCheckbox label="Servicios" {...uiProps("servicios")} deshabilitado opcional={false} />
+        <QCheckbox
+          label="Rectificativa"
+          nombre="rectificativa"
+          valor={!!modelo.rectificativa_id}
+          deshabilitado
         />
       </quimera-formulario>
     </>

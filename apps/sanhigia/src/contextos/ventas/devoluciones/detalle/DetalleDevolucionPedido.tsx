@@ -6,7 +6,7 @@ import { ListadoSemiControlado } from "@olula/componentes/maestro/ListadoSemiCon
 import { useEsMovil } from "@olula/componentes/maestro/useEsMovil.js";
 import { QModalConfirmacion } from "@olula/componentes/moleculas/qmodalconfirmacion.tsx";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
-import { criteriaDefecto } from "@olula/lib/dominio.js";
+import { criteriaDefecto, formatearFechaDate } from "@olula/lib/dominio.js";
 import { useEffect } from "react";
 import { LineaDevolucionPedido } from "../diseño.ts";
 import "./DetalleDevolucionPedido.css";
@@ -35,7 +35,7 @@ const TarjetaLineaDevolucion = ({
   const referencia = linea.referencia || linea.codigo;
   const lote = linea.codLote || "Sin lote";
   const fechaCaducidad = linea.fechaCaducidad
-    ? linea.fechaCaducidad.toLocaleDateString()
+    ? formatearFechaDate(linea.fechaCaducidad)
     : "Sin caducidad";
 
   return (
@@ -123,7 +123,7 @@ export const DetalleDevolucionPedido = ({
 
   const cerrarDetalle = () => publicar("devolucion_deseleccionada", null);
   const fecha = ctx.devolucion.fecha
-    ? ctx.devolucion.fecha.toLocaleDateString()
+    ? formatearFechaDate(ctx.devolucion.fecha)
     : "-";
   const total = formatoMoneda.format(ctx.devolucion.total ?? 0);
   const hayErroresLineas = Object.keys(ctx.erroresLineas).length > 0;
@@ -155,7 +155,7 @@ export const DetalleDevolucionPedido = ({
       id: "fechaCaducidad",
       cabecera: "F. Caducidad",
       render: (linea) =>
-        linea.fechaCaducidad ? linea.fechaCaducidad.toLocaleDateString() : "-",
+        linea.fechaCaducidad ? formatearFechaDate(linea.fechaCaducidad) : "-",
     },
     {
       id: "cantidadOk",

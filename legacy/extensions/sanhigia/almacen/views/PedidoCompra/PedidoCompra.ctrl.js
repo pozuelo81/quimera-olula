@@ -35,6 +35,38 @@ export const bunch = parent => {
         onCancel: "focusCodBarras",
       },
     ],
+    onCerrarLineasNoInformadasClicked: [
+      {
+        type: "userConfirm",
+        question: () => ({
+          titulo: "Cerrar líneas",
+          cuerpo: "¿Seguro que desea cerrar todas las líneas sin cantidad a recibir informada?",
+          textoSi: "CONFIRMAR",
+          textoNo: "CANCELAR",
+        }),
+        onConfirm: "onCerrarLineasNoInformadasConfirmado",
+        onCancel: "focusCodBarras",
+      },
+    ],
+    onCerrarLineasNoInformadasConfirmado: [
+      {
+        type: "function",
+        function: (_, { lineas }) => {
+          const data = lineas.idList.map(id => lineas.dict[id]);
+          const lineasACerrar = data.filter(l =>
+            !l.cerradaPDA &&
+            (l.shCantAlbaran === 0 || l.shCantAlbaran == null) &&
+            parseFloat(l.totalEnAlbaran) < parseFloat(l.cantidad)
+          );
+          lineasACerrar.forEach(l =>
+            _.dispatch({
+              type: "onCerrarLineaClicked",
+              payload: { idLineaCerrar: l.idLinea },
+            })
+          );
+        },
+      },
+    ],
     compruebaCambiaEstadoPda: [
       {
         condition: ({ response }, { pedido }) =>

@@ -1,0 +1,74 @@
+.TabGeneral {
+
+    quimera-input[nombre="nombre"] {
+        grid-column: span 12;
+    }
+
+    quimera-input[nombre="administrador"] {
+        grid-column: span 8;
+    }
+
+    quimera-input[nombre="cifNif"] {
+        grid-column: span 4;
+    }
+
+    quimera-input[nombre="telefono"] {
+        grid-column: span 3;
+    }
+
+    quimera-input[nombre="email"] {
+        grid-column: span 4;
+    }
+
+    quimera-input[nombre="web"] {
+        grid-column: span 3;
+    }
+
+    quimera-input[nombre="ejercicioId"] {
+        grid-column: span 2;
+    }
+
+    .TabGeneral-direccion-resumen {
+        grid-column: 1 / -1;
+        display: grid;
+        gap: 0.35rem;
+    }
+
+    .TabGeneral-direccion-resumen-label {
+        font-size: 0.75rem;
+        color: var(--color-texto-secundario, #667085);
+        font-weight: 500;
+    }
+
+    .TabGeneral-direccion-resumen-contenido {
+        min-height: 2.5rem;
+        border: 1px solid var(--gris-2, #d0d5dd);
+        border-radius: var(--redondeo-borde-xs, 8px);
+        padding: 0.45rem 0.65rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+    }
+
+    .TabGeneral-direccion-resumen-contenido span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
+@media (max-width: 768px) {
+    .TabGeneral {
+
+        quimera-input[nombre="nombre"],
+        quimera-input[nombre="administrador"],
+        quimera-input[nombre="cifNif"],
+        quimera-input[nombre="telefono"],
+        quimera-input[nombre="email"],
+        quimera-input[nombre="web"],
+        quimera-input[nombre="ejercicioId"] {
+            grid-column: 1 / -1 !important;
+        }
+    }
+}

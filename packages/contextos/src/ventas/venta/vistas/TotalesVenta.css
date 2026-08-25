@@ -33,6 +33,10 @@
     overflow-wrap: anywhere;
 }
 
+.totales-venta-item--divisa-empresa {
+    color: var(--color-texto-secundario);
+}
+
 @media (max-width: 768px) {
     .totales-venta {
         flex-direction: row;

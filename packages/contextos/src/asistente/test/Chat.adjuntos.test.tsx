@@ -64,6 +64,77 @@ test("[asistente-chat-adjunto-01] adjuntar un Excel muestra el chip y lo manda e
     }]);
 });
 
+test("[asistente-chat-adjunto-03] hacer una foto con la cámara muestra la miniatura y la manda en la consulta", async () => {
+    const detenerPista = vi.fn();
+    const getUserMedia = vi.fn(async () => ({ getTracks: () => [{ stop: detenerPista }] }));
+    Object.defineProperty(globalThis.navigator, "mediaDevices", {
+        value: { getUserMedia },
+        configurable: true,
+    });
+    // jsdom no reproduce vídeo real: se simulan las dimensiones del frame capturado y el
+    // canvas donde useCapturaFoto vuelca ese frame para convertirlo a base64.
+    Object.defineProperty(HTMLVideoElement.prototype, "videoWidth", { value: 100, configurable: true });
+    Object.defineProperty(HTMLVideoElement.prototype, "videoHeight", { value: 80, configurable: true });
+    HTMLCanvasElement.prototype.getContext = vi.fn(() => ({ drawImage: vi.fn() })) as never;
+    HTMLCanvasElement.prototype.toDataURL = vi.fn(() => "data:image/jpeg;base64,Zm90bw==");
+
+    render(
+        <AsistenteRuntimeProvider>
+            <Chat />
+        </AsistenteRuntimeProvider>
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: "Adjuntar" }));
+    await userEvent.click(await screen.findByRole("menuitem", { name: "Hacer foto" }));
+
+    expect(getUserMedia).toHaveBeenCalledWith({ video: { facingMode: "environment" } });
+    await userEvent.click(await screen.findByRole("button", { name: "Hacer la foto" }));
+
+    // Al capturar se cierra la ventanita de la cámara y se libera la pista de vídeo
+    expect(detenerPista).toHaveBeenCalled();
+    // La miniatura del adjunto pendiente aparece antes de enviar
+    await screen.findByAltText("foto.jpg");
+
+    await userEvent.type(await screen.findByPlaceholderText("Escribe un mensaje…"), "¿qué es esto?");
+    await userEvent.click(screen.getByRole("button", { name: "Enviar" }));
+
+    expect(consultarIa).toHaveBeenCalledTimes(1);
+    const consultaEnviada = vi.mocked(consultarIa).mock.calls[0][0];
+    expect(consultaEnviada.pregunta).toBe("¿qué es esto?");
+    expect(consultaEnviada.adjuntos).toEqual([{
+        nombre: "foto.jpg",
+        tipoMime: "image/jpeg",
+        datosBase64: expect.any(String),
+    }]);
+});
+
+test("[asistente-chat-adjunto-04] una foto reconstruida se carga bajo demanda", async () => {
+    localStorage.setItem("quimera-preferencias", JSON.stringify({ "asistente.threadIdActivo": "hilo-viejo" }));
+    vi.mocked(obtenerMensajesHilo).mockResolvedValueOnce({
+        threadId: "hilo-viejo",
+        mensajes: [
+            {
+                id: "m1-u", rol: "user", texto: "", a2uiMessages: [],
+                adjuntos: [{ id: "adj-foto-1", nombre: "foto.jpg", tipoMime: "image/jpeg" }],
+            },
+            { id: "m1-a", rol: "assistant", texto: "Ya lo veo.", a2uiMessages: [], adjuntos: [] },
+        ],
+    });
+    vi.mocked(obtenerAdjuntoHilo).mockResolvedValueOnce(new Blob(["contenido-foto"], { type: "image/jpeg" }));
+
+    const { container } = render(
+        <AsistenteRuntimeProvider>
+            <Chat />
+        </AsistenteRuntimeProvider>
+    );
+
+    const botonVerFoto = await screen.findByRole("button", { name: "Ver foto" });
+    await userEvent.click(botonVerFoto);
+
+    expect(obtenerAdjuntoHilo).toHaveBeenCalledWith("hilo-viejo", "adj-foto-1");
+    await waitFor(() => expect(container.querySelector("img.asistente-chat__adjunto-imagen-mensaje")).not.toBeNull());
+});
+
 test("[asistente-chat-adjunto-02] un adjunto de audio reconstruido se reproduce bajo demanda", async () => {
     localStorage.setItem("quimera-preferencias", JSON.stringify({ "asistente.threadIdActivo": "hilo-viejo" }));
     vi.mocked(obtenerMensajesHilo).mockResolvedValueOnce({

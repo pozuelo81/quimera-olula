@@ -9,6 +9,8 @@ import "./qcheckbox.css";
 
 export type QCheckboxProps = Omit<FormInputProps, "valor" | "onChange"> & {
   valor: boolean | string;
+  soloLectura?: boolean;
+  modificado?: boolean;
   onChange?: (valor: string, evento: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
@@ -23,9 +25,26 @@ export const QCheckbox = ({
   valido,
   opcional,
   condensado,
+  soloLectura,
+  modificado,
   onChange,
   ...props
 }: QCheckboxProps) => {
+  // Convertir valor a boolean si viene como string
+  const valorBoolean =
+    typeof valor === "string" ? valor === "true" || valor === "1" : valor;
+
+  if (soloLectura) {
+    return (
+      <quimera-checkbox solo-lectura="" nombre={nombre} condensado={condensado}>
+        <label>
+          <input type="checkbox" checked={valorBoolean} disabled readOnly />
+          <Etiqueta label={label} />
+        </label>
+      </quimera-checkbox>
+    );
+  }
+
   const attrs = {
     nombre,
     erroneo,
@@ -34,6 +53,7 @@ export const QCheckbox = ({
     opcional,
     condensado,
     deshabilitado,
+    modificado,
   };
 
   const manejarChange = (
@@ -42,10 +62,6 @@ export const QCheckbox = ({
   ) => {
     onChange?.(e.target.checked.toString(), e);
   };
-
-  // Convertir valor a boolean si viene como string
-  const valorBoolean =
-    typeof valor === "string" ? valor === "true" || valor === "1" : valor;
 
   const inputAttrs = {
     nombre,

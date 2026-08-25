@@ -49,11 +49,12 @@ export const Lineas = ({
         lineas={factura.lineas || []}
         seleccionada={lineaActiva?.id}
         onCambioCantidad={handleCambioCantidad}
+        divisa={factura.divisa_id}
         facturaEditable={facturaEsEditable}
         acciones={facturaEsEditable ? acciones : undefined}
         publicar={publicar}
       />
-      {estadoFactura === "CREANDO_LINEA" && <CrearLinea publicar={publicar} />}
+      {estadoFactura === "CREANDO_LINEA" && <CrearLinea facturaId={factura.id} publicar={publicar} />}
 
       {lineaActiva && estadoFactura === "CAMBIANDO_LINEA" && (
         <EditarLinea publicar={publicar} linea={lineaActiva} />

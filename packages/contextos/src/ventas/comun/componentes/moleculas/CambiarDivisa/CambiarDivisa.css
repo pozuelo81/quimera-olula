@@ -1,0 +1,9 @@
+.CambiarDivisa {
+    quimera-select[nombre="divisa_id"] {
+        grid-column: 1 / span 8;
+    }
+
+    quimera-input[nombre="tasa_conversion"] {
+        grid-column: span 4;
+    }
+}

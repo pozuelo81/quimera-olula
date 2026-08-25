@@ -1,8 +1,18 @@
 import { useCallback, useContext, useEffect, useState } from "react";
 
-import { ContextoError } from "./contexto.ts";
+import { ContextoError, QError } from "./contexto.ts";
 import { Modelo, TipoInput, ValorCampoUI } from "./diseño.ts";
 import { getFormProps, MetaModelo } from "./dominio.ts";
+
+const aQError = (error: unknown): QError => {
+    const apiError = error as QError;
+    const errorJS = error as Error;
+
+    return {
+        nombre: apiError?.nombre ?? "Error",
+        descripcion: apiError?.descripcion ?? errorJS?.message,
+    };
+};
 
 export function useModelo<T extends Modelo>(
     meta: MetaModelo<T>,
@@ -12,28 +22,41 @@ export function useModelo<T extends Modelo>(
 
     const [modelo, setModelo] = useState(modeloInicialProp);
     const [modeloInicial, setModeloInicial] = useState<T>(modeloInicialProp);
+    const [errorGuardado, setErrorGuardado] = useState<QError | null>(null);
+    const [guardados, setGuardados] = useState(0);
 
     const { intentar } = useContext(ContextoError);
 
+    const cambiarModelo = useCallback((nuevoModelo: T) => {
+        setErrorGuardado(null);
+        setModelo(nuevoModelo);
+    }, []);
+
     const init = useCallback((nuevoModelo?: T) => {
         const modeloAUsar = nuevoModelo || modeloInicialProp;
+        setErrorGuardado(null);
         setModelo(modeloAUsar);
         setModeloInicial(modeloAUsar);
     }, [modeloInicialProp]);
 
     const onModeloListoConError = useCallback(
         async (modelo: T) => {
-            return onModeloListo
-                ? await intentar(
-                    async () => await onModeloListo(modelo)
-                ) :
-                Promise.resolve();
+            if (!onModeloListo) return;
+
+            try {
+                await intentar(async () => await onModeloListo(modelo));
+                setErrorGuardado(null);
+                setGuardados((n) => n + 1);
+            } catch (error) {
+                setErrorGuardado(aQError(error));
+            }
         },
         [intentar, onModeloListo]
     );
 
 
     useEffect(() => {
+        setErrorGuardado(null);
         setModelo(modeloInicialProp);
         setModeloInicial(modeloInicialProp);
     }, [modeloInicialProp]);
@@ -42,8 +65,10 @@ export function useModelo<T extends Modelo>(
         modelo,
         modeloInicial: modeloInicial || modeloInicialProp,
         init,
-        set: setModelo,
-        ...getFormProps(modelo, modeloInicial, meta, setModelo, onModeloListoConError),
+        set: cambiarModelo,
+        errorGuardado,
+        guardados,
+        ...getFormProps(modelo, modeloInicial, meta, cambiarModelo, onModeloListoConError, errorGuardado),
     } as const;
 }
 
@@ -56,6 +81,8 @@ export type HookModelo<T extends Modelo> = {
     modificado: boolean,
     valido: boolean,
     editable: boolean,
+    errorGuardado: QError | null,
+    guardados: number,
 }
 
 type ParamOpcion = {
@@ -76,9 +103,8 @@ export type UiProps = {
     opcional: boolean;
     valido: boolean;
     modificado: boolean;
-    soloTexto: boolean;
+    soloLectura: boolean;
     onChange: (valor: ValorControl) => void;
     evaluarCambio: () => void;
     descripcion?: string;
 }
-

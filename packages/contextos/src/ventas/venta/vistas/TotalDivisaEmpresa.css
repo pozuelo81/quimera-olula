@@ -1,0 +1,14 @@
+.total-divisa-empresa {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: baseline;
+    gap: var(--espaciado-xs);
+    min-width: 0;
+    color: var(--color-texto-secundario);
+    font-size: var(--tamaño-letra-s);
+}
+
+.total-divisa-empresa strong {
+    font-weight: var(--grosor-letra-6);
+    color: var(--color-texto);
+}

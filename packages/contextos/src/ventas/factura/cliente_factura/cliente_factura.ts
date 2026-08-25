@@ -7,7 +7,7 @@ export interface ModeloClienteFacturaRegistrado extends Modelo {
     nombre: string,
 }
 
-export const clienteFacturaRegistradoVacio: ModeloClienteFacturaRegistrado = {
+const clienteFacturaRegistradoVacio: ModeloClienteFacturaRegistrado = {
     idCliente: "",
     nombre: "",
 }

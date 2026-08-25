@@ -1,8 +1,5 @@
+/* Los campos de dirección se posicionan en CamposDireccionVenta.css (.campos-direccion). */
 .Albaran .CrearAlbaran {
-    quimera-formulario {
-        max-width: 600px;
-    }
-
     quimera-autocompletar[nombre="albaran_cliente_id"] {
         grid-column: span 12;
     }
@@ -11,7 +8,11 @@
         grid-column: span 12;
     }
 
-    quimera-input[nombre="empresa_id"] {
-        grid-column: span 12;
+    quimera-input[nombre="nombre_cliente"] {
+        grid-column: span 8;
+    }
+
+    quimera-input[nombre="id_fiscal"] {
+        grid-column: span 4;
     }
 }

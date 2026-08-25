@@ -43,6 +43,7 @@ export const DetalleModulo = ({
 
     useEffect(() => {
         emitir("modulo_id_cambiado", id, true);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
     if (!ctx.modLin.id) return null;

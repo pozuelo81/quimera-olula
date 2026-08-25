@@ -44,10 +44,10 @@ export const DetalleStock = ({
         >
             <div className="DetalleStock">
                 <quimera-formulario>
-                    <QInput label="Artículo"            nombre="articulo"           valor={stock.articulo ?? ""}                   soloTexto />
-                    <QInput label="Almacén"             nombre="almacen"            valor={stock.almacen ?? ""}                    soloTexto />
-                    <QInput label="Cantidad física"     nombre="cantidadFisica"     valor={String(stock.cantidadFisica ?? "")}     soloTexto tipo="numero" />
-                    <QInput label="Cantidad disponible" nombre="cantidadDisponible" valor={String(stock.cantidadDisponible ?? "")} soloTexto tipo="numero"/>
+                    <QInput label="Artículo"            nombre="articulo"           valor={stock.articulo ?? ""}                   soloLectura />
+                    <QInput label="Almacén"             nombre="almacen"            valor={stock.almacen ?? ""}                    soloLectura />
+                    <QInput label="Cantidad física"     nombre="cantidadFisica"     valor={String(stock.cantidadFisica ?? "")}     soloLectura tipo="numero" />
+                    <QInput label="Cantidad disponible" nombre="cantidadDisponible" valor={String(stock.cantidadDisponible ?? "")} soloLectura tipo="numero"/>
                 </quimera-formulario>
             </div>
         </Detalle>

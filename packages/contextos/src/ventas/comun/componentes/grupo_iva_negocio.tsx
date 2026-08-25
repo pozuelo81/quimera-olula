@@ -1,8 +1,9 @@
+import { capitalizarDescripcion } from "#/ventas/comun/dominio.ts";
 import { QSelect } from "@olula/componentes/atomos/qselect.tsx";
-import { obtenerOpcionesSelector } from "@olula/lib/infraestructura.ts";
+import { obtenerDatosSelector } from "@olula/lib/infraestructura.ts";
 import { useEffect, useState } from "react";
 
-interface FormaPagoProps {
+interface GrupoIvaNegocioProps {
   valor: string;
   label?: string;
   nombre?: string;
@@ -11,23 +12,24 @@ interface FormaPagoProps {
 
 export const GrupoIvaNegocio = ({
   valor,
-  label = "Grupo IVA",
-  nombre = "grupo_iva_id",
+  label = "Grupo IVA negocio",
+  nombre = "grupo_iva_negocio_id",
   onChange,
   ...props
-}: FormaPagoProps) => {
+}: GrupoIvaNegocioProps) => {
   const [opciones, setOpciones] = useState<
     { valor: string; descripcion: string }[]
   >([]);
 
   useEffect(() => {
     const cargarOpciones = async () => {
-      const opciones = await obtenerOpcionesSelector("grupo_iva_negocio")();
-      const opcionesMapeadas = opciones.map((opcion) => ({
-        valor: opcion[0],
-        descripcion: opcion[1],
-      }));
-      setOpciones(opcionesMapeadas);
+      const datos = await obtenerDatosSelector("grupo_iva_negocio")();
+      setOpciones(
+        datos.map((grupo) => ({
+          valor: String(grupo.id ?? ""),
+          descripcion: capitalizarDescripcion(String(grupo.descripcion ?? "")),
+        }))
+      );
     };
 
     cargarOpciones();

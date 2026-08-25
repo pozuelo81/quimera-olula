@@ -6,7 +6,7 @@ import { ContextoError } from "@olula/lib/contexto.ts";
 import { EmitirEvento, Entidad } from "@olula/lib/diseño.ts";
 import { ConfigMaquina4, useMaquina4 } from "@olula/lib/useMaquina.ts";
 import { useModelo } from "@olula/lib/useModelo.ts";
-import { useContext } from "react";
+import { useContext, useMemo } from "react";
 import { useParams } from "react-router";
 import { Almacen } from "../../diseño.ts";
 import {
@@ -50,7 +50,11 @@ export const DetalleAlmacen = ({
   const params = useParams();
   const { intentar } = useContext(ContextoError);
 
-  const almacen = useModelo(metaAlmacen, almacenVacio());
+  // useModelo reinicia el modelo cuando cambia la identidad del inicial, así que
+  // crearlo en cada render entra en bucle y borra lo escrito.
+  const inicial = useMemo(almacenVacio, []);
+
+  const almacen = useModelo(metaAlmacen, inicial);
   const { modelo, uiProps, init } = almacen;
 
   const guardar = async () => {

@@ -50,6 +50,7 @@ type ListadoProps<T extends Entidad> = {
   seleccionada?: string;
   onSeleccion: (seleccionada: string) => void;
   modo?: Modo;
+  modoInicial?: Modo;
   modosDisponibles?: Modo[];
   mostrarCambioModo?: boolean;
   onModoChanged?: (modo: Modo) => void;
@@ -80,6 +81,7 @@ export const Listado = <T extends Entidad>({
   seleccionada,
   onSeleccion,
   modo,
+  modoInicial,
   modosDisponibles,
   mostrarCambioModo,
   onModoChanged,
@@ -92,7 +94,7 @@ export const Listado = <T extends Entidad>({
   urlDescarga,
   formatosDescarga,
 }: ListadoProps<T>) => {
-  const [modoEstado, setModoEstado] = useState<Modo>(modo ?? "tarjetas");
+  const [modoEstado, setModoEstado] = useState<Modo>(modo ?? modoInicial ?? "tabla");
   const modoInterno = modo ?? modoEstado;
 
   const [multiseleccionEstado, setMultiseleccionEstado] = useState(false);

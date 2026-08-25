@@ -1,0 +1,36 @@
+.tarjeta-doc-titulo {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+.q-avatar.tarjeta-doc-avatar {
+  color: #fff;
+}
+
+.q-avatar.tarjeta-doc-avatar.estado-cerrado {
+  background-color: var(--color-deshabilitado-oscuro);
+}
+
+.q-avatar.tarjeta-doc-avatar.estado-parcial {
+  background-color: var(--color-advertencia-oscuro);
+}
+
+.q-avatar.tarjeta-doc-avatar.estado-pendiente {
+  background-color: var(--color-exito-oscuro);
+}
+
+.tarjeta-doc-importes {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--espaciado-xxs);
+}
+
+.tarjeta-doc-contravalor {
+  font-size: var(--tamaño-letra-xs);
+  color: var(--color-texto-secundario);
+  white-space: nowrap;
+}

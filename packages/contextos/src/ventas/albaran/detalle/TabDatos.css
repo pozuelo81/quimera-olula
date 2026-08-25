@@ -1,19 +1,61 @@
+/*
+ * TabDatos.css — posicionado de campos de la pestaña Datos del albarán.
+ * Grid de 12 columnas (quimera-formulario). Toda fila suma 12:
+ *   Fila 1: fecha (3) + hora (3) + almacen_id (6)
+ *   Fila 2: divisa_id (3) + tasa_conversion (2) + icono cambiar divisa (1)
+ *           + agente_id (3) + por_comision (2) + icono cambiar agente (1)
+ *   Fila 3: total en divisa de empresa (12, desde TotalDivisaEmpresa.css)
+ *   Fila 4: forma_pago_id (6) + grupo_iva_negocio_id (6)
+ */
 .Albaran .TabDatos {
     quimera-date[nombre="fecha"] {
-        grid-column: span 2;
+        grid-column: 1 / span 3;
+    }
+
+    quimera-input[nombre="hora"] {
+        grid-column: span 3;
+        min-width: 0;
+    }
+
+    quimera-select[nombre="almacen_id"] {
+        grid-column: span 6;
+        min-width: 0;
     }
 
     quimera-select[nombre="divisa_id"] {
-        grid-column: span 5;
+        grid-column: 1 / span 3;
+        min-width: 0;
     }
 
     quimera-input[nombre="tasa_conversion"] {
-        grid-column: span 5;
+        grid-column: 4 / span 2;
+        min-width: 0;
     }
 
-
     quimera-autocompletar[nombre="agente_id"] {
-        grid-column: 1 / span 12;
+        grid-column: 7 / span 3;
+        min-width: 0;
+    }
+
+    quimera-input[nombre="por_comision"] {
+        grid-column: 10 / span 2;
+        min-width: 0;
+    }
+
+    .TabDatos-accion {
+        display: flex;
+        justify-content: flex-end;
+        align-items: end;
+        margin: 0;
+        min-width: 0;
+    }
+
+    .TabDatos-accion--divisa {
+        grid-column: 6 / span 1;
+    }
+
+    .TabDatos-accion--agente {
+        grid-column: 12 / span 1;
     }
 
     quimera-select[nombre="forma_pago_id"] {
@@ -25,8 +67,24 @@
     }
 }
 
+/*
+ * Móvil: 2 columnas de campos + 1 columna estrecha para el icono de cambio,
+ * que solo existe cuando se renderiza algún .TabDatos-accion.
+ */
 @media (max-width: 768px) {
+    .Albaran .TabDatos quimera-formulario:has(.TabDatos-accion) {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 2.5rem;
+    }
+
     .Albaran .TabDatos quimera-formulario {
+        quimera-date[nombre="fecha"] {
+            grid-column: 1 / span 1 !important;
+        }
+
+        quimera-input[nombre="hora"] {
+            grid-column: 2 / -1 !important;
+        }
+
         quimera-select[nombre="divisa_id"] {
             grid-column: 1 / span 1 !important;
         }
@@ -35,12 +93,25 @@
             grid-column: 2 / span 1 !important;
         }
 
+        quimera-autocompletar[nombre="agente_id"] {
+            grid-column: 1 / span 1 !important;
+        }
+
+        quimera-input[nombre="por_comision"] {
+            grid-column: 2 / span 1 !important;
+        }
+
         quimera-select[nombre="forma_pago_id"] {
             grid-column: 1 / span 1 !important;
         }
 
         quimera-select[nombre="grupo_iva_negocio_id"] {
-            grid-column: 2 / span 1 !important;
+            grid-column: 2 / -1 !important;
+        }
+
+        .TabDatos-accion {
+            grid-column: 3 / span 1 !important;
+            justify-content: flex-end;
         }
     }
 }

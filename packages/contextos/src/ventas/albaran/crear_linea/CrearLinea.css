@@ -1,3 +1,8 @@
+.Albaran .modo-linea {
+    display: flex;
+    justify-content: flex-end;
+}
+
 .Albaran .CrearLinea {
     quimera-formulario {
         max-width: 500px;
@@ -7,7 +12,15 @@
         grid-column: span 9;
     }
 
+    quimera-input[nombre="descripcion"] {
+        grid-column: span 12;
+    }
+
     quimera-input[nombre="cantidad"] {
         grid-column: span 3;
+    }
+
+    quimera-input[nombre="pvp_unitario"] {
+        grid-column: span 4;
     }
 }

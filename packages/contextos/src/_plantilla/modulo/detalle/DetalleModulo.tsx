@@ -60,6 +60,7 @@ export const DetalleModulo = ({
     // Recargar cuando el ID cambia (o se deselecciona con undefined)
     useEffect(() => {
         emitir("modulo_id_cambiado", id, true);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
     if (!ctx.modulo.id) return null;

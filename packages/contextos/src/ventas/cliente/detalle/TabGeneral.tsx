@@ -1,8 +1,9 @@
 import { TipoIdFiscal } from "#/ventas/comun/componentes/tipoIdFiscal.tsx";
+import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QDate } from "@olula/componentes/atomos/qdate.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QTextArea } from "@olula/componentes/atomos/qtextarea.tsx";
-import { ProcesarEvento } from "@olula/lib/useMaquina.js";
+import { EmitirEvento } from "@olula/lib/diseño.ts";
 import { HookModelo } from "@olula/lib/useModelo.ts";
 import { Cliente } from "../diseño.ts";
 import "./TabGeneral.css";
@@ -10,13 +11,14 @@ import "./TabGeneral.css";
 interface TabGeneralProps {
   form: HookModelo<Cliente>;
   cliente: Cliente;
-  emitirCliente: ProcesarEvento;
+  emitirCliente: EmitirEvento;
   recargarCliente: () => void;
 }
 
 export const TabGeneral = ({
   form,
   cliente,
+  emitirCliente,
 }: TabGeneralProps) => {
   const { uiProps } = form;
 
@@ -27,6 +29,11 @@ export const TabGeneral = ({
         <QInput label="Nombre Comercial" {...uiProps("nombre_comercial")} />
         <TipoIdFiscal {...uiProps("tipo_id_fiscal")} />
         <QInput label="Id Fiscal" {...uiProps("id_fiscal")} />
+        <div className="TabGeneral-accion">
+          <QBoton onClick={() => emitirCliente("cambio_id_fiscal_solicitado")}>
+            Cambiar Id Fiscal
+          </QBoton>
+        </div>
         <QInput label="Teléfono 1" {...uiProps("telefono1")} />
         <QInput label="Teléfono 2" {...uiProps("telefono2")} />
         <QInput label="Email" {...uiProps("email")} />

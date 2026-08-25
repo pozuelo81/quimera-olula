@@ -37,10 +37,13 @@ export const CrearLineaNrj = ({ pedidoId, publicar }: CrearLineaProps) => {
   const cantidadEnvasesNominal = modelo.cantidadPalets * modelo.envasesPorPalet;
 
   return (
-    <QModal abierto={true} nombre="mostrar" onCerrar={cancelar}>
+    <QModal
+      abierto={true}
+      nombre="crearLinea"
+      titulo="Crear línea NRJ"
+      onCerrar={cancelar}
+    >
       <div className="CrearLinea">
-        <h2>Crear línea NRJ</h2>
-
         <quimera-formulario>
           <TipoPalet
             label="Tipo Palet"

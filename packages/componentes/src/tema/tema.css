@@ -76,6 +76,13 @@
 
     --width-menu: 275px;
 
+    /* Controles de formulario */
+    --altura-control: 2rem;
+    --color-borde-focus: var(--color-primario);
+    --color-fondo-focus: var(--color-primario-claro);
+    --color-borde-editando: var(--color-primario-oscuro);
+    --grosor-borde-editando: var(--tamaño-borde-m);
+
     --padding-horizontal: 1rem;
     --padding-vertical: 1rem;
     --gap-formulario: 1rem;

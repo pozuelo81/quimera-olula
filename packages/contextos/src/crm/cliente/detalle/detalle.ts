@@ -1,4 +1,5 @@
-import { idFiscalValido, tipoIdFiscalValido } from "#/valores/idfiscal.ts";
+import { CambioIdFiscal } from "#/ventas/comun/componentes/moleculas/CambiarIdFiscal/diseño.ts";
+import { camposIdFiscal, idFiscalCompletoValido } from "#/ventas/comun/componentes/moleculas/CambiarIdFiscal/dominio.ts";
 import { ProcesarContexto } from "@olula/lib/diseño.js";
 import { ejecutarListaProcesos, MetaModelo } from "@olula/lib/dominio.js";
 import { pipe } from "@olula/lib/funcional.js";
@@ -24,21 +25,13 @@ export const clienteVacio = {
     contacto_id: '',
 }
 
-export const idFiscalValidoGeneral = (tipo: string, valor: string) => {
-    return idFiscalValido(tipo)(valor) && tipoIdFiscalValido(tipo) === true;
-}
+export const idFiscalValidoGeneral = (tipo: string, valor: string) =>
+    idFiscalCompletoValido({ tipo_id_fiscal: tipo, id_fiscal: valor });
 
 export const metaCliente: MetaModelo<Cliente> = {
     campos: {
         nombre: { requerido: true },
-        id_fiscal: {
-            requerido: true,
-            validacion: (cliente: Cliente) => idFiscalValido(cliente.tipo_id_fiscal)(cliente.id_fiscal),
-        },
-        tipo_id_fiscal: {
-            requerido: true,
-            validacion: (cliente: Cliente) => tipoIdFiscalValido(cliente.tipo_id_fiscal),
-        },
+        ...camposIdFiscal<Cliente>(true),
         nombre_agente: { bloqueado: true },
         email: { tipo: "email" },
         telefono1: { tipo: "telefono" },
@@ -80,6 +73,16 @@ export const refrescarCliente: ProcesarCliente = async (contexto) => {
 export const cambiarCliente: ProcesarCliente = async (contexto, payload) => {
     const cliente = payload as Cliente;
     await patchCliente(contexto.cliente.id, cliente)
+
+    return pipeCliente(contexto, [
+        refrescarCliente,
+        "INICIAL",
+    ]);
+}
+
+export const cambiarIdFiscalCliente: ProcesarCliente = async (contexto, payload) => {
+    const cambio = payload as CambioIdFiscal;
+    await patchCliente(contexto.cliente.id, { ...contexto.cliente, ...cambio })
 
     return pipeCliente(contexto, [
         refrescarCliente,

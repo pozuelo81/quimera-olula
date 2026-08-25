@@ -4,7 +4,7 @@ import UrlsVentasClass from "#/ventas/comun/urls.ts";
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
 import { Filtro, Orden, RespuestaLista } from "@olula/lib/diseño.ts";
 import { criteriaQuery, criteriaQueryUrl } from "@olula/lib/infraestructura.ts";
-import { NuevoPresupuesto, Presupuesto } from "../../ventas/presupuesto/diseño.ts";
+import { Presupuesto } from "../../ventas/presupuesto/diseño.ts";
 import { Accion } from "../accion/diseño.ts";
 import { AccionAPI, accionDesdeAPI } from "../accion/infraestructura.ts";
 import UrlsCrmClass from "../comun/urls.ts";
@@ -98,7 +98,7 @@ export const crearPresupuestoOportunidad = async (oportunidadId: string, cliente
 
     const direccion = await getDireccion(cliente_id, direccionFacturacion.id);
 
-    const nuevoPresupuesto: Partial<NuevoPresupuesto> = {
+    const nuevoPresupuesto = {
         oportunidad_id: oportunidadId,
         cliente: {
             cliente_id: cliente_id,

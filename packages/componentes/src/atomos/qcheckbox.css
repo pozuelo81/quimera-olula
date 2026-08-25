@@ -1,15 +1,26 @@
 quimera-checkbox {
     --color-focus: var(--color-primario-claro);
 
-    padding: var(--espaciado-xs) var(--espaciado-xxs);
-
     label {
         flex-direction: row;
+        align-items: center;
+        gap: var(--espaciado-xs);
         flex-wrap: wrap;
+        min-height: var(--altura-control);
+
+        input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+            cursor: pointer;
+            accent-color: var(--color-primario);
+        }
+
+        .etiqueta {
+            cursor: pointer;
+        }
 
         .texto-validacion {
             flex: 0 0 100%;
-            margin-left: calc(var(--espaciado-s) * 1.6);
             font-size: var(--tamaño-letra-xs);
         }
     }
@@ -17,12 +28,21 @@ quimera-checkbox {
     &:has(input:focus) {
         background-color: var(--color-focus);
         border-radius: var(--redondeo-borde-xs);
-        color: var(--color-texto-primario);
     }
 
     &[condensado] {
         .texto-validacion {
             font-size: var(--tamaño-letra-xxs);
+        }
+    }
+
+    &[deshabilitado] {
+        input[type="checkbox"] {
+            cursor: inherit;
+        }
+
+        .etiqueta {
+            cursor: inherit;
         }
     }
 }

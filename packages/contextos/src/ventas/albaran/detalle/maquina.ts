@@ -6,18 +6,21 @@ import {
     activarLinea,
     borrarAlbaran,
     borrarLinea,
+    cambiarAgente,
     cambiarAlbaran,
     cambiarCantidadLinea,
     cambiarCliente,
     cambiarDescuento,
+    cambiarDivisa,
     cambiarLinea,
     cancelarCambioAlbaran,
     cargarContexto,
     crearLinea,
+    facturarAlbaran,
     getContextoVacio,
     refrescarAlbaran,
     refrescarLineas
-} from "./dominio.ts";
+} from "./detalle.ts";
 
 
 export const getMaquina: () => Maquina<EstadoAlbaran, ContextoAlbaran> = () => {
@@ -49,7 +52,13 @@ export const getMaquina: () => Maquina<EstadoAlbaran, ContextoAlbaran> = () => {
 
             borrar_solicitado: "BORRANDO_ALBARAN",
 
+            facturar_solicitado: "FACTURANDO_ALBARAN",
+
             cambio_cliente_solicitado: "CAMBIANDO_CLIENTE",
+
+            cambio_divisa_solicitado: "CAMBIANDO_DIVISA",
+
+            cambio_agente_solicitado: "CAMBIANDO_AGENTE",
 
             descuento_solicitado: "CAMBIANDO_DESCUENTO",
 
@@ -62,8 +71,6 @@ export const getMaquina: () => Maquina<EstadoAlbaran, ContextoAlbaran> = () => {
             edicion_de_albaran_cancelada: [cancelarCambioAlbaran],
 
             linea_seleccionada: [activarLinea],
-
-            cliente_cambiado: [cambiarCliente],
 
             cambio_cantidad_linea_solicitado: cambiarCantidadLinea,
 
@@ -90,11 +97,37 @@ export const getMaquina: () => Maquina<EstadoAlbaran, ContextoAlbaran> = () => {
             borrar_cancelado: "ABIERTO",
         },
 
+        FACTURANDO_ALBARAN: {
+
+            facturacion_lista: [facturarAlbaran],
+
+            facturar_cancelado: "ABIERTO",
+        },
+
+        FACTURA_CREADA: {
+
+            factura_creada_cerrada: [abiertoOFacturado],
+        },
+
         CAMBIANDO_CLIENTE: {
 
             cambio_cliente_listo: [cambiarCliente, "ABIERTO"],
 
             cambio_cliente_cancelado: "ABIERTO",
+        },
+
+        CAMBIANDO_DIVISA: {
+
+            cambio_divisa_listo: [cambiarDivisa],
+
+            cambio_divisa_cancelado: "ABIERTO",
+        },
+
+        CAMBIANDO_AGENTE: {
+
+            cambio_agente_listo: [cambiarAgente],
+
+            cambio_agente_cancelado: "ABIERTO",
         },
 
         CAMBIANDO_DESCUENTO: {

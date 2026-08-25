@@ -1,9 +1,8 @@
-quimera-radio {
-    --color-borde: var(--color-texto-secundario);
-    --color-validacion: var(--color-texto-deshabilitado);
-    display: block;
-    width: 100%;
+/* Overrides específicos de radio.
+   Los estilos base (etiqueta, estados, validacion, condensado)
+   vienen de _forminput.css */
 
+quimera-radio {
     fieldset {
         border: none;
         padding: 0;
@@ -15,18 +14,6 @@ quimera-radio {
             padding: 0;
             width: 100%;
             float: left;
-
-            .etiqueta {
-                font-size: var(--tamaño-letra-s);
-                padding-left: var(--espaciado-xxs);
-
-                .etiqueta-opcional {
-                    margin-left: var(--espaciado-xxs);
-                    color: var(--color-texto-deshabilitado);
-                    font-size: var(--tamaño-letra-xs);
-                    display: none;
-                }
-            }
         }
 
         .radio-opciones {
@@ -80,35 +67,11 @@ quimera-radio {
         }
 
         .texto-validacion {
-            margin-top: var(--espaciado-xxs);
-            color: var(--color-validacion);
-            font-size: var(--tamaño-letra-s);
-            margin-left: var(--espaciado-xxs);
+            clear: both;
         }
     }
 
-    &[erroneo] {
-        --color-borde: var(--color-error);
-        --color-validacion: var(--color-error);
-    }
-
-    &[advertido] {
-        --color-borde: var(--color-advertencia);
-        --color-validacion: var(--color-advertencia);
-    }
-
-    &[valido] {
-        --color-borde: var(--color-exito);
-    }
-
-    &[opcional] fieldset legend .etiqueta .etiqueta-opcional {
-        display: inline;
-    }
-
     &[deshabilitado] {
-        cursor: inherit;
-        pointer-events: none;
-
         fieldset legend {
             color: var(--color-texto-deshabilitado);
         }
@@ -121,21 +84,9 @@ quimera-radio {
     }
 
     &[condensado] {
-        fieldset legend .etiqueta {
-            font-size: var(--tamaño-letra-xs);
-
-            .etiqueta-opcional {
-                font-size: var(--tamaño-letra-xxs);
-            }
-        }
-
         .radio-opcion span {
             font-size: var(--tamaño-letra-s);
             color: var(--color-primario);
-        }
-
-        .texto-validacion {
-            font-size: var(--tamaño-letra-xs);
         }
     }
 }

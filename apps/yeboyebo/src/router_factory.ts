@@ -1,4 +1,5 @@
 import { RouterFactoryAuthOlula } from '#/auth/router_factory.ts';
+import { RouterFactoryProyectosOlula } from '#/proyectos/router_factory.ts';
 import { RouterFactoryRrhh } from '#/rrhh/router_factory.ts';
 import { RouterFactoryRrhhEmpleado } from '#/rrhh_area_empleado/router_factory.ts';
 import { FondoInicio } from '@olula/componentes/plantilla/FondoInicio.tsx';
@@ -10,6 +11,7 @@ export class RouterFactoryYeboyebo {
     Auth = RouterFactoryAuthOlula;
     Rrhh = RouterFactoryRrhh;
     RrhhAreaEmpleado = RouterFactoryRrhhEmpleado;
+    Proyectos = RouterFactoryProyectosOlula;
 }
 
 export const router = crearRouter(new RouterFactoryYeboyebo() as unknown as Record<string, { router: RouteObject }>);

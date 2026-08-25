@@ -1,6 +1,6 @@
 import { Maquina } from "@olula/lib/diseño.js";
 import { ContextoMaestroPedido, EstadoMaestroPedido } from "#/ventas/pedido/maestro/diseño.ts";
-import { Pedidos, ampliarPedidos, recargarPedidos } from "#/ventas/pedido/maestro/dominio.ts";
+import { Pedidos, ampliarPedidos, recargarPedidos } from "#/ventas/pedido/maestro/maestro.ts";
 
 export const getMaquina: () => Maquina<EstadoMaestroPedido, ContextoMaestroPedido> = () => {
     return {
@@ -18,6 +18,12 @@ export const getMaquina: () => Maquina<EstadoMaestroPedido, ContextoMaestroPedid
         CREANDO_PEDIDO: {
             pedido_creado: [Pedidos.incluir, "INICIAL"],
             creacion_pedido_cancelada: "INICIAL",
+        },
+        ALBARANANDO_PEDIDOS: {
+            albaranado_multiple_cancelado: "INICIAL",
+        },
+        ALBARANES_CREADOS: {
+            resultado_albaranado_cerrado: "INICIAL",
         },
     };
 };

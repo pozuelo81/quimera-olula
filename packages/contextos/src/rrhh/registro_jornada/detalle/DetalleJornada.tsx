@@ -81,7 +81,7 @@ export const DetalleJornada = ({
                         label="Duración"
                         nombre="minutosJornada"
                         valor={minutosAHorasMinutos(jornada.minutosJornada)}
-                        soloTexto
+                        soloLectura
                     />
                     <QInput
                         label="Observaciones"

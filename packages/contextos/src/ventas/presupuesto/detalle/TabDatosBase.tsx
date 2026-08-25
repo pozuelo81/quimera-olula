@@ -1,3 +1,6 @@
+import { Almacen } from "#/almacen/comun/componentes/Almacen.tsx";
+import { BotonCambiar } from "#/ventas/comun/componentes/BotonCambiar.tsx";
+import { TotalDivisaEmpresa } from "#/ventas/venta/vistas/TotalDivisaEmpresa.tsx";
 import { QDate } from "@olula/componentes/atomos/qdate.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { HookModelo } from "@olula/lib/useModelo.ts";
@@ -5,26 +8,60 @@ import { Agente } from "../../comun/componentes/agente.tsx";
 import { Divisa } from "../../comun/componentes/divisa.tsx";
 import { FormaPago } from "../../comun/componentes/formapago.tsx";
 import { GrupoIvaNegocio } from "../../comun/componentes/grupo_iva_negocio.tsx";
+import {
+  grupoIvaNegocioEnDocumento,
+  puedeCambiarDivisa,
+} from "../../venta/dominio.ts";
 import { Presupuesto } from "../diseño.ts";
+import { EstadoPresupuesto } from "./diseño.ts";
 import "./TabDatos.css";
 
 export interface TabDatosProps {
   presupuesto: HookModelo<Presupuesto>;
+  estado?: EstadoPresupuesto;
+  publicar?: (evento: string, payload?: unknown) => void;
 }
 
-export const TabDatosBase = ({ presupuesto }: TabDatosProps) => {
-  const { uiProps } = presupuesto;
+export const TabDatosBase = ({
+  presupuesto,
+  estado,
+  publicar = () => {},
+}: TabDatosProps) => {
+  const { uiProps, modelo } = presupuesto;
+  const mostrarBotonesCambio = estado === "ABIERTO" && !modelo.aprobado;
 
   return (
     <div className="TabDatos">
       <quimera-formulario>
         <QDate label="Fecha" {...uiProps("fecha")} />
         <QDate label="Fecha salida" {...uiProps("fecha_salida")} />
+        <Almacen {...uiProps("almacen_id")} />
         <Divisa {...uiProps("divisa_id")} />
         <QInput label="T. Conversión" {...uiProps("tasa_conversion")} />
+        {mostrarBotonesCambio && (
+          <div className="TabDatos-accion TabDatos-accion--divisa">
+            <BotonCambiar
+              titulo="Cambiar divisa y tasa de conversión"
+              onClick={() => publicar("cambio_divisa_solicitado")}
+              deshabilitado={!puedeCambiarDivisa(modelo)}
+            />
+          </div>
+        )}
         <Agente {...uiProps("agente_id", "nombre_agente")} />
+        <QInput label="% Comisión" {...uiProps("por_comision")} />
+        {mostrarBotonesCambio && (
+          <div className="TabDatos-accion TabDatos-accion--agente">
+            <BotonCambiar
+              titulo="Cambiar agente y % de comisión"
+              onClick={() => publicar("cambio_agente_solicitado")}
+            />
+          </div>
+        )}
+        <TotalDivisaEmpresa venta={modelo} />
         <FormaPago {...uiProps("forma_pago_id", "nombre_forma_pago")} />
-        <GrupoIvaNegocio {...uiProps("grupo_iva_negocio_id")} />
+        {grupoIvaNegocioEnDocumento() && (
+          <GrupoIvaNegocio {...uiProps("grupo_iva_negocio_id")} />
+        )}
       </quimera-formulario>
     </div>
   );

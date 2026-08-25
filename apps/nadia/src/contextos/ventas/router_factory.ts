@@ -1,4 +1,4 @@
-import { MaestroConDetalleArticulo } from "#/ventas/articulo/vistas/MaestroConDetalleArticulo.tsx";
+import { MaestroConDetalleArticulo } from "#/ventas/articulo/MaestroConDetalleArticulo.tsx";
 
 export class RouterFactoryVentasNad {
     static router = {

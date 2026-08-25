@@ -5,6 +5,7 @@ import {
   formatearFechaString,
   formatearHoraString,
   formatearMoneda,
+  resolverDivisa,
 } from "@olula/lib/dominio.ts";
 import { ReactNode } from "react";
 import { QBoton } from "./qboton.tsx";
@@ -24,7 +25,7 @@ type MetaColumna<T extends Entidad> = {
     | "fechahora"
     | "booleano"
     | undefined;
-  divisa?: string;
+  divisa?: string | ((entidad: T) => string);
   ancho?: string;
   render?: (entidad: T) => string | ReactNode;
 };
@@ -67,7 +68,10 @@ const fila = <T extends Entidad>(entidad: Entidad, metaTabla: MetaTabla<T>) => {
     // Formateo automático según tipo
     if (tipo === "moneda") {
       if (typeof datos === "number" || typeof datos === "string") {
-        datos = formatearMoneda(datos, divisa ?? "EUR");
+        datos = formatearMoneda(
+          datos,
+          resolverDivisa(divisa, entidad as T) ?? "EUR"
+        );
       }
     } else if (tipo === "fecha" && typeof datos === "string") {
       datos = formatearFechaString(datos);

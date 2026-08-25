@@ -5,7 +5,7 @@ import { EmitirEvento } from "@olula/lib/diseño.js";
 import { useFocus } from "@olula/lib/useFocus.ts";
 import { useForm } from "@olula/lib/useForm.js";
 import { useModelo } from "@olula/lib/useModelo.ts";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { postModLin } from "../infraestructura.js";
 import { metaNuevoModulo, nuevoModLinVacio } from "./crear.js";
 
@@ -18,15 +18,20 @@ import { metaNuevoModulo, nuevoModLinVacio } from "./crear.js";
  *       "modulo_creado"            con el ID devuelto por la API  (éxito)
  *       "alta_de_modulo_cancelada" sin payload                    (cancelar)
  *   - No recibe prop `activo`; la visibilidad la controla el padre.
+ *   - El modelo inicial SIEMPRE va memoizado: useModelo lo reinicia cuando cambia
+ *     su identidad, así que pasar `nuevoModLinVacio()` en línea entra en bucle
+ *     infinito en cuanto el usuario escribe.
  */
 export const CrearModulo = ({
     publicar,
 }: {
     publicar: EmitirEvento;
 }) => {
+    const inicial = useMemo(nuevoModLinVacio, []);
+
     const { modelo: modLin, uiProps, valido } = useModelo(
         metaNuevoModulo,
-        nuevoModLinVacio()
+        inicial
     );
 
     const crear_ = useCallback(

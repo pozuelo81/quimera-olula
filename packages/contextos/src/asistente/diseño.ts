@@ -25,6 +25,8 @@ export interface Capacidad {
 export interface AccionNavegacion {
     ruta: string;
     parametros?: Record<string, string>;
+    /** Texto legible para el botón que se muestra en vez de navegar automáticamente. */
+    descripcion?: string | null;
 }
 
 /** Audio/documento (Excel, PDF) que se manda junto con un mensaje. */

@@ -1,0 +1,19 @@
+.TabGeneral {
+    /* Fila 1: Nombre (9 cols) + Estado (3 cols) = 12 */
+    quimera-input[nombre="nombre"] {
+        grid-column: span 9;
+    }
+
+    quimera-select[nombre="estado"] {
+        grid-column: span 3;
+    }
+
+    /* Fila 2: Fecha inicio (3 cols) + Fecha fin (3 cols) */
+    quimera-input[nombre="fechaInicio"] {
+        grid-column: span 3;
+    }
+
+    quimera-input[nombre="fechaFin"] {
+        grid-column: span 3;
+    }
+}

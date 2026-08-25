@@ -1,15 +1,14 @@
+import { ArticuloLinea } from "#/ventas/comun/componentes/articulo_linea/ArticuloLinea.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QModal } from "@olula/componentes/index.js";
-import { Articulo } from "@olula/ctx/ventas/comun/componentes/articulo.tsx";
 import { GrupoIvaProducto } from "@olula/ctx/ventas/comun/componentes/grupo_iva_producto.tsx";
 import { ProcesarEvento } from "@olula/lib/useMaquina.js";
 import { useModelo } from "@olula/lib/useModelo.ts";
-import { useCallback, useState } from "react";
-import { TagArticulo } from "../../articulo/diseño.ts";
+import { useCallback, useMemo, useState } from "react";
 import { LineaFactura as Linea } from "../diseño.ts";
-import { metaLineaFactura as metaLinea } from "./dominio.ts";
 import "./EditarLinea.css";
+import { getModeloInicial, metaLinea, ModeloCambiarLinea } from "./dominio.ts";
 
 export const EditarLinea = ({
   publicar,
@@ -18,7 +17,9 @@ export const EditarLinea = ({
   linea: Linea;
   publicar: ProcesarEvento;
 }) => {
-  const { modelo, uiProps, valido, set } = useModelo(metaLinea, linea);
+  const modeloInicial = useMemo(() => getModeloInicial(linea), [linea.id]);
+
+  const { modelo, uiProps, valido, set } = useModelo<ModeloCambiarLinea>(metaLinea, modeloInicial);
 
   const [cambiando, setCambiando] = useState(false);
   const [mostrarMas, setMostrarMas] = useState(false);
@@ -32,25 +33,7 @@ export const EditarLinea = ({
     if (!cambiando) publicar("editar_linea_cancelado");
   }, [cambiando, publicar]);
 
-  const handleArticuloChange = useCallback(
-    (
-      opcion: { valor: string; descripcion: string; datos?: TagArticulo } | null
-    ) => {
-      if (!opcion) return;
-
-      const articulo = opcion.datos;
-      if (!articulo) return;
-
-      set({
-        ...modelo,
-        referencia: opcion.valor,
-        descripcion: opcion.descripcion,
-        pvp_unitario: articulo.precio,
-        grupo_iva_producto_id: articulo.grupo_iva_producto_id,
-      });
-    },
-    [modelo, set]
-  );
+  const libre = modelo.tipoArticulo === "libre";
 
   return (
     <QModal
@@ -61,13 +44,14 @@ export const EditarLinea = ({
     >
       <div className="EdicionLinea">
         <quimera-formulario>
-          <div className="articulo-info">
-            <span className="articulo-ref">Ref. {linea.referencia}</span>
-          </div>
-
-          <Articulo
-            {...uiProps("referencia", "descripcion")}
-            onChange={handleArticuloChange}
+          <ArticuloLinea
+            tipoArticulo={modelo.tipoArticulo}
+            referencia={modelo.referencia}
+            descripcionArticulo={modelo.descripcionArticulo}
+            descripcion={modelo.descripcion}
+            nombre="referencia_cambiar_linea_factura"
+            onChange={(cambios) => set({ ...modelo, ...cambios })}
+            bloqueado={true}
           />
 
           <QInput label="Cantidad" {...uiProps("cantidad")} />
@@ -86,8 +70,13 @@ export const EditarLinea = ({
 
           {mostrarMas && (
             <>
-              <GrupoIvaProducto {...uiProps("grupo_iva_producto_id")} />
               <QInput label="% Descuento" {...uiProps("dto_porcentual")} />
+              <QInput label="Dto. lineal" {...uiProps("dto_lineal")} />
+              <GrupoIvaProducto {...uiProps("grupo_iva_producto_id")} soloLectura={!libre} />
+              <QInput label="% IVA" {...uiProps("tipo_iva")} soloLectura />
+              <QInput label="% I.R.P.F." {...uiProps("tipo_irpf")} />
+              <QInput label="% Comisión agente" {...uiProps("por_comision")} />
+              <QInput label="Importe comisión" {...uiProps("importe_comision")} />
             </>
           )}
         </quimera-formulario>

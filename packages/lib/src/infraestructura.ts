@@ -198,3 +198,9 @@ export const obtenerOpcionesSelector =
         RestAPI.get<{ datos: [] }>(
             `/cache/comun/${path}`
         ).then((respuesta) => respuesta.datos.map(({ descripcion, ...resto }: Record<string, string>) => [Object.values(resto).at(0), descripcion] as OpcionCampo));
+
+export const obtenerDatosSelector =
+    (path: string) => async () =>
+        RestAPI.get<{ datos: Record<string, unknown>[] }>(
+            `/cache/comun/${path}`
+        ).then((respuesta) => respuesta.datos);

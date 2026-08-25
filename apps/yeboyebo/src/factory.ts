@@ -1,4 +1,5 @@
 import { FactoryAuthOlula } from '#/auth/factory.ts';
+import { FactoryProyectosOlula } from '#/proyectos/factory.ts';
 import { FactoryRrhhOlula } from '#/rrhh/factory.ts';
 import { FactoryRrhhEmpleadoOlula } from '#/rrhh_area_empleado/factory.ts';
 
@@ -7,6 +8,7 @@ export class FactoryYeboyebo {
     Auth = FactoryAuthOlula;
     Rrhh = FactoryRrhhOlula;
     RrhhAreaEmpleado = FactoryRrhhEmpleadoOlula;
+    Proyectos = FactoryProyectosOlula;
 }
 
 export default FactoryYeboyebo;

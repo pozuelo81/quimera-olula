@@ -46,6 +46,10 @@ interface AsistenteContextValue {
      * conoce texto (ver convertMessage), así que la UI accede a esto por fuera, igual
      * que ya hace messageSurfaceMap para los bloques A2UI. */
     adjuntosPorMensaje: Record<string, AdjuntoMensaje[]>;
+    /** Navegación propuesta por el asistente (tool proponer_navegacion), por id de
+     * mensaje — la app YA NO navega sola al recibirla: se muestra como un botón dentro
+     * del propio mensaje (ver Chat.tsx) y solo se navega cuando el usuario lo pulsa. */
+    accionNavegacionPorMensaje: Record<string, AccionNavegacion>;
 }
 
 const AsistenteContext = createContext<AsistenteContextValue | null>(null);
@@ -83,6 +87,7 @@ export function AsistenteRuntimeProvider({ children, onAccionNavegacion }: Props
     const [streamingEnabled, setStreamingEnabled] = useState(false);
     const [a2uiSurfaces, setA2uiSurfaces] = useState<SurfaceModel<ReactComponentImplementation>[]>([]);
     const [messageSurfaceMap, setMessageSurfaceMap] = useState<Record<string, string[]>>({});
+    const [accionNavegacionPorMensaje, setAccionNavegacionPorMensaje] = useState<Record<string, AccionNavegacion>>({});
     const [threadIdActivo, setThreadIdActivo] = useState<string | null>(null);
 
     // Última conversación abierta — solo una conveniencia para restaurarla al reabrir
@@ -212,10 +217,11 @@ export function AsistenteRuntimeProvider({ children, onAccionNavegacion }: Props
                 procesarMensajesA2ui(respuesta.a2uiMessages, assistantId);
             }
             if (respuesta.accionNavegacion) {
-                onAccionNavegacion?.(respuesta.accionNavegacion);
+                const accion = respuesta.accionNavegacion;
+                setAccionNavegacionPorMensaje(prev => ({ ...prev, [assistantId]: accion }));
             }
         },
-        [establecerThreadId, onAccionNavegacion, procesarMensajesA2ui]
+        [establecerThreadId, procesarMensajesA2ui]
     );
 
     // El servidor devuelve el id con el que ha persistido cada adjunto — se guarda en
@@ -272,7 +278,8 @@ export function AsistenteRuntimeProvider({ children, onAccionNavegacion }: Props
                             } else if (evento.tipo === "a2ui") {
                                 procesarMensajesA2ui([evento.a2uiMessage], assistantId);
                             } else if (evento.tipo === "accion_navegacion") {
-                                onAccionNavegacion?.(evento.accionNavegacion);
+                                const accion = evento.accionNavegacion;
+                                setAccionNavegacionPorMensaje(prev => ({ ...prev, [assistantId]: accion }));
                             } else if (evento.tipo === "fin") {
                                 establecerThreadId(evento.threadId);
                                 if (evento.necesitaCapacidades) {
@@ -317,7 +324,7 @@ export function AsistenteRuntimeProvider({ children, onAccionNavegacion }: Props
         },
         [
             streamingEnabled, construirConsulta, consultar, aplicarRespuesta, aplicarIdsAdjuntos,
-            procesarMensajesA2ui, establecerThreadId, onAccionNavegacion,
+            procesarMensajesA2ui, establecerThreadId,
         ]
     );
 
@@ -462,6 +469,7 @@ export function AsistenteRuntimeProvider({ children, onAccionNavegacion }: Props
                 messageSurfaceMap,
                 enviarAccion,
                 adjuntosPorMensaje,
+                accionNavegacionPorMensaje,
                 threadIdActivo,
                 cambiarAHilo,
                 nuevaConversacion,

@@ -1,0 +1,16 @@
+.fila-acciones-documento {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--espaciado-s);
+}
+
+.fila-acciones-documento quimera-acciones {
+    flex: 0 0 auto;
+    margin-inline-start: auto;
+}
+
+.titulo-documento {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--espaciado-xs);
+}

@@ -98,7 +98,7 @@ export const TabDatos = ({ accion }: { accion: HookModelo<Accion> }) => {
         <QInput
           label={origenLabel}
           nombre="origen"
-          soloTexto
+          soloLectura
           valor={origenValor}
         />
       </quimera-formulario>

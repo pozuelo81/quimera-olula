@@ -6,9 +6,11 @@ import {
     activarLinea,
     borrarFactura,
     borrarLinea,
+    cambiarAgente,
     cambiarCantidadLinea,
     cambiarCliente,
     cambiarDescuento,
+    cambiarDivisa,
     cambiarFactura,
     cambiarLinea,
     cancelarCambioFactura,
@@ -48,6 +50,10 @@ export const getMaquina: () => Maquina<EstadoFactura, ContextoFactura> = () => {
 
             cambio_cliente_solicitado: "CAMBIANDO_CLIENTE",
 
+            cambio_divisa_solicitado: "CAMBIANDO_DIVISA",
+
+            cambio_agente_solicitado: "CAMBIANDO_AGENTE",
+
             descuento_solicitado: "CAMBIANDO_DESCUENTO",
 
             factura_cargada: [abrirFactura],
@@ -80,6 +86,20 @@ export const getMaquina: () => Maquina<EstadoFactura, ContextoFactura> = () => {
             cambio_cliente_listo: [cambiarCliente],
 
             cambio_cliente_cancelado: "ABIERTO",
+        },
+
+        CAMBIANDO_DIVISA: {
+
+            cambio_divisa_listo: [cambiarDivisa],
+
+            cambio_divisa_cancelado: "ABIERTO",
+        },
+
+        CAMBIANDO_AGENTE: {
+
+            cambio_agente_listo: [cambiarAgente],
+
+            cambio_agente_cancelado: "ABIERTO",
         },
 
         CAMBIANDO_DESCUENTO: {

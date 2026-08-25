@@ -8,6 +8,8 @@ interface AgenteProps {
   nombre?: string;
   label?: string;
   deshabilitado?: boolean;
+  opcional?: boolean;
+  enlace?: string;
   onChange: (opcion: { valor: string; descripcion: string } | null) => void;
 }
 
@@ -16,14 +18,15 @@ export const Agente = ({
   valor,
   nombre = "agente_id",
   label = "Agente",
+  enlace = "/ventas/agente",
   onChange,
   ...props
 }: AgenteProps) => {
-  const obtenerOpciones = async (valor: string) => {
-    if (valor.length < 3) return [];
+  const obtenerOpciones = async (valor: string, id?: string) => {
+    if (!id && valor.length < 3) return [];
 
     const criteria = {
-      filtro: ["nombre", "~", valor],
+      filtro: id ? [["id", "=", id]] : ["nombre", "~", valor],
       orden: ["id"],
     };
 
@@ -35,6 +38,7 @@ export const Agente = ({
     return agentes.map((agente) => ({
       valor: agente.id,
       descripcion: agente.nombre,
+      por_comision: agente.por_comision,
     }));
   };
 
@@ -46,6 +50,7 @@ export const Agente = ({
       valor={valor}
       autoSeleccion
       obtenerOpciones={obtenerOpciones}
+      enlace={enlace}
       descripcion={descripcion}
       {...props}
     />

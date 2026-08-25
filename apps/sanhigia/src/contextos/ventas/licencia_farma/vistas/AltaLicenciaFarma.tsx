@@ -24,7 +24,6 @@ export const AltaLicenciaFarma = ({
 
   return (
     <>
-      <h2>Nueva Licencia Farma</h2>
       <quimera-formulario>
         <QInput
           label="Nombre del cliente"
