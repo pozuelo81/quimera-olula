@@ -17,7 +17,9 @@ import {
 } from "@quimera/comps";
 import { CircularProgress } from "@quimera/thirdparty";
 import Quimera, { getSchemas, useStateValue, useWidth, util } from "quimera";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { ModalTraza } from "@olula/ctx/comun/componentes/traza/ModalTraza.tsx";
+import { getTrazaAlbaran } from "@olula/ctx/ventas/albaran/infraestructura.ts";
 
 import { LineaAlbaranCliComp } from "../../comps";
 
@@ -37,6 +39,7 @@ function AlbaranCli({ callbackChanged, idAlbaran, initAlbaran, useStyles }) {
     dispatch,
   ] = useStateValue();
   const classes = useStyles();
+  const [verTraza, setVerTraza] = useState(false);
   const width = useWidth();
 
   const opcionesDocProp = {
@@ -163,6 +166,12 @@ function AlbaranCli({ callbackChanged, idAlbaran, initAlbaran, useStyles }) {
                 disabled={!editable}
               />
               <QBoxButton id="enviarEmail" title="Enviar por email" icon="email" />
+              <QBoxButton
+                id="verTraza"
+                title="Documentos relacionados"
+                icon="account_tree"
+                onClick={() => setVerTraza(true)}
+              />
             </>
           }
         >
@@ -335,6 +344,13 @@ function AlbaranCli({ callbackChanged, idAlbaran, initAlbaran, useStyles }) {
           />
         </DialogContent>
       </Dialog>
+      {verTraza && (
+        <ModalTraza
+          id={String(albaran.data.idAlbaran)}
+          getTraza={getTrazaAlbaran}
+          onCerrar={() => setVerTraza(false)}
+        />
+      )}
     </Quimera.Template>
   );
 }

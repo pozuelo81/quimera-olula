@@ -39,6 +39,8 @@ export const getMaquina: () => Maquina<EstadoFactura, ContextoFactura> = () => {
 
         ABIERTO: {
 
+            traza_solicitada: "VIENDO_TRAZA",
+
             linea_creada: [refrescarFactura, refrescarLineas],
 
             alta_linea_solicitada: "CREANDO_LINEA",
@@ -140,5 +142,9 @@ export const getMaquina: () => Maquina<EstadoFactura, ContextoFactura> = () => {
             borrar_linea_cancelado: "ABIERTO",
         },
 
+        VIENDO_TRAZA: {
+
+            traza_cerrada: "ABIERTO",
+        },
     }
 }

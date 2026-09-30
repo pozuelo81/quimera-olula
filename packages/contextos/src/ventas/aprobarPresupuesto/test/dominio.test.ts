@@ -1,9 +1,11 @@
 import { LineaAprobarPresupuesto } from "#/ventas/aprobarPresupuesto/diseño.ts";
 import {
     lineaCompleta,
+    metaLinea,
     pendienteDeLinea,
     transformarLineasPedido,
 } from "#/ventas/aprobarPresupuesto/dominio.ts";
+import { campoModeloEsValido, modeloEsEditable } from "@olula/lib/dominio.ts";
 import { describe, expect, test } from "vitest";
 
 const linea = (cambios: Partial<LineaAprobarPresupuesto> = {}): LineaAprobarPresupuesto => ({
@@ -97,5 +99,30 @@ describe("transformarLineasPedido arma el patch que viaja al servidor", () => {
 
     test("sin líneas no hay patch", () => {
         expect(transformarLineasPedido([])).toEqual([]);
+    });
+});
+
+describe("metaLinea valida la cantidad a aprobar de la fila", () => {
+    const aAprobarValido = (l: LineaAprobarPresupuesto) => campoModeloEsValido(metaLinea)(l, "a_aprobar");
+
+    test("hasta lo pendiente es válido", () => {
+        expect(aAprobarValido(linea({ cantidad: 10, aprobada: 6, a_aprobar: 4 }))).toBe(true);
+    });
+
+    test("cero es válido", () => {
+        expect(aAprobarValido(linea({ a_aprobar: 0 }))).toBe(true);
+    });
+
+    test("más de lo pendiente no", () => {
+        expect(aAprobarValido(linea({ cantidad: 10, aprobada: 6, a_aprobar: 5 }))).toBe(false);
+    });
+
+    test("negativo no", () => {
+        expect(aAprobarValido(linea({ a_aprobar: -1 }))).toBe(false);
+    });
+
+    test("una línea cerrada no deja editar la cantidad", () => {
+        expect(modeloEsEditable(metaLinea)(linea({ cerrada: true }), "a_aprobar")).toBe(false);
+        expect(modeloEsEditable(metaLinea)(linea({ cerrada: false }), "a_aprobar")).toBe(true);
     });
 });

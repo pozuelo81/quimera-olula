@@ -233,42 +233,52 @@ function Articulo({
               </Box>
               <Box flexGrow={1} mr={2}>
                 <Field.Text
+                  id="articulo.buffer/codBarrasInterno"
+                  fullWidth
+                  field="codBarrasInterno"
+                  label="Código de barras interno"
+                  disabled
+                  value={articulo.buffer.codBarrasInterno}
+                />
+              </Box>
+              <Box flexGrow={1} mr={2}>
+                <Field.Text
                   id="articulo.buffer/codBarras"
                   fullWidth
                   field="codBarras"
                   label="Código de barras"
-                  disabled
                   value={articulo.buffer.codBarras}
                 />
               </Box>
-              <Box
-                flexGrow={1}
-                display="flex"
-                alignItems="flex-end"
-                justifyContent="flex-end"
-                style={{ gap: 8 }}
-              >
-                <Button
-                  id="guardarArticulo"
-                  text="Guardar"
-                  color="secondary"
-                  variant="contained"
-                  disabled={articuloSinCambios()}
-                  startIcon={<Icon>save_alt</Icon>}
-                />
-                <Button
-                  id="volver"
-                  text="Volver"
-                  color="primary"
-                  variant="contained"
-                  onClick={() => {
-                    referenciaArticulo && callbackVolver({ data: articulo.data });
-                    dispatch({ type: "onVolverClicked" });
-                  }}
-                  startIcon={<Icon>arrow_back_outlined</Icon>}
-                />
-              </Box>
             </Grid>
+            <Box
+              flexGrow={1}
+              mt={2}
+              display="flex"
+              alignItems="flex-end"
+              justifyContent="flex-end"
+              style={{ gap: 8 }}
+            >
+              <Button
+                id="guardarArticulo"
+                text="Guardar"
+                color="secondary"
+                variant="contained"
+                disabled={articuloSinCambios()}
+                startIcon={<Icon>save_alt</Icon>}
+              />
+              <Button
+                id="volver"
+                text="Volver"
+                color="primary"
+                variant="contained"
+                onClick={() => {
+                  referenciaArticulo && callbackVolver({ data: articulo.data });
+                  dispatch({ type: "onVolverClicked" });
+                }}
+                startIcon={<Icon>arrow_back_outlined</Icon>}
+              />
+            </Box>
           </Grid>
         </Box>
         <Box>
@@ -352,6 +362,12 @@ function Articulo({
               label="Coste real"
               value={nuevoProveedor.coste * ((100 - nuevoProveedor.descuento) / 100)}
               disabled
+              fullWidth
+            />
+            <Field.Schema
+              id="nuevoProveedor.codBarras"
+              label="Código de barras"
+              schema={schemaCondiciones}
               fullWidth
             />
             {nuevoProveedor.id && (

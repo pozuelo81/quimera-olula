@@ -14,11 +14,19 @@ export const getMaquina: () => Maquina<EstadoDetalleReciboCompra, ContextoDetall
         },
 
         ABIERTO: {
+
+            traza_solicitada: "VIENDO_TRAZA",
+
             recibo_id_cambiado: [cargarContexto],
 
             recibo_deseleccionado: [
                 publicar('recibo_deseleccionado', null),
             ],
+        },
+
+        VIENDO_TRAZA: {
+
+            traza_cerrada: "ABIERTO",
         },
     };
 };

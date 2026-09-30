@@ -1,3 +1,4 @@
+import { ModalTraza } from "#/comun/componentes/traza/ModalTraza.tsx";
 import { CambiarDivisa } from "#/ventas/comun/componentes/moleculas/CambiarDivisa/CambiarDivisa.tsx";
 import { CambioProveedor } from "#/compras/comun/componentes/moleculas/CambioProveedor/CambioProveedor.tsx";
 import { Detalle } from "@olula/componentes/detalle/Detalle.tsx";
@@ -12,7 +13,7 @@ import { useNavigate } from "react-router";
 import { BorrarPedido } from "../borrar/BorrarPedido.tsx";
 import { Pedido } from "../diseño.ts";
 import { pedidoAlbaranable, pedidoPendiente } from "../dominio.ts";
-import { getReportPedido } from "../infraestructura.ts";
+import { getReportPedido, getTrazaPedido } from "../infraestructura.ts";
 import {
     contextoDetallePedidoInicial,
     guardarPedido,
@@ -73,6 +74,7 @@ export const DetallePedido = ({
             deshabilitado: !pedidoAlbaranable(pedido),
         },
         { texto: "Imprimir", onClick: imprimir },
+        { texto: "Documentos relacionados", onClick: () => emitir("traza_solicitada") },
         {
             icono: "eliminar",
             texto: "Borrar",
@@ -140,6 +142,14 @@ export const DetallePedido = ({
 
             {estado === "BORRANDO" && (
                 <BorrarPedido pedido={pedido} publicar={emitir} />
+            )}
+
+            {estado === "VIENDO_TRAZA" && (
+              <ModalTraza
+                id={pedido.id}
+                getTraza={getTrazaPedido}
+                onCerrar={() => emitir("traza_cerrada")}
+              />
             )}
         </Detalle>
     );

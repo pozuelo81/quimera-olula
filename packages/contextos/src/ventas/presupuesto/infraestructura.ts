@@ -7,6 +7,7 @@ import ApiUrls from "../comun/urls.ts";
 import { direccionVacia, payloadCambioCliente } from "../venta/dominio.ts";
 import { articuloDeLinea, NuevaLineaVentaApiReq, NuevaLineaVentaApiRes, peticionNuevaLineaApi, respuestaNuevaLineaApi } from "../venta/infraestructura.ts";
 import { CambiarArticuloLinea, CambiarCantidadLinea, CambioClientePresupuesto, DeleteLinea, EstadoAprobado, GetPresupuesto, GetPresupuestos, GetReportPresupuesto, LineaPresupuesto, PatchAprobarPresupuesto, PatchCambiarDivisa, PatchLinea, PostLinea, PostPresupuesto, Presupuesto, QueryNuevaLinea } from "./diseño.ts";
+import { getTraza } from "#/comun/componentes/traza/infraestructura.ts";
 
 type PresupuestoAPI = {
     id: string;
@@ -238,3 +239,5 @@ export const patchCambiarDescuento = async (id: string, dto_porcentual: number):
         }
     }, "Error al cambiar descuento del presupuesto");
 };
+
+export const getTrazaPresupuesto = (id: string): Promise<unknown> => getTraza(`${baseUrl}/${id}`);

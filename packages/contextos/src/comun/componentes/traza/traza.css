@@ -1,0 +1,165 @@
+.traza-documentos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaciado-m);
+  align-items: center;
+  min-width: min(100%, 320px);
+
+  .traza-mensaje {
+    color: var(--color-texto-secundario);
+    margin: var(--espaciado-m) 0;
+  }
+
+  .traza-grafo {
+    align-self: stretch;
+    min-width: 0;
+    max-height: 50vh;
+    overflow: auto;
+    padding: var(--espaciado-s);
+    border: var(--tamaño-borde-s, 1px) solid var(--color-borde-sutil);
+    border-radius: var(--redondeo-borde-m);
+    background: var(--color-superficie-sunken, var(--color-fondo));
+
+    svg {
+      display: block;
+      margin: 0 auto;
+    }
+  }
+
+  .traza-columna {
+    fill: var(--color-texto-secundario);
+    font-size: var(--tamaño-letra-xs);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .traza-arista {
+    fill: none;
+    stroke: var(--color-borde-fuerte, var(--color-borde));
+    stroke-width: 1.5;
+
+    &.activa {
+      stroke: var(--color-primario);
+      stroke-width: 2.5;
+    }
+  }
+
+  .traza-nodo {
+    cursor: pointer;
+    outline: none;
+
+    rect {
+      fill: var(--color-superficie-elevada, var(--color-superficie));
+      stroke: var(--color-borde);
+      stroke-width: 1;
+    }
+
+    .traza-nodo-codigo {
+      fill: var(--color-texto-primario);
+      font-size: var(--tamaño-letra-s);
+      font-weight: 600;
+    }
+
+    .traza-nodo-detalle {
+      fill: var(--color-texto-secundario);
+      font-size: var(--tamaño-letra-xs);
+    }
+
+    &:hover rect {
+      stroke: var(--color-primario);
+    }
+
+    &:focus-visible rect {
+      stroke: var(--color-primario);
+      stroke-width: 3;
+    }
+
+    &.raiz rect {
+      stroke: var(--color-primario);
+      stroke-width: 2;
+    }
+
+    &.seleccionado rect {
+      fill: var(--color-primario-claro);
+      stroke: var(--color-primario);
+      stroke-width: 2;
+    }
+
+    &.oculto {
+      rect {
+        stroke-dasharray: 4 3;
+      }
+
+      .traza-nodo-codigo,
+      .traza-nodo-detalle {
+        fill: var(--color-texto-deshabilitado, var(--color-texto-secundario));
+      }
+    }
+  }
+
+  .traza-panel {
+    width: min(100%, 420px);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-m);
+    padding: var(--espaciado-m);
+    border: var(--tamaño-borde-s, 1px) solid var(--color-borde-sutil);
+    border-radius: var(--redondeo-borde-m);
+
+    /* Anula el `header` de QModal (flex centrado y con padding). */
+    header {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--espaciado-xxs);
+      padding: 0 0 var(--espaciado-s);
+      border-bottom: var(--tamaño-borde-s, 1px) solid var(--color-borde-sutil);
+    }
+
+    .traza-panel-tipo {
+      color: var(--color-texto-secundario);
+      font-size: var(--tamaño-letra-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .traza-panel-codigo {
+      font-size: var(--tamaño-letra-l);
+      color: var(--color-texto-primario);
+    }
+
+    .traza-panel-aviso {
+      color: var(--color-texto-secundario);
+      margin: 0;
+    }
+
+    dl {
+      display: grid;
+      gap: var(--espaciado-xs);
+      margin: 0;
+
+      div {
+        display: grid;
+        grid-template-columns: 5.5rem 1fr;
+        gap: var(--espaciado-s);
+      }
+
+      dt {
+        color: var(--color-texto-secundario);
+      }
+
+      dd {
+        margin: 0;
+        overflow-wrap: anywhere;
+        font-variant-numeric: tabular-nums;
+      }
+    }
+
+    .botones {
+      display: flex;
+      justify-content: flex-end;
+    }
+  }
+}

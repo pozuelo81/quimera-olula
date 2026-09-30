@@ -1,0 +1,23 @@
+/* -----------------------------------------------------------------------
+ * Tabla de líneas
+ * ----------------------------------------------------------------------- */
+.LineasAprobar table {
+    border-collapse: collapse;
+}
+
+.LineasAprobar > table thead th {
+    padding: 0.4rem 1.5rem;
+    text-align: left;
+    white-space: nowrap;
+    border-bottom: 2px solid #ddd;
+}
+
+.LineasAprobar > table th.num,
+.LineasAprobar > table td.num {
+    text-align: right;
+}
+
+.LineasAprobar > table > tbody > tr > td {
+    padding: 0.4rem 1.5rem;
+    vertical-align: middle;
+}

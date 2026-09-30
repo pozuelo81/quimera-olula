@@ -39,6 +39,8 @@ export const getMaquina: () => Maquina<EstadoPresupuesto, ContextoPresupuesto> =
 
         ABIERTO: {
 
+            traza_solicitada: "VIENDO_TRAZA",
+
             linea_creada: [
                 refrescarPresupuesto,
                 refrescarLineas
@@ -81,6 +83,8 @@ export const getMaquina: () => Maquina<EstadoPresupuesto, ContextoPresupuesto> =
         },
 
         APROBADO: {
+
+            traza_solicitada: "VIENDO_TRAZA",
 
             presupuesto_cargado: [abiertoOAprobadoContexto],
 
@@ -158,5 +162,9 @@ export const getMaquina: () => Maquina<EstadoPresupuesto, ContextoPresupuesto> =
             borrar_linea_cancelado: "ABIERTO",
         },
 
+        VIENDO_TRAZA: {
+
+            traza_cerrada: [abiertoOAprobadoContexto],
+        },
     }
 }

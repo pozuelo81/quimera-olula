@@ -1,9 +1,14 @@
-.AprobarPresupuesto {
-    padding: 20px 20% !important;
+/* -----------------------------------------------------------------------
+ * Wrapper centrado — contiene la cabecera, los botones y la tabla.
+ * ----------------------------------------------------------------------- */
+.aprobar-bloque {
+    width: fit-content;
+    margin: 0 auto;
 }
 
-@media (max-width: 768px) {
-    .AprobarPresupuesto {
-        padding: 10px !important;
-    }
+.aprobar-bloque .maestro-botones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
 }

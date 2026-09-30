@@ -30,6 +30,7 @@ import {
     PostPedido,
     Recibido,
 } from "./diseño.ts";
+import { getTraza } from "#/comun/componentes/traza/infraestructura.ts";
 
 const baseUrl = new ApiUrls().PEDIDO;
 
@@ -421,3 +422,5 @@ export const borrarLineasPedido: BorrarLineasPedido = async (id, lineas) => {
         "Error al borrar las líneas del pedido"
     );
 };
+
+export const getTrazaPedido = (id: string): Promise<unknown> => getTraza(`${baseUrl}/${id}`);

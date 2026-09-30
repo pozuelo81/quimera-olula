@@ -3,7 +3,7 @@ import { LineaPedido, Pedido } from "../diseño.ts";
 
 export type EstadoDetallePedido =
     | 'INICIAL'
-    | 'ABIERTO'
+    | 'ABIERTO' | 'VIENDO_TRAZA'
     | 'BORRANDO'
     | 'CAMBIANDO_PROVEEDOR'
     | 'CAMBIANDO_DIVISA'

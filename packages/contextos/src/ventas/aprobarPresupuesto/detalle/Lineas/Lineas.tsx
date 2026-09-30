@@ -1,117 +1,112 @@
-import { Presupuesto } from "#/ventas/presupuesto/diseño.ts";
-import { MetaTabla } from "@olula/componentes/atomos/qtablacontrolada.tsx";
-import {
-  QModalConfirmacion,
-  QuimeraAcciones,
-} from "@olula/componentes/index.ts";
-import { ListadoSemiControlado } from "@olula/componentes/maestro/ListadoSemiControlado.tsx";
-import { Criteria, ListaSeleccionable } from "@olula/lib/diseño.js";
-import { criteriaDefecto } from "@olula/lib/dominio.js";
-import { getSeleccionada } from "@olula/lib/entidad.ts";
-import { ProcesarEvento } from "@olula/lib/useMaquina.js";
+import { QEtiqueta } from "@olula/componentes/atomos/qetiqueta.tsx";
+import { QInput } from "@olula/componentes/atomos/qinput.tsx";
+import { QModalConfirmacion } from "@olula/componentes/index.ts";
+import { EmitirEvento, ListaSeleccionable } from "@olula/lib/diseño.ts";
+import { useModelo } from "@olula/lib/useModelo.ts";
 import { LineaAprobarPresupuesto as Linea } from "../../diseño.ts";
+import { metaLinea } from "../../dominio.ts";
 import { EstadoAprobarPresupuesto } from "../diseño.ts";
-import { hayPendiente, puedeAprobar } from "../dominio.ts";
 import { AccionesLinea } from "./AccionesLinea.tsx";
-import { ExpansionCantidad } from "./ExpansionCantidad.tsx";
+import "./Lineas.css";
+
+// ---------------------------------------------------------------------------
+// Fila de línea
+// ---------------------------------------------------------------------------
+
+const FilaLinea = ({
+  linea,
+  presupuestoId,
+  publicar,
+}: {
+  linea: Linea;
+  presupuestoId: string;
+  publicar: EmitirEvento;
+}) => {
+  const { uiProps } = useModelo(metaLinea, linea, async (lineaActualizada) => {
+    await publicar("cantidad_cambiada", {
+      id: lineaActualizada.id,
+      cantidad: Number(lineaActualizada.a_aprobar),
+    });
+  });
+
+  return (
+    <tr>
+      <td>
+        <span>{linea.referencia}</span> <span>{linea.descripcion}</span>
+      </td>
+      <td className="num">
+        <QEtiqueta
+          variante={
+            linea.aprobada === 0
+              ? "error"
+              : linea.aprobada < linea.cantidad
+                ? "advertencia"
+                : "exito"
+          }
+        >
+          {linea.aprobada} / {linea.cantidad}
+        </QEtiqueta>
+      </td>
+      <td className="num">
+        <QInput label="" {...uiProps("a_aprobar")} />
+      </td>
+      <td>
+        <AccionesLinea
+          linea={linea}
+          presupuestoId={presupuestoId}
+          publicar={publicar}
+        />
+      </td>
+    </tr>
+  );
+};
+
+// ---------------------------------------------------------------------------
+// Orquestador principal
+// ---------------------------------------------------------------------------
 
 export const Lineas = ({
-  presupuesto,
+  presupuestoId,
   lineas,
   estado,
   publicar,
 }: {
-  presupuesto: Presupuesto;
+  presupuestoId: string;
   lineas: ListaSeleccionable<Linea>;
   estado: EstadoAprobarPresupuesto;
-  publicar: ProcesarEvento;
-}) => {
-  const seleccionada = getSeleccionada(lineas);
-  const esConfirmandoAprobacion = estado === "CONFIRMANDO_APROBACION";
+  publicar: EmitirEvento;
+}) => (
+  <div className="LineasAprobar">
+    <table>
+      <thead>
+        <tr>
+          <th>Artículo</th>
+          <th className="num">Aprobada</th>
+          <th className="num">A aprobar</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {lineas.lista.map((linea) => (
+          <FilaLinea
+            key={linea.id}
+            linea={linea}
+            presupuestoId={presupuestoId}
+            publicar={publicar}
+          />
+        ))}
+      </tbody>
+    </table>
 
-  const acciones = [
-    // "Todos" es un atajo de relleno y debería pesar menos que "Generar
-    // Pedido", pero QuimeraAcciones fuerza variante "solido" en toda acción
-    // habilitada, así que de momento salen iguales.
-    {
-      texto: "Todos",
-      onClick: () => publicar("todas_las_lineas_aprobadas"),
-      deshabilitado: !hayPendiente(lineas),
-    },
-    {
-      texto: "Generar Pedido",
-      onClick: () => publicar("aprobacion_solicitada"),
-      deshabilitado: !puedeAprobar({ presupuesto, lineas }),
-    },
-  ];
-
-  const metaTabla: MetaTabla<Linea> = {
-    cols: [
-      {
-        id: "linea",
-        cabecera: "Línea",
-        esTitulo: true,
-        render: (l) => `${l.referencia || "-"} ${l.descripcion || ""}`.trim(),
-      },
-      { id: "cantidad", cabecera: "Cantidad", tipo: "numero" },
-      {
-        id: "aprobada",
-        cabecera: "Servida",
-        tipo: "numero",
-        render: (l) => String(l.aprobada || 0),
-      },
-      {
-        id: "a_aprobar",
-        cabecera: "A pedir",
-        tipo: "numero",
-        render: (l) => String(l.a_aprobar || 0),
-      },
-      {
-        id: "acciones",
-        cabecera: "",
-        render: (l) => (
-          <AccionesLinea linea={l} presupuestoId={presupuesto.id} publicar={publicar} />
-        ),
-      },
-    ],
-    expansion: ({ entidad }) => (
-      <ExpansionCantidad linea={entidad} publicar={publicar} />
-    ),
-  };
-
-  return (
-    <div className="DetalleAprobarPresupuesto">
-      <div className="CabeceraPresupuesto">
-        <div className="botones maestro-botones ">
-          <QuimeraAcciones acciones={acciones} />
-        </div>
-      </div>
-      <ListadoSemiControlado
-        metaTabla={metaTabla}
-        entidades={lineas.lista}
-        totalEntidades={lineas.lista.length}
-        cargando={false}
-        seleccionada={seleccionada ?? null}
-        onSeleccion={(l: Linea) => publicar("linea_seleccionada", l.id)}
-        criteriaInicial={criteria_lineas}
-        onCriteriaChanged={() => null}
-        modo="tabla"
-      />
-      <QModalConfirmacion
-        nombre="aprobarPresupuesto"
-        abierto={esConfirmandoAprobacion}
-        titulo="Confirmar"
-        mensaje="¿Está seguro de que desea generar el pedido?"
-        labelAceptar="Aceptar"
-        mostrarCancelar={true}
-        onCerrar={() => publicar("aprobacion_cancelada")}
-        onAceptar={() => publicar("aprobacion_confirmada")}
-      />
-    </div>
-  );
-};
-
-const criteria_lineas: Criteria = {
-  ...criteriaDefecto,
-  orden: ["id", "DESC"],
-};
+    <QModalConfirmacion
+      nombre="aprobarPresupuesto"
+      abierto={estado === "CONFIRMANDO_APROBACION"}
+      titulo="Confirmar"
+      mensaje="¿Está seguro de que desea generar el pedido?"
+      labelAceptar="Aceptar"
+      mostrarCancelar={true}
+      onCerrar={() => publicar("aprobacion_cancelada")}
+      onAceptar={() => publicar("aprobacion_confirmada")}
+    />
+  </div>
+);

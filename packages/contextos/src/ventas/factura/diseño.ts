@@ -103,7 +103,7 @@ export type PatchEmitirFactura = (id: string) => Promise<void>;
 
 export type EstadoFactura = (
     'INICIAL'
-    | 'ABIERTO'
+    | 'ABIERTO' | 'VIENDO_TRAZA'
     | 'BORRANDO_FACTURA'
     | 'CAMBIANDO_CLIENTE'
     | 'CAMBIANDO_DESCUENTO'

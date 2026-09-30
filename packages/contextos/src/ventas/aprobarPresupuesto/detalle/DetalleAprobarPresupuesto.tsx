@@ -1,10 +1,11 @@
-import { QBoton, QModal } from "@olula/componentes/index.ts";
+import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
+import { QModal } from "@olula/componentes/moleculas/qmodal.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
 import { FactoryCtx } from "@olula/lib/factory_ctx.tsx";
 import { useContext, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router";
 import "./DetalleAprobarPresupuesto.css";
-import { contextoVacio } from "./dominio.ts";
+import { contextoVacio, hayPendiente, puedeAprobar } from "./dominio.ts";
 import { Lineas } from "./Lineas/Lineas.tsx";
 import { getMaquina } from "./maquina.ts";
 
@@ -29,63 +30,77 @@ export const DetalleAprobarPresupuesto = () => {
 
   const { ctx, emitir } = useMaquina(getMaquina, contextoVacio, async () => {});
 
-  const { presupuesto, lineas, pedidoCreado } = ctx;
+  const { presupuesto, lineas, pedidoCreado, estado } = ctx;
 
   useEffect(() => {
     if (presupuestoId && presupuestoId !== presupuestoIdCargadoRef.current) {
       presupuestoIdCargadoRef.current = presupuestoId;
-      emitir("cargar", presupuestoId, true);
+      void emitir("cargar", presupuestoId, true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [presupuestoId]);
 
-  if (
-    ctx.estado === "INICIAL" ||
-    ctx.estado === "VACIO" ||
-    ctx.estado === "CARGANDO"
-  ) {
+  if (estado === "INICIAL" || estado === "VACIO" || estado === "CARGANDO") {
     return <div className="AprobarPresupuesto">Cargando...</div>;
   }
 
   return (
     <div className="AprobarPresupuesto">
-      <div className="DetalleAprobarPresupuesto">
+      <div className="aprobar-bloque">
         <h2>
-          Aprobar Presupuesto: {presupuesto.cliente.nombre_cliente} - {presupuesto.codigo}
+          Aprobar Presupuesto: {presupuesto.cliente.nombre_cliente} -{" "}
+          {presupuesto.codigo}
         </h2>
+        <div className="botones maestro-botones">
+          <QBoton
+            onClick={() => emitir("todas_las_lineas_aprobadas")}
+            deshabilitado={!hayPendiente(lineas)}
+          >
+            Aprobar todo
+          </QBoton>
+          <QBoton
+            onClick={() => emitir("aprobacion_solicitada")}
+            deshabilitado={
+              !puedeAprobar({ presupuesto, lineas }) || estado !== "LISTO"
+            }
+          >
+            Generar pedido
+          </QBoton>
+        </div>
+
         <Lineas
-          presupuesto={presupuesto}
+          presupuestoId={presupuesto.id}
           lineas={lineas}
-          estado={ctx.estado}
+          estado={estado}
           publicar={emitir}
         />
       </div>
 
-      <QModal
-        nombre="pedidoCreado"
-        abierto={ctx.estado === "PEDIDO_CREADO" && Boolean(pedidoCreado)}
-        titulo="Pedido generado"
-        onCerrar={() => emitir("pedido_creado_cerrado")}
-      >
-        <div className="mensaje" style={{ whiteSpace: "pre-line" }}>
-          El pedido se ha generado correctamente.
-        </div>
-        <div className="botones">
-          <QBoton
-            variante="texto"
-            onClick={() => presupuestoId && navigate(urlPresupuesto(presupuestoId))}
-          >
-            Volver al presupuesto
-          </QBoton>
-          <QBoton
-            onClick={() =>
-              pedidoCreado && navigate(urlPedido(pedidoCreado.id))
-            }
-          >
-            Ir al pedido {pedidoCreado?.codigo}
-          </QBoton>
-        </div>
-      </QModal>
+      {estado === "PEDIDO_CREADO" && pedidoCreado && (
+        <QModal
+          nombre="pedidoCreado"
+          abierto={true}
+          titulo="Pedido generado"
+          onCerrar={() => emitir("pedido_creado_cerrado")}
+        >
+          <p>
+            Pedido <strong>{pedidoCreado.codigo}</strong> generado correctamente.
+          </p>
+          <div className="botones maestro-botones">
+            <QBoton
+              variante="texto"
+              onClick={() =>
+                presupuestoId && navigate(urlPresupuesto(presupuestoId))
+              }
+            >
+              Volver al presupuesto
+            </QBoton>
+            <QBoton onClick={() => navigate(urlPedido(pedidoCreado.id))}>
+              Ir al pedido {pedidoCreado.codigo}
+            </QBoton>
+          </div>
+        </QModal>
+      )}
     </div>
   );
 };

@@ -1,3 +1,4 @@
+import { ModalTraza } from "#/comun/componentes/traza/ModalTraza.tsx";
 import { Detalle } from "@olula/componentes/detalle/Detalle.tsx";
 import { Tab, Tabs } from "@olula/componentes/detalle/tabs/Tabs.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
@@ -24,7 +25,7 @@ import {
 } from "../dominio.ts";
 import { FacturaGenerada } from "../facturar/FacturaGenerada.tsx";
 import { FacturarAlbaran } from "../facturar/FacturarAlbaran.tsx";
-import { getReportAlbaran } from "../infraestructura.ts";
+import { getReportAlbaran, getTrazaAlbaran } from "../infraestructura.ts";
 import { EstadoAlbaran } from "../vistas/EstadoAlbaran.tsx";
 import "./DetalleAlbaran.css";
 import { Lineas } from "./lineas/Lineas.tsx";
@@ -96,6 +97,10 @@ export const DetalleAlbaran = ({
     {
       texto: "Imprimir",
       onClick: imprimir,
+    },
+    {
+      texto: "Documentos relacionados",
+      onClick: () => emitir("traza_solicitada"),
     },
     {
       icono: "eliminar",
@@ -177,6 +182,14 @@ export const DetalleAlbaran = ({
 
       {estado === "FACTURA_CREADA" && facturaCreada && (
         <FacturaGenerada factura={facturaCreada} publicar={emitir} />
+      )}
+
+      {estado === "VIENDO_TRAZA" && (
+        <ModalTraza
+          id={ctx.albaran.id}
+          getTraza={getTrazaAlbaran}
+          onCerrar={() => emitir("traza_cerrada")}
+        />
       )}
     </Detalle>
   );

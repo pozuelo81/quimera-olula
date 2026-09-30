@@ -26,6 +26,7 @@ import {
   PostLinea,
   QueryNuevaLinea
 } from "./diseño.ts";
+import { getTraza } from "#/comun/componentes/traza/infraestructura.ts";
 
 const baseUrl = new ApiUrls().ALBARAN;
 
@@ -280,3 +281,5 @@ export const patchCambiarAgente: PatchCambiarAgente = async (id, cambio) => {
     }
   }, "Error al cambiar agente del albarán");
 };
+
+export const getTrazaAlbaran = (id: string): Promise<unknown> => getTraza(`${baseUrl}/${id}`);

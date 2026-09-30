@@ -3,7 +3,7 @@ import { Factura, LineaFactura } from "../diseño.ts";
 
 export type EstadoDetalleFactura =
     | 'INICIAL'
-    | 'ABIERTO'
+    | 'ABIERTO' | 'VIENDO_TRAZA'
     | 'BORRANDO'
     | 'CAMBIANDO_PROVEEDOR'
     | 'CAMBIANDO_DIVISA'

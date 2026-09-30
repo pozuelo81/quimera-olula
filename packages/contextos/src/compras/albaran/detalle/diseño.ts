@@ -4,7 +4,7 @@ import { Albaran, LineaAlbaran } from "../diseño.ts";
 
 export type EstadoDetalleAlbaran =
     | 'INICIAL'
-    | 'ABIERTO'
+    | 'ABIERTO' | 'VIENDO_TRAZA'
     | 'BORRANDO'
     | 'FACTURANDO'
     | 'FACTURA_CREADA'

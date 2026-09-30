@@ -33,17 +33,6 @@ export const cargarDatos: ProcesarAprobarPresupuesto = async (contexto, presupue
     };
 };
 
-export const seleccionarLinea: ProcesarAprobarPresupuesto = async (contexto, payload) => {
-    const lineaId = payload as string;
-    return {
-        ...contexto,
-        lineas: {
-            ...contexto.lineas,
-            idActivo: lineaId,
-        },
-    };
-};
-
 export const cambiarCantidadLinea: ProcesarAprobarPresupuesto = async (contexto, payload) => {
     const { id, cantidad } = payload as { id: string; cantidad: number };
     const lineasActualizadas = contexto.lineas.lista.map((l) => {
@@ -71,25 +60,7 @@ export const actualizarEstadoCerradoLinea: ProcesarAprobarPresupuesto = async (c
         return {
             ...l,
             cerrada,
-        };
-    });
-
-    return {
-        ...contexto,
-        lineas: {
-            ...contexto.lineas,
-            lista: lineasActualizadas,
-        },
-    };
-};
-
-export const aprobarLinea: ProcesarAprobarPresupuesto = async (contexto, payload) => {
-    const lineaId = payload as string;
-    const lineasActualizadas = contexto.lineas.lista.map((l) => {
-        if (String(l.id) !== String(lineaId)) return l;
-        return {
-            ...l,
-            a_aprobar: pendienteDeLinea(l),
+            a_aprobar: cerrada ? 0 : l.a_aprobar,
         };
     });
 
@@ -116,16 +87,6 @@ export const aprobarTodas: ProcesarAprobarPresupuesto = async (contexto) => {
         lineas: {
             ...contexto.lineas,
             lista: lineasActualizadas,
-        },
-    };
-};
-
-export const cancelarSeleccion: ProcesarAprobarPresupuesto = async (contexto) => {
-    return {
-        ...contexto,
-        lineas: {
-            ...contexto.lineas,
-            idActivo: null,
         },
     };
 };

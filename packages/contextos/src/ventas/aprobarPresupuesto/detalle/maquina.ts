@@ -2,13 +2,10 @@ import { Maquina } from "@olula/lib/diseño.js";
 import { ContextoAprobarPresupuesto, EstadoAprobarPresupuesto } from "./diseño.ts";
 import {
     actualizarEstadoCerradoLinea,
-    aprobarLinea,
     aprobarPresupuesto,
     aprobarTodas,
     cambiarCantidadLinea,
-    cancelarSeleccion,
     cargarDatos,
-    seleccionarLinea
 } from "./dominio.ts";
 
 export const getMaquina: () => Maquina<EstadoAprobarPresupuesto, ContextoAprobarPresupuesto> = () => {
@@ -22,17 +19,11 @@ export const getMaquina: () => Maquina<EstadoAprobarPresupuesto, ContextoAprobar
         CARGANDO: {},
 
         LISTO: {
-            linea_seleccionada: seleccionarLinea,
-
             cantidad_cambiada: cambiarCantidadLinea,
-
-            linea_aprobada: aprobarLinea,
 
             todas_las_lineas_aprobadas: aprobarTodas,
 
             linea_cerrada_actualizada: actualizarEstadoCerradoLinea,
-
-            seleccion_cancelada: cancelarSeleccion,
 
             aprobacion_solicitada: "CONFIRMANDO_APROBACION",
         },

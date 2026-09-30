@@ -14,12 +14,15 @@ import {
   Typography,
 } from "@quimera/comps";
 import Quimera, { getSchemas, useStateValue, useWidth, util } from "quimera";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { ModalTraza } from "@olula/ctx/comun/componentes/traza/ModalTraza.tsx";
+import { getTrazaFactura } from "@olula/ctx/ventas/factura/infraestructura.ts";
 
 function FacturaCli({ callbackChanged, idFactura, initFactura, useStyles }) {
   const [{ lineas, logic, factura, modalVistaEnviarDocumento, vistaDetalle }, dispatch] =
     useStateValue();
   const classes = useStyles();
+  const [verTraza, setVerTraza] = useState(false);
   const width = useWidth();
 
   useEffect(() => {
@@ -92,6 +95,12 @@ function FacturaCli({ callbackChanged, idFactura, initFactura, useStyles }) {
                 disabled={false}
               />
               <QBoxButton id="enviarEmail" title="Enviar por email" icon="email" />
+              <QBoxButton
+                id="verTraza"
+                title="Documentos relacionados"
+                icon="account_tree"
+                onClick={() => setVerTraza(true)}
+              />
               <Quimera.Block id="sideButtons" />
             </>
           }
@@ -181,6 +190,13 @@ function FacturaCli({ callbackChanged, idFactura, initFactura, useStyles }) {
           />
         </DialogContent>
       </Dialog>
+      {verTraza && (
+        <ModalTraza
+          id={String(factura.data.idFactura)}
+          getTraza={getTrazaFactura}
+          onCerrar={() => setVerTraza(false)}
+        />
+      )}
     </Quimera.Template>
   );
 }

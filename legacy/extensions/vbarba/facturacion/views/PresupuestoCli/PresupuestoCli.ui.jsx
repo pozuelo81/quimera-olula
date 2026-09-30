@@ -14,7 +14,9 @@ import {
   Typography,
 } from "@quimera/comps";
 import Quimera, { getSchemas, useStateValue, useWidth, util } from "quimera";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { ModalTraza } from "@olula/ctx/comun/componentes/traza/ModalTraza.tsx";
+import { getTrazaPresupuesto } from "@olula/ctx/ventas/presupuesto/infraestructura.ts";
 
 function PresupuestoCli({ callbackChanged, idPresupuesto, initPresupuesto, useStyles }) {
   const [
@@ -22,6 +24,7 @@ function PresupuestoCli({ callbackChanged, idPresupuesto, initPresupuesto, useSt
     dispatch,
   ] = useStateValue();
   const classes = useStyles();
+  const [verTraza, setVerTraza] = useState(false);
   const width = useWidth();
 
   useEffect(() => {
@@ -103,6 +106,12 @@ function PresupuestoCli({ callbackChanged, idPresupuesto, initPresupuesto, useSt
                 }
               />
               <QBoxButton id="enviarEmail" title="Enviar por email" icon="email" />
+              <QBoxButton
+                id="verTraza"
+                title="Documentos relacionados"
+                icon="account_tree"
+                onClick={() => setVerTraza(true)}
+              />
             </>
           }
         >
@@ -225,6 +234,13 @@ function PresupuestoCli({ callbackChanged, idPresupuesto, initPresupuesto, useSt
           />
         </DialogContent>
       </Dialog>
+      {verTraza && (
+        <ModalTraza
+          id={String(presupuesto.data.idPresupuesto)}
+          getTraza={getTrazaPresupuesto}
+          onCerrar={() => setVerTraza(false)}
+        />
+      )}
     </Quimera.Template>
   );
 }

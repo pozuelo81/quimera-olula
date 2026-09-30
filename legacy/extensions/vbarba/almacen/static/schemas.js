@@ -16,6 +16,7 @@ export default parent => ({
     perimetro: Field.Text("perimetro", "perimetro"),
     familia: Field.Text("codfamilia", "familia"),
     codBarras: Field.Text("codbarras", "Código de barras"),
+    codBarrasInterno: Field.Text("codbarrasinterno", "Código de barras interno"),
     tieneFoto: Field.Bool("tienefoto", "tienefoto"),
     publicadoWeb: Field.Bool("vb_publicadoweb", "Publicado Web"),
     idPlanta: Field.Int("idplanta", "Id planta"),
@@ -38,6 +39,7 @@ export default parent => ({
       id: Field.Int("id", "Id"),
       referencia: Field.Text("referencia", "Referencia"),
       descripcion: Field.Text("descripcion", "Descripción"),
+      codBarras: Field.Text("codbarras", "Código de barras"),
       codproveedor: Field.Text("codproveedor", "codproveedor").required(),
       // descuento: Field.Float("dto", "Descuento"),
       descuento: Field.Float("dto", "Descuento")

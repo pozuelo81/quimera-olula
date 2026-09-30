@@ -26,6 +26,9 @@ export const getMaquina: () => Maquina<EstadoDetallePedido, ContextoDetallePedid
         },
 
         ABIERTO: {
+
+            traza_solicitada: "VIENDO_TRAZA",
+
             pedido_id_cambiado: [cargarContexto],
 
             pedido_guardado: [refrescarPedido],
@@ -82,6 +85,11 @@ export const getMaquina: () => Maquina<EstadoDetallePedido, ContextoDetallePedid
         BORRANDO_LINEA: {
             linea_borrada: [onLineaBorrada, "ABIERTO"],
             borrado_de_linea_cancelado: "ABIERTO",
+        },
+
+        VIENDO_TRAZA: {
+
+            traza_cerrada: "ABIERTO",
         },
     };
 };

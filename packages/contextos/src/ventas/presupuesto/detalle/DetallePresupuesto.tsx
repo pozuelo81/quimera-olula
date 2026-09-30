@@ -1,3 +1,4 @@
+import { ModalTraza } from "#/comun/componentes/traza/ModalTraza.tsx";
 import { Detalle } from "@olula/componentes/detalle/Detalle.tsx";
 import { Tab, Tabs } from "@olula/componentes/detalle/tabs/Tabs.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
@@ -21,7 +22,7 @@ import { PedidoGenerado } from "../aprobar/PedidoGenerado.tsx";
 import { BorrarPresupuesto } from "../borrar/BorrarPresupuesto.tsx";
 import { Presupuesto } from "../diseño.ts";
 import { aprobado } from "../dominio.ts";
-import { getReportPresupuesto } from "../infraestructura.ts";
+import { getReportPresupuesto, getTrazaPresupuesto } from "../infraestructura.ts";
 import { EstadoPresupuesto } from "../vistas/EstadoPresupuesto.tsx";
 import { metaPresupuesto, presupuestoVacio } from "./detalle.ts";
 import "./DetallePresupuesto.css";
@@ -99,6 +100,10 @@ export const DetallePresupuesto = ({
       {
         texto: "Imprimir",
         onClick: imprimir,
+      },
+      {
+        texto: "Documentos relacionados",
+        onClick: () => emitir("traza_solicitada"),
       },
       {
         icono: "eliminar",
@@ -192,6 +197,14 @@ export const DetallePresupuesto = ({
 
       {estado === "PEDIDO_CREADO" && pedidoCreado && (
         <PedidoGenerado pedido={pedidoCreado} publicar={emitir} />
+      )}
+
+      {estado === "VIENDO_TRAZA" && (
+        <ModalTraza
+          id={ctx.presupuesto.id}
+          getTraza={getTrazaPresupuesto}
+          onCerrar={() => emitir("traza_cerrada")}
+        />
       )}
     </Detalle>
   );

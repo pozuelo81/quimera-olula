@@ -81,7 +81,7 @@ export type ContextoMaestroPresupuesto = {
 };
 
 export type EstadoPresupuesto = (
-  'INICIAL' | 'ABIERTO' | 'APROBADO'
+  'INICIAL' | 'ABIERTO' | 'VIENDO_TRAZA' | 'APROBADO'
   | 'BORRANDO_PRESUPUESTO'
   | 'APROBANDO_PRESUPUESTO' | 'PEDIDO_CREADO'
   | 'CAMBIANDO_DIVISA'

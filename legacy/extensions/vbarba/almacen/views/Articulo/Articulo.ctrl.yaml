@@ -10,7 +10,7 @@ shortcuts:
 state:
   articulosProv: []
   nuevoProveedor:
-    { id: null, codproveedor: null, descuento: 0, coste: 0, costeReal: 0, porDefecto: false }
+    { id: null, codproveedor: null, descuento: 0, coste: 0, costeReal: 0, codBarras: null, porDefecto: false }
   modalAddProveedor: false
   handleErrorProveedor: { error: false, text: "" }
 bunch:
@@ -64,7 +64,7 @@ bunch:
     - _type: set
       path: nuevoProveedor
       value:
-        const: { codproveedor: null, descuento: 0, coste: 0, costeReal: 0, porDefecto: false }
+        const: { codproveedor: null, descuento: 0, coste: 0, costeReal: 0, codBarras: null, porDefecto: false }
   onNuevoProveedorCosteChanged:
     - _type: set
       path: nuevoProveedor.coste
@@ -140,6 +140,9 @@ bunch:
         - key: costereal
           value:
             code: return state.nuevoProveedor.coste * ((100 - state.nuevoProveedor.descuento) / 100)
+        - key: codbarras
+          value:
+            statePath: nuevoProveedor.codBarras
       success: onProveedorModificado
   esCrearProveedor:
     - _type: patch
@@ -163,6 +166,9 @@ bunch:
         - key: costereal
           value:
             statePath: nuevoProveedor.costeReal
+        - key: codbarras
+          value:
+            statePath: nuevoProveedor.codBarras
         - key: pordefecto
           value:
             statePath: nuevoProveedor.porDefecto
@@ -192,7 +198,7 @@ bunch:
     - _type: set
       path: nuevoProveedor
       value:
-        code: "return { id:payload.id, codproveedor: payload.codproveedor, descuento: payload.descuento, coste: payload.coste, costeReal: payload.costeReal, porDefecto: payload.porDefecto } "
+        code: "return { id:payload.id, codproveedor: payload.codproveedor, descuento: payload.descuento, coste: payload.coste, costeReal: payload.costeReal, codBarras: payload.codBarras, porDefecto: payload.porDefecto } "
   onVerImagenClicked:
     - _type: get
       schema: articuloimages

@@ -42,6 +42,8 @@ export const getMaquina: () => Maquina<EstadoAlbaran, ContextoAlbaran> = () => {
 
         ABIERTO: {
 
+            traza_solicitada: "VIENDO_TRAZA",
+
             linea_creada: [
                 refrescarAlbaran,
                 refrescarLineas
@@ -84,6 +86,8 @@ export const getMaquina: () => Maquina<EstadoAlbaran, ContextoAlbaran> = () => {
         },
 
         FACTURADO: {
+
+            traza_solicitada: "VIENDO_TRAZA",
 
             albaran_cargado: [abiertoOFacturado],
 
@@ -167,5 +171,9 @@ export const getMaquina: () => Maquina<EstadoAlbaran, ContextoAlbaran> = () => {
             borrar_linea_cancelado: "ABIERTO",
         },
 
+        VIENDO_TRAZA: {
+
+            traza_cerrada: [abiertoOFacturado],
+        },
     }
 }

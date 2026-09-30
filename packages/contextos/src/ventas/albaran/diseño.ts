@@ -74,7 +74,7 @@ export type FacturaCreada = {
 export type PatchFacturarAlbaran = (id: string) => Promise<FacturaCreada>;
 
 export type EstadoAlbaran = (
-    'INICIAL' | 'ABIERTO' | 'FACTURADO'
+    'INICIAL' | 'ABIERTO' | 'VIENDO_TRAZA' | 'FACTURADO'
     | 'BORRANDO_ALBARAN'
     | 'FACTURANDO_ALBARAN' | 'FACTURA_CREADA'
     | 'CAMBIANDO_CLIENTE'

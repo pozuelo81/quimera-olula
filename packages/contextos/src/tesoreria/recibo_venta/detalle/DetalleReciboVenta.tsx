@@ -1,3 +1,4 @@
+import { ModalTraza } from "#/comun/componentes/traza/ModalTraza.tsx";
 import { Cliente } from "#/ventas/comun/componentes/cliente.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { Detalle } from "@olula/componentes/detalle/Detalle.tsx";
@@ -12,17 +13,18 @@ import {
   reciboDevolvible,
   reciboPagable,
 } from "../dominio.js";
+import { getTrazaReciboVenta } from "../infraestructura.ts";
+import { RecibosAgrupados } from "./agrupados/RecibosAgrupados.tsx";
+import { DeshacerAgrupacion } from "./desagrupar/DeshacerAgrupacion.tsx";
 import {
   contextoDetalleReciboVentaInicial,
   metaReciboVenta,
 } from "./detalle.js";
-import { RecibosAgrupados } from "./agrupados/RecibosAgrupados.tsx";
-import { DeshacerAgrupacion } from "./desagrupar/DeshacerAgrupacion.tsx";
-import { DevolverReciboVenta } from "./devolver/DevolverReciboVenta.tsx";
 import "./DetalleReciboVenta.css";
+import { DevolverReciboVenta } from "./devolver/DevolverReciboVenta.tsx";
 import { getMaquina } from "./maquina.js";
-import { PagosReciboVenta } from "./pagos/PagosReciboVenta.tsx";
 import { PagarReciboVenta } from "./pagar/PagarReciboVenta.tsx";
+import { PagosReciboVenta } from "./pagos/PagosReciboVenta.tsx";
 
 export const DetalleReciboVenta = ({
   id,
@@ -65,6 +67,11 @@ export const DetalleReciboVenta = ({
       deshabilitado: !reciboDesagrupable(ctx.recibo),
       advertencia: true,
     },
+    // Esta funcionalidad no existe en el ERP; posibilidad de habilitarla si se pide.
+    // {
+    //   texto: "Documentos relacionados",
+    //   onClick: () => emitir("traza_solicitada"),
+    // },
   ];
 
   return (
@@ -83,7 +90,10 @@ export const DetalleReciboVenta = ({
           <QInput label="Estado" {...uiProps("estado")} />
           <QInput label="Importe" {...uiProps("importe")} />
           <QInput label="Fecha de emisión" {...uiProps("fechaEmision")} />
-          <QInput label="Fecha de vencimiento" {...uiProps("fechaVencimiento")} />
+          <QInput
+            label="Fecha de vencimiento"
+            {...uiProps("fechaVencimiento")}
+          />
           <Cliente {...uiProps("clienteId", "nombreCliente")} deshabilitado />
           <QInput label="ID Fiscal" {...uiProps("idFiscal")} />
           <QInput label="Factura" {...uiProps("facturaId")} />
@@ -103,6 +113,14 @@ export const DetalleReciboVenta = ({
 
         {ctx.estado === "DESAGRUPANDO" && (
           <DeshacerAgrupacion recibo={ctx.recibo} publicar={emitir} />
+        )}
+
+        {ctx.estado === "VIENDO_TRAZA" && (
+          <ModalTraza
+            id={ctx.recibo.id}
+            getTraza={getTrazaReciboVenta}
+            onCerrar={() => emitir("traza_cerrada")}
+          />
         )}
       </div>
     </Detalle>

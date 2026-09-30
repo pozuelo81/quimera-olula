@@ -20,7 +20,9 @@ import {
 } from "@quimera/comps";
 import { CircularProgress } from "@quimera/thirdparty";
 import Quimera, { getSchemas, useStateValue, useWidth, util } from "quimera";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { ModalTraza } from "@olula/ctx/comun/componentes/traza/ModalTraza.tsx";
+import { getTrazaPedido } from "@olula/ctx/ventas/pedido/infraestructura.ts";
 
 function PedidoCli({ callbackChanged, idPedido, initPedido, useStyles }) {
   const [
@@ -36,6 +38,7 @@ function PedidoCli({ callbackChanged, idPedido, initPedido, useStyles }) {
     dispatch,
   ] = useStateValue();
   const classes = useStyles();
+  const [verTraza, setVerTraza] = useState(false);
   const width = useWidth();
 
   useEffect(() => {
@@ -134,6 +137,12 @@ function PedidoCli({ callbackChanged, idPedido, initPedido, useStyles }) {
               />
               <QBoxButton id="albaranar" title="Albarán parcial" icon="shop" disabled={!editable} onClick={() => (window.location.href = `/ventas/albaranar-pedido/${pedido.data.idPedido}`)} />
               <QBoxButton id="enviarEmail" title="Enviar por email" icon="email" />
+              <QBoxButton
+                id="verTraza"
+                title="Documentos relacionados"
+                icon="account_tree"
+                onClick={() => setVerTraza(true)}
+              />
             </>
           }
         >
@@ -248,6 +257,13 @@ function PedidoCli({ callbackChanged, idPedido, initPedido, useStyles }) {
           />
         </DialogContent>
       </Dialog>
+      {verTraza && (
+        <ModalTraza
+          id={String(pedido.data.idPedido)}
+          getTraza={getTrazaPedido}
+          onCerrar={() => setVerTraza(false)}
+        />
+      )}
     </Quimera.Template>
   );
 }

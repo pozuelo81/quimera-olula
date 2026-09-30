@@ -2,13 +2,16 @@ import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QModal } from "@olula/componentes/moleculas/qmodal.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
+import { FactoryCtx } from "@olula/lib/factory_ctx.tsx";
 import { useModelo } from "@olula/lib/useModelo.ts";
-import { useEffect, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router";
 import { metaAlbaranarPedido } from "../../dominio.ts";
 import { contextoVacio } from "./dominio.ts";
 import { getMaquina } from "./maquina.ts";
 import { LineasAlbaranar } from "./lineas/LineasAlbaranar.tsx";
+
+type UrlPorId = (id: string) => string;
 
 export const AlbaranarPedido = ({
     publicar = async () => {},
@@ -16,6 +19,10 @@ export const AlbaranarPedido = ({
     publicar?: EmitirEvento;
 }) => {
     const navigate = useNavigate();
+    const { app } = useContext(FactoryCtx);
+    const urlAlbaran =
+        (app.Ventas?.albaranar_url_albaran as UrlPorId | undefined) ??
+        ((id: string) => `/ventas/albaran?id=${id}`);
     const params = useParams();
     const pedidoId = params.id;
     const pedidoIdCargadoRef = useRef<string | null>(null);
@@ -78,7 +85,7 @@ export const AlbaranarPedido = ({
                             Volver a pedidos
                         </QBoton>
                         <QBoton
-                            onClick={() => navigate(`/ventas/albaran?id=${ctx.albaranCreado!.id}`)}
+                            onClick={() => navigate(urlAlbaran(ctx.albaranCreado!.id))}
                         >
                             Ir al albarán {ctx.albaranCreado.codigo}
                         </QBoton>

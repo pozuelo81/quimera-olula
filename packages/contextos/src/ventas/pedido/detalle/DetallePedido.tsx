@@ -1,3 +1,4 @@
+import { ModalTraza } from "#/comun/componentes/traza/ModalTraza.tsx";
 import { IndicadorGuardado } from "#/ventas/comun/componentes/IndicadorGuardado.tsx";
 import { CambiarAgente } from "#/ventas/comun/componentes/moleculas/CambiarAgente/CambiarAgente.tsx";
 import { CambiarDescuento } from "#/ventas/comun/componentes/moleculas/CambiarDescuento/CambiarDescuento.tsx";
@@ -18,7 +19,7 @@ import { useCallback, useContext, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
 import { BorrarPedido } from "../borrar/BorrarPedido.tsx";
 import { Pedido } from "../diseño.ts";
-import { getReportPedido } from "../infraestructura.ts";
+import { getReportPedido, getTrazaPedido } from "../infraestructura.ts";
 import { editable, metaPedido, pedidoVacio } from "./detalle.ts";
 import "./DetallePedido.css";
 import { Lineas } from "./lineas/Lineas.tsx";
@@ -106,6 +107,10 @@ export const DetallePedidoBase = ({
       onClick: imprimir,
     },
     {
+      texto: "Documentos relacionados",
+      onClick: () => emitir("traza_solicitada"),
+    },
+    {
       icono: "eliminar",
       texto: "Borrar",
       advertencia: true,
@@ -177,6 +182,14 @@ export const DetallePedidoBase = ({
 
       {estado === "BORRANDO_PEDIDO" && (
         <BorrarPedido pedido={ctx.pedido} publicar={emitir} />
+      )}
+
+      {estado === "VIENDO_TRAZA" && (
+        <ModalTraza
+          id={ctx.pedido.id}
+          getTraza={getTrazaPedido}
+          onCerrar={() => emitir("traza_cerrada")}
+        />
       )}
     </Detalle>
   );

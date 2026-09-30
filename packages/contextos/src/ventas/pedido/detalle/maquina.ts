@@ -37,6 +37,8 @@ export const getMaquina = (): Maquina<EstadoPedido, ContextoPedido> => {
 
         ABIERTO: {
 
+            traza_solicitada: "VIENDO_TRAZA",
+
             alta_linea_solicitada: "CREANDO_LINEA",
 
             baja_linea_solicitada: "BORRANDO_LINEA",
@@ -72,6 +74,8 @@ export const getMaquina = (): Maquina<EstadoPedido, ContextoPedido> => {
         },
 
         SERVIDO: {
+
+            traza_solicitada: "VIENDO_TRAZA",
 
             pedido_cargado: [abiertoOServido],
 
@@ -137,5 +141,9 @@ export const getMaquina = (): Maquina<EstadoPedido, ContextoPedido> => {
             borrar_linea_cancelado: "ABIERTO",
         },
 
+        VIENDO_TRAZA: {
+
+            traza_cerrada: [abiertoOServido],
+        },
     }
 }

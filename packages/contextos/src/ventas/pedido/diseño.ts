@@ -81,7 +81,7 @@ export type PatchCambiarDivisa = (id: string, cambio: CambioDivisa) => Promise<v
 export type PatchCambiarAgente = (id: string, cambio: CambioAgente) => Promise<void>;
 
 export type EstadoPedido = (
-    'INICIAL' | 'ABIERTO' | 'SERVIDO'
+    'INICIAL' | 'ABIERTO' | 'VIENDO_TRAZA' | 'SERVIDO'
     | 'BORRANDO_PEDIDO'
     | 'CAMBIANDO_CLIENTE'
     | 'CAMBIANDO_DESCUENTO'

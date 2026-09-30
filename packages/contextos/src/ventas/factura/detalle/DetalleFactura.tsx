@@ -1,3 +1,4 @@
+import { ModalTraza } from "#/comun/componentes/traza/ModalTraza.tsx";
 import { Detalle } from "@olula/componentes/detalle/Detalle.tsx";
 import { Tab, Tabs } from "@olula/componentes/detalle/tabs/Tabs.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
@@ -21,7 +22,7 @@ import "../../comun/estilos/campos.css";
 import "../../comun/estilos/detalle_documento.css";
 import { tituloDocumentoVenta } from "../../venta/dominio.ts";
 import { facturaVacia } from "../dominio.ts";
-import { getReportFactura } from "../infraestructura.ts";
+import { getReportFactura, getTrazaFactura } from "../infraestructura.ts";
 import "./DetalleFactura.css";
 import { editable, metaFactura } from "./diseño.ts";
 import { Lineas } from "./Lineas/Lineas.tsx";
@@ -93,6 +94,10 @@ export const DetalleFactura = ({
     {
       texto: "Imprimir",
       onClick: imprimir,
+    },
+    {
+      texto: "Documentos relacionados",
+      onClick: () => emitir("traza_solicitada"),
     },
     {
       icono: "eliminar",
@@ -174,6 +179,14 @@ export const DetalleFactura = ({
 
       {estado === "BORRANDO_FACTURA" && (
         <BorrarFactura factura={ctx.factura} publicar={emitir} />
+      )}
+
+      {estado === "VIENDO_TRAZA" && (
+        <ModalTraza
+          id={ctx.factura.id}
+          getTraza={getTrazaFactura}
+          onCerrar={() => emitir("traza_cerrada")}
+        />
       )}
     </Detalle>
   );

@@ -28,6 +28,9 @@ export const getMaquina: () => Maquina<EstadoDetalleFactura, ContextoDetalleFact
         },
 
         ABIERTO: {
+
+            traza_solicitada: "VIENDO_TRAZA",
+
             factura_id_cambiado: [cargarContexto],
 
             factura_guardada: [refrescarFactura],
@@ -93,6 +96,11 @@ export const getMaquina: () => Maquina<EstadoDetalleFactura, ContextoDetalleFact
         BORRANDO_LINEA: {
             linea_borrada: [onLineaBorrada, "ABIERTO"],
             borrado_de_linea_cancelado: "ABIERTO",
+        },
+
+        VIENDO_TRAZA: {
+
+            traza_cerrada: "ABIERTO",
         },
     };
 };

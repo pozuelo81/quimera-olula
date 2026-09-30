@@ -28,6 +28,7 @@ import {
     PostAlbaran,
     PostLineasAlbaran,
 } from "./diseño.ts";
+import { getTraza } from "#/comun/componentes/traza/infraestructura.ts";
 
 const baseUrl = new ApiUrls().ALBARAN;
 
@@ -353,3 +354,5 @@ export const borrarLineasAlbaran: BorrarLineasAlbaran = async (id, lineas) => {
         "Error al borrar las líneas del albarán"
     );
 };
+
+export const getTrazaAlbaran = (id: string): Promise<unknown> => getTraza(`${baseUrl}/${id}`);

@@ -26,6 +26,9 @@ export const getMaquina: () => Maquina<EstadoDetalleAlbaran, ContextoDetalleAlba
         },
 
         ABIERTO: {
+
+            traza_solicitada: "VIENDO_TRAZA",
+
             albaran_id_cambiado: [cargarContexto],
 
             albaran_guardado: [refrescarAlbaran],
@@ -91,6 +94,11 @@ export const getMaquina: () => Maquina<EstadoDetalleAlbaran, ContextoDetalleAlba
         BORRANDO_LINEA: {
             linea_borrada: [onLineaBorrada, "ABIERTO"],
             borrado_de_linea_cancelado: "ABIERTO",
+        },
+
+        VIENDO_TRAZA: {
+
+            traza_cerrada: "ABIERTO",
         },
     };
 };

@@ -1,9 +1,8 @@
 import { QIcono } from "@olula/componentes/index.js";
 import { ContextoError } from "@olula/lib/contexto.ts";
-import { ProcesarEvento } from "@olula/lib/useMaquina.js";
+import { EmitirEvento } from "@olula/lib/diseño.ts";
 import { useContext } from "react";
 import { LineaAprobarPresupuesto } from "../../diseño.ts";
-import { lineaCompleta } from "../../dominio.ts";
 import { patchCerrarLineaPresupuesto } from "../../infraestructura.ts";
 import "./AccionesLinea.css";
 
@@ -14,44 +13,19 @@ export const AccionesLinea = ({
 }: {
   linea: LineaAprobarPresupuesto;
   presupuestoId: string;
-  publicar: ProcesarEvento;
+  publicar: EmitirEvento;
 }) => {
   const { intentar } = useContext(ContextoError);
-
-  const aPedir = linea.a_aprobar || 0;
-  const completo = lineaCompleta(linea);
-
-  const colorAprobar = linea.cerrada
-    ? undefined
-    : completo
-      ? "var(--color-exito)"
-      : aPedir > 0
-        ? "var(--color-advertencia)"
-        : undefined;
 
   // El nombre accesible y el título visual comparten el mismo texto para que
   // el estado (no solo el color) llegue también a lectores de pantalla.
   const etiquetaCandado = linea.cerrada ? "Abrir línea" : "Cerrar línea";
 
-  const etiquetaAprobar = linea.cerrada
-    ? "Línea cerrada: no se puede aprobar"
-    : completo
-      ? "Aprobar toda la línea (queda completa)"
-      : aPedir > 0
-        ? `Aprobar toda la línea (${aPedir} unidades pendientes)`
-        : "Aprobar toda la línea";
-
-  const toggleCerrada = async (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const toggleCerrada = async () => {
     if (!linea.id) return;
     const cerrada = !linea.cerrada;
     await intentar(() => patchCerrarLineaPresupuesto(presupuestoId, linea.id, cerrada));
-    publicar("linea_cerrada_actualizada", { id: linea.id, cerrada });
-  };
-
-  const aprobar = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    publicar("linea_aprobada", linea.id);
+    await publicar("linea_cerrada_actualizada", { id: linea.id, cerrada });
   };
 
   return (
@@ -68,22 +42,6 @@ export const AccionesLinea = ({
           nombre={linea.cerrada ? "candado" : "candado_abierto"}
           tamaño="sm"
           color={linea.cerrada ? "var(--color-error)" : undefined}
-        />
-      </button>
-      <button
-        type="button"
-        className="accion-icono"
-        onClick={aprobar}
-        disabled={linea.cerrada}
-        title={etiquetaAprobar}
-        aria-label={etiquetaAprobar}
-      >
-        {/* La forma del icono (check vs. doble check) distingue el estado
-            "línea completa" sin depender solo del color para verlo. */}
-        <QIcono
-          nombre={completo ? "checkdoble" : "check"}
-          tamaño="sm"
-          color={colorAprobar}
         />
       </button>
     </div>

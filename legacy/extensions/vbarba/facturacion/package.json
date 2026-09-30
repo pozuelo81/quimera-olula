@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "@olula/ctx": "workspace:*",
     "quimera": "workspace:@quimera/core@*",
     "@quimera/comps": "workspace:*",
     "@quimera/styles": "workspace:*",
