@@ -47,8 +47,9 @@ export const descripcionEstadoExpedicion: Record<EstadoExpedicion, string> = {
 
 /**
  * Variante del plugin `estado_expedicion_factura` del servidor en la que la
- * firma (Veri*Factu) es la que cierra la factura. Las otras son "basico" e
- * "inactivo"; "activo" no existe.
+ * firma (Veri*Factu) es la que cierra la factura. Las otras son "basico",
+ * "inactivo" y "emision" (firma con la factura emitida protegida: como en
+ * "basico", solo se edita el borrador); "activo" no existe.
  */
 export const VARIANTE_EXPEDICION_CON_FIRMA = "firma";
 
