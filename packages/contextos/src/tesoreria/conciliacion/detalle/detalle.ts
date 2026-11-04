@@ -1,17 +1,24 @@
 import { ProcesarContexto } from "@olula/lib/diseño.ts";
 import { ejecutarListaProcesos, MetaModelo } from "@olula/lib/dominio.ts";
-import { CandidatoConciliacion, Conciliacion, MovimientoBancario, RemesaCandidata } from "../diseño.js";
 import {
+    CandidatoConciliacion, CandidatoListaConciliacion, Conciliacion, MovimientoBancario, PartidaHuerfana,
+    RemesaCandidata,
+} from "../diseño.js";
+import {
+    admiteSeleccion,
     conciliacionDesdeCandidato,
     conciliacionDesdeRemesa,
     conRemesas,
+    itemsDesdeSeleccion,
     movimientoBancarioVacio,
+    seleccionCuadra,
 } from "../dominio.js";
 import {
     getCandidatosConciliacion,
     getConciliacionAplicadaMovimientoBancario,
     getConciliacionesMovimientoBancario,
     getMovimientoBancario,
+    getPartidasHuerfanas,
     getRemesasConciliacion,
     patchConciliarMovimientoBancario,
     patchDesconciliarMovimientoBancario,
@@ -60,7 +67,9 @@ export const contextoDetalleConciliacionInicial: ContextoDetalleConciliacion = {
     candidatos: [],
     candidatosTexto: "",
     remesas: [],
+    partidas: [],
     conciliacionSeleccionada: null,
+    seleccion: [],
     remesaSeleccionada: null,
 };
 
@@ -72,6 +81,12 @@ const requiereCandidatos = (movimiento: MovimientoBancario): boolean =>
 const cargarRemesas = async (movimiento: MovimientoBancario): Promise<RemesaCandidata[]> =>
     requiereCandidatos(movimiento) && conRemesas(movimiento)
         ? await getRemesasConciliacion(movimiento.id)
+        : [];
+
+/** Partidas contables de la subcuenta bancaria que el movimiento podría vincular. */
+const cargarPartidas = async (movimiento: MovimientoBancario): Promise<PartidaHuerfana[]> =>
+    requiereCandidatos(movimiento) && movimiento.cuentaConexionId
+        ? await getPartidasHuerfanas(movimiento.cuentaConexionId)
         : [];
 
 const cargarConciliaciones = async (movimiento: MovimientoBancario): Promise<Conciliacion[]> =>
@@ -127,12 +142,47 @@ export const seleccionarRemesa: ProcesarDetalle = async (contexto, payload) => (
     remesaSeleccionada: payload as RemesaCandidata,
 });
 
+/** Reúne un candidato con los demás seleccionados para conciliarlos juntos. */
+export const añadirCandidato: ProcesarDetalle = async (contexto, payload) => {
+    const candidato = payload as CandidatoListaConciliacion;
+    const yaEsta = contexto.seleccion.some((c) => c.id === candidato.id);
+    return yaEsta || !admiteSeleccion(candidato, contexto.movimiento)
+        ? contexto
+        : { ...contexto, seleccion: [...contexto.seleccion, candidato] };
+};
+
+/** `payload`: id del candidato que vuelve a la lista. */
+export const quitarCandidato: ProcesarDetalle = async (contexto, payload) => ({
+    ...contexto,
+    seleccion: contexto.seleccion.filter((c) => c.id !== payload),
+});
+
+export const vaciarSeleccion: ProcesarDetalle = async (contexto) => ({ ...contexto, seleccion: [] });
+
+/**
+ * Los candidatos seleccionados, si suman el movimiento, pasan a confirmarse en el modal
+ * como una conciliación de varios ítems; si no, se sigue en ABIERTO.
+ */
+export const seleccionarCandidatosReunidos: ProcesarDetalle = async (contexto) =>
+    seleccionCuadra(contexto.movimiento, contexto.seleccion)
+        ? {
+            ...contexto,
+            estado: 'CONCILIANDO',
+            conciliacionSeleccionada: {
+                conciliacionId: null,
+                items: itemsDesdeSeleccion(contexto.seleccion),
+                probabilidad: null,
+                justificacion: null,
+            },
+        }
+        : contexto;
+
 /** Asiento a mano: la subcuenta de contrapartida se pide en el modal. */
 export const seleccionarAsiento: ProcesarDetalle = async (contexto) => ({
     ...contexto,
     conciliacionSeleccionada: {
         conciliacionId: null,
-        items: [{ tipo: "asiento_manual" as const, params: {}, recibo: null, cuota: null, remesa: null, asientoId: null }],
+        items: [{ tipo: "asiento_manual" as const, params: {}, recibo: null, cuota: null, remesa: null, asientoId: null, asiento: null }],
         probabilidad: null,
         justificacion: null,
     },
@@ -150,7 +200,9 @@ export const cargarMovimiento: (_: string) => ProcesarDetalle =
                 candidatos: [],
                 candidatosTexto: "",
                 remesas: await cargarRemesas(movimiento),
+                partidas: await cargarPartidas(movimiento),
                 conciliacionSeleccionada: null,
+                seleccion: [],
                 remesaSeleccionada: null,
             }),
             cargarCandidatos,
@@ -172,7 +224,9 @@ export const cargarContexto: ProcesarDetalle = async (contexto, payload) => {
         candidatos: [],
         candidatosTexto: "",
         remesas: [],
+        partidas: [],
         conciliacionSeleccionada: null,
+        seleccion: [],
         remesaSeleccionada: null,
     };
 };
@@ -191,10 +245,11 @@ export const refrescarMovimiento: ProcesarDetalle = async (contexto) => {
     const conciliaciones = await cargarConciliaciones(movimiento);
     const conciliacionAplicada = await cargarConciliacionAplicada(movimiento);
     const remesas = await cargarRemesas(movimiento);
+    const partidas = await cargarPartidas(movimiento);
     return [
         {
-            ...contexto, estado: 'ABIERTO', movimiento, conciliaciones, conciliacionAplicada, candidatos, remesas,
-            conciliacionSeleccionada: null, remesaSeleccionada: null,
+            ...contexto, estado: 'ABIERTO', movimiento, conciliaciones, conciliacionAplicada, candidatos, remesas, partidas,
+            conciliacionSeleccionada: null, seleccion: [], remesaSeleccionada: null,
         },
         [["movimiento_cambiado", movimiento]],
     ];
@@ -253,14 +308,14 @@ export const onReactivado: ProcesarDetalle = async (contexto) => {
 
 /**
  * Vincula un asiento contable preexistente al movimiento (tipo `asiento_vinculado`).
- * No requiere modal: el usuario ya eligió el asiento en el tab Partidas.
+ * No requiere modal: el usuario ya eligió la partida en la lista de candidatos.
  * `payload` es el `idasiento` (number) del asiento a vincular.
  */
 export const onVincularAsiento: ProcesarDetalle = async (contexto, payload) => {
     const { idasiento, importe } = payload as { idasiento: number; importe: number };
     await patchConciliarMovimientoBancario(
         contexto.movimiento.id,
-        { items: [{ tipo: "asiento_vinculado" as const, params: { idasiento, importe }, recibo: null, cuota: null, remesa: null, asientoId: null }] }
+        { items: [{ tipo: "asiento_vinculado" as const, params: { idasiento, importe }, recibo: null, cuota: null, remesa: null, asientoId: null, asiento: null }] }
     );
     return refrescarMovimiento(contexto);
 };
@@ -290,7 +345,9 @@ export const onDesconciliado: ProcesarDetalle = async (contexto) => {
             candidatos: [],
             candidatosTexto: "",
             remesas: [],
+            partidas: [],
             conciliacionSeleccionada: null,
+            seleccion: [],
             remesaSeleccionada: null,
         },
         [["movimiento_borrado", contexto.movimiento.id]],

@@ -72,12 +72,12 @@ export const ConciliarRemesaMovimientoBancario = ({
 
                 {remesa.tipoConciliacion === "cobro_parcial_remesa" && remesa.reciboIdsPropuestos.length === 0 && (
                     <QAviso variante="advertencia">
-                        Ninguna combinación sencilla de recibos cuadra con el importe: elígelos a mano.
+                        No se ha encontrado ninguna combinación de recibos que cuadre con el importe: elígelos a mano.
                     </QAviso>
                 )}
                 {remesa.propuestaAmbigua && (
                     <QAviso variante="advertencia">
-                        Hay otras combinaciones de recibos por el mismo importe: comprueba que la propuesta es la buena.
+                        Puede haber otras combinaciones de recibos por el mismo importe: comprueba que la propuesta es la buena.
                     </QAviso>
                 )}
 

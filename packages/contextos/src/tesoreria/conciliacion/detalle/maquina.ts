@@ -1,6 +1,7 @@
 import { Maquina } from "@olula/lib/diseño.ts";
 import { publicar } from "@olula/lib/dominio.ts";
 import {
+    añadirCandidato,
     cargarCandidatos,
     cargarContexto,
     onConciliado,
@@ -9,10 +10,13 @@ import {
     onIgnorado,
     onReactivado,
     onVincularAsiento,
+    quitarCandidato,
     seleccionarAsiento,
     seleccionarCandidato,
+    seleccionarCandidatosReunidos,
     seleccionarConciliacion,
     seleccionarRemesa,
+    vaciarSeleccion,
 } from "./detalle.js";
 import { ContextoDetalleConciliacion, EstadoDetalleConciliacion } from "./diseño.js";
 
@@ -41,6 +45,12 @@ export const getMaquina: () => Maquina<EstadoDetalleConciliacion, ContextoDetall
             remesa_solicitada: [seleccionarRemesa, "CONCILIANDO_REMESA"],
             // Vincular un asiento preexistente: sin modal, directo.
             asiento_vinculado_confirmado: [onVincularAsiento],
+            // Varios candidatos que se concilian juntos si suman el movimiento.
+            candidato_añadido: [añadirCandidato],
+            candidato_quitado: [quitarCandidato],
+            seleccion_vaciada: [vaciarSeleccion],
+            // seleccionarCandidatosReunidos pasa a CONCILIANDO solo si la selección cuadra.
+            seleccion_solicitada: [seleccionarCandidatosReunidos],
             ignorar_solicitado: "IGNORANDO",
             desconciliar_solicitado: "DESCONCILIANDO",
             reactivar_solicitado: "REACTIVANDO",

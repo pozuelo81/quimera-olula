@@ -19,7 +19,7 @@ const remesa = (cambios: Partial<RemesaPago> = {}): RemesaPago => ({
 describe("remesa de pago", () => {
 
     test("sin pagos se puede pagar; con uno, solo deshacerlo", () => {
-        expect(remesaPagoPagable(remesa())).toBe(true);
+        expect(remesaPagoPagable(remesa(), () => false)).toBe(true);
         expect(remesaPagoConPago(remesa())).toBe(false);
 
         const pagada = remesa({ estado: "Pagada", pagos: [{ id: "1", fecha: new Date() }] });
@@ -27,8 +27,17 @@ describe("remesa de pago", () => {
         expect(remesaPagoConPago(pagada)).toBe(true);
     });
 
+    test("con pago directo una remesa de recibos no se paga; una de nóminas, sí", () => {
+        const directo = () => true;
+        const diferido = () => false;
+
+        expect(remesaPagoPagable(remesa({ tipo: "Recibos" }), directo)).toBe(false);
+        expect(remesaPagoPagable(remesa({ tipo: "Nóminas" }), directo)).toBe(true);
+        expect(remesaPagoPagable(remesa({ tipo: "Recibos" }), diferido)).toBe(true);
+    });
+
     test("una remesa sin id no se paga", () => {
-        expect(remesaPagoPagable(remesa({ id: "" }))).toBe(false);
+        expect(remesaPagoPagable(remesa({ id: "" }), () => false)).toBe(false);
     });
 
     test("distingue las remesas de nóminas", () => {

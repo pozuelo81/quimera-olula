@@ -114,6 +114,19 @@
         grid-column: span 6;
     }
 
+    /* Asiento vinculado — Fila única: Número (3) + Fecha (4) + Importe (5) = 12 */
+    quimera-input[nombre="av-numero"] {
+        grid-column: span 3;
+    }
+
+    quimera-input[nombre="av-fecha"] {
+        grid-column: span 4;
+    }
+
+    quimera-input[nombre="av-importe"] {
+        grid-column: span 5;
+    }
+
     /* Fila: Origen (3) + Conciliado por (4) + Conciliado el (5) = 12 */
     quimera-input[nombre="origenConciliacion"] {
         grid-column: span 3;

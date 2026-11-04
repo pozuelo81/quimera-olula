@@ -24,9 +24,15 @@ const lineaItem = (item: ItemConciliacion, movimiento: MovimientoBancario): stri
     }
     if (item.remesa) {
         const recibos = reciboIdsConciliacionRemesa(item);
+        // En una conciliación de varios ítems la remesa cubre su `importe`, no todo el movimiento.
+        const importe = item.params.importe !== undefined ? Number(item.params.importe) : Math.abs(movimiento.importe);
         return `${etiquetaTipoConciliacion(item.tipo)}: remesa ${item.remesa.id} · cargo ${formatearFechaDate(item.remesa.fechaCargo)} · `
             + (recibos ? `${recibos.length} de ${item.remesa.numRecibos} recibos` : "todos los recibos pendientes")
-            + ` · ${formatearMoneda(Math.abs(movimiento.importe), divisa)}`;
+            + ` · ${formatearMoneda(importe, divisa)}`;
+    }
+    if (item.asiento) {
+        const asiento = item.asiento;
+        return `${etiquetaTipoConciliacion(item.tipo)}: asiento ${asiento.numero ?? `#${asiento.id}`} · ${formatearFechaDate(asiento.fecha)} · ${formatearMoneda(asiento.importe, divisa)}`;
     }
     if (item.cuota) {
         const cuota = item.cuota;
@@ -56,7 +62,10 @@ export const ConciliarMovimientoBancario = ({
 
     const divisa = movimiento.divisa ?? "EUR";
     const item0 = conciliacion.items[0];
-    const titulo = item0 ? etiquetaTipoConciliacion(item0.tipo) : "Conciliación";
+    const varios = conciliacion.items.length > 1;
+    const titulo = varios
+        ? `Conciliar con ${conciliacion.items.length} candidatos`
+        : item0 ? etiquetaTipoConciliacion(item0.tipo) : "Conciliación";
 
     const lineasItems = conciliacion.items.map((item) => lineaItem(item, movimiento));
     const mensaje = [
@@ -65,7 +74,9 @@ export const ConciliarMovimientoBancario = ({
         ...lineasItems,
         conciliacion.justificacion ? `Motivo: ${conciliacion.justificacion}` : "",
         "",
-        item0?.cuota
+        varios
+            ? "Los recibos y remesas quedarán pagados con la fecha del movimiento y las partidas, vinculadas; el movimiento quedará conciliado con todos."
+            : item0?.cuota
             ? "Se generará el asiento de la cuota: el capital contra la deuda y los intereses contra el gasto, y el banco por el total."
             : item0?.remesa
             ? "Los recibos de la remesa quedarán pagados con la fecha del movimiento; la remesa solo pasa a pagada cuando lo están todos."

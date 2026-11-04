@@ -1,4 +1,7 @@
-import { CandidatoConciliacion, Conciliacion, ItemConciliacion, MovimientoBancario, RemesaCandidata } from "../diseño.js";
+import {
+    CandidatoConciliacion, CandidatoListaConciliacion, Conciliacion, ItemConciliacion, MovimientoBancario,
+    PartidaHuerfana, RemesaCandidata,
+} from "../diseño.js";
 
 /**
  * CONCILIANDO / CONCILIANDO_REMESA / DESCONCILIANDO / IGNORANDO / REACTIVANDO: modales de
@@ -38,7 +41,14 @@ export type ContextoDetalleConciliacion = {
     candidatosTexto: string;
     /** Remesas de cobro que puede pagar el movimiento; solo si es un ingreso no resuelto. */
     remesas: RemesaCandidata[];
+    /** Partidas contables de la cuenta sin movimiento bancario; solo si el movimiento no está resuelto. */
+    partidas: PartidaHuerfana[];
     conciliacionSeleccionada: ConciliacionSeleccionada | null;
+    /**
+     * Candidatos reunidos para conciliarlos juntos. Guarda los candidatos completos, no sus
+     * ids, para conservarlos al buscar otro texto (la búsqueda recarga los recibos).
+     */
+    seleccion: CandidatoListaConciliacion[];
     /** Remesa elegida, pendiente de que el usuario confirme sus recibos en el modal. */
     remesaSeleccionada: RemesaCandidata | null;
 };

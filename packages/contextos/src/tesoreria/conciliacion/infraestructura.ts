@@ -6,6 +6,7 @@ import {
     Conciliacion,
     CuadreBancario,
     CuadreCuenta,
+    EncajeCandidato,
     EstadoMovimientoBancario,
     GetCandidatosConciliacion,
     GetConciliacionesMovimientoBancario,
@@ -65,6 +66,7 @@ export interface MovimientoBancarioApi {
 export interface CandidatoConciliacionApi {
     tipo_recibo: TipoReciboMovimiento;
     tipo_conciliacion: TipoConciliacion;
+    encaje: EncajeCandidato;
     recibo_id: string;
     codigo: string;
     factura_codigo: string | null;
@@ -111,6 +113,7 @@ interface ItemConciliacionApi {
     cuota?: CuotaConciliacionApi | null;
     remesa?: RemesaConciliacionApi | null;
     asiento_id?: number | null;
+    asiento?: { id: number; numero: string | null; fecha: string; importe: number; concepto?: string | null } | null;
 }
 
 export interface RemesaCandidataApi {
@@ -217,6 +220,7 @@ export const candidatoConciliacionDesdeApi = (api: CandidatoConciliacionApi): Ca
     id: `${api.tipo_recibo}_${api.recibo_id}`,
     tipoRecibo: api.tipo_recibo,
     tipoConciliacion: api.tipo_conciliacion,
+    encaje: api.encaje,
     reciboId: api.recibo_id,
     codigo: api.codigo,
     facturaCodigo: api.factura_codigo,
@@ -282,6 +286,15 @@ const itemConciliacionDesdeApi = (api: ItemConciliacionApi): ItemConciliacion =>
         }
         : null,
     asientoId: api.asiento_id ? String(api.asiento_id) : null,
+    asiento: api.asiento
+        ? {
+            id: String(api.asiento.id),
+            numero: api.asiento.numero,
+            fecha: new Date(Date.parse(api.asiento.fecha)),
+            importe: api.asiento.importe,
+            concepto: api.asiento.concepto ?? null,
+        }
+        : null,
 });
 
 export const conciliacionDesdeApi = (api: ConciliacionApi): Conciliacion => ({
@@ -330,24 +343,25 @@ export const getMovimientosBancarios: GetMovimientosBancarios = async (criteria)
 };
 
 /**
- * Lanza `/transactions/sync` para todas las conexiones activas. Sin cuerpo;
- * puede tardar varios segundos. Devuelve un resumen aunque alguna conexión
+ * Lanza `/transactions/sync` para las conexiones de la cuenta bancaria (con sus otras
+ * cuentas, porque el cursor es de la conexión) y concilia automáticamente los movimientos
+ * de esa cuenta. Puede tardar varios segundos. Devuelve un resumen aunque alguna conexión
  * individual haya fallado (ver `errores`).
  */
-export const postSincronizarMovimientoBancario: PostSincronizarMovimientoBancario = async () => {
-    const respuesta = await RestAPI.query<undefined, ResumenSincronizacionMovimientoBancarioApi>(
+export const postSincronizarMovimientoBancario: PostSincronizarMovimientoBancario = async (cuentaBancoId) => {
+    const respuesta = await RestAPI.query<{ cuenta_banco_id: string }, ResumenSincronizacionMovimientoBancarioApi>(
         `${baseUrl}/sincronizar`,
-        undefined,
+        { cuenta_banco_id: cuentaBancoId },
         "Error al sincronizar los movimientos bancarios"
     );
     return resumenSincronizacionDesdeApi(respuesta);
 };
 
-/** Aplica las reglas automáticas a todos los movimientos conciliables (lo mismo que al sincronizar). */
-export const postConciliarAutomaticamente: PostConciliarAutomaticamente = async () => {
-    const api = await RestAPI.query<undefined, ResumenConciliacionAutomaticaApi>(
+/** Aplica las reglas automáticas a los movimientos conciliables de la cuenta bancaria (lo mismo que al sincronizar). */
+export const postConciliarAutomaticamente: PostConciliarAutomaticamente = async (cuentaBancoId) => {
+    const api = await RestAPI.query<{ cuenta_banco_id: string }, ResumenConciliacionAutomaticaApi>(
         `${baseUrl}/conciliar_automaticamente`,
-        undefined,
+        { cuenta_banco_id: cuentaBancoId },
         "Error al conciliar automáticamente los movimientos bancarios"
     );
     return {
@@ -441,6 +455,7 @@ export const patchReactivarMovimientoBancario: PatchReactivarMovimientoBancario 
 };
 
 interface CuadreCuentaApi {
+    cuenta_id: string;
     cuenta_banco_id: string;
     nombre_cuenta: string;
     institucion: string | null;
@@ -464,6 +479,7 @@ interface CuadreBancarioApi {
 }
 
 const cuadreCuentaDesdeApi = (api: CuadreCuentaApi): CuadreCuenta => ({
+    cuentaId: api.cuenta_id,
     cuentaBancoId: api.cuenta_banco_id,
     nombreCuenta: api.nombre_cuenta,
     institucion: api.institucion,

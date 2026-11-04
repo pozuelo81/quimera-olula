@@ -2,7 +2,9 @@ import { formatearFechaHora, formatearMoneda } from "@olula/lib/dominio.js";
 import { ReactNode, useEffect, useState } from "react";
 import { Link } from "react-router";
 import { CuadreBancario, CuadreCuenta } from "../diseño.js";
+import { urlConciliacionCuentaBancaria } from "../dominio.js";
 import { getCuadreBancario } from "../infraestructura.js";
+import { PartidasSinConciliar } from "./PartidasSinConciliar.js";
 
 /**
  * Panel de cuadre bancario-contable: muestra el saldo banco vs. saldo contable
@@ -51,22 +53,28 @@ export const PanelCuadreBancario = ({
  */
 const urlMovimientosCuenta = (cuentaBancoId: string, filtros: Record<string, string>, label: string): string => {
     const params = new URLSearchParams({ ...filtros, _label: label });
-    return `/tesoreria/cuentas/${cuentaBancoId}/movimientos?${params}`;
+    return `${urlConciliacionCuentaBancaria(cuentaBancoId)}?${params}`;
 };
 
-/** Badge de alerta: enlace si hay cuenta bancaria enlazada, span estático si no. */
+/** Badge de alerta: enlace si hay cuenta bancaria enlazada, botón si abre algo
+ * en la propia pantalla y span estático si no. */
 const Alerta = ({
     variante,
     children,
     href,
+    onClick,
 }: {
     variante: string;
     children: ReactNode;
     href?: string;
+    onClick?: () => void;
 }) => {
     const className = `alerta alerta--${variante}`;
     if (href) {
         return <Link className={className} to={href}>{children}</Link>;
+    }
+    if (onClick) {
+        return <button type="button" className={className} onClick={onClick}>{children}</button>;
     }
     return <span className={className}>{children}</span>;
 };
@@ -75,6 +83,7 @@ const FilaCuadreCuenta = ({ cuenta }: { cuenta: CuadreCuenta }) => {
     const { diferencia, cuentaBancoId } = cuenta;
     const hayAlertas = cuenta.totalAlertas > 0;
     const hayDiferencia = diferencia !== null && diferencia !== 0;
+    const [verPartidas, setVerPartidas] = useState(false);
 
     // Construye la URL al maestro con filtros; null si la cuenta no tiene codcuenta ERP.
     const url = cuentaBancoId
@@ -159,11 +168,15 @@ const FilaCuadreCuenta = ({ cuenta }: { cuenta: CuadreCuenta }) => {
                         </Alerta>
                     )}
                     {cuenta.partidaHuerfana > 0 && (
-                        <Alerta variante="error">
-                            {cuenta.partidaHuerfana} partida{cuenta.partidaHuerfana > 1 ? "s" : ""} contable{cuenta.partidaHuerfana > 1 ? "s" : ""} sin movimiento
+                        <Alerta variante="error" onClick={() => setVerPartidas(true)}>
+                            {cuenta.partidaHuerfana} partida{cuenta.partidaHuerfana > 1 ? "s" : ""} contable{cuenta.partidaHuerfana > 1 ? "s" : ""} sin conciliar
                         </Alerta>
                     )}
                 </div>
+            )}
+
+            {verPartidas && (
+                <PartidasSinConciliar cuentaId={cuenta.cuentaId} onCerrar={() => setVerPartidas(false)} />
             )}
         </div>
     );

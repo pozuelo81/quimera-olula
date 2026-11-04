@@ -48,6 +48,16 @@ export interface CuotaConciliacion {
     total: number;
 }
 
+/** Asiento ya contabilizado al que se vincularía una casación `asiento_vinculado`. */
+export interface AsientoConciliacion {
+    id: string;
+    numero: string | null;
+    fecha: Date;
+    /** Lo que el asiento mueve en la subcuenta del banco. */
+    importe: number;
+    concepto: string | null;
+}
+
 /** Remesa de cobro o de pago que pagaría una casación de remesa. */
 export interface RemesaConciliacion {
     id: string;
@@ -76,6 +86,8 @@ export interface ItemConciliacion {
     remesa: RemesaConciliacion | null;
     /** Asiento vinculado o, en la conciliación aplicada, el generado al conciliar. */
     asientoId: string | null;
+    /** Datos del asiento al que se vincularía (solo en `asiento_vinculado`). */
+    asiento: AsientoConciliacion | null;
 }
 
 /** Conciliación candidata de un movimiento, propuesta por las reglas o la IA. */
@@ -170,7 +182,7 @@ export type ResumenSincronizacionMovimientoBancario = {
     erroresConciliacion: string[];
 };
 
-export type PostSincronizarMovimientoBancario = () => Promise<ResumenSincronizacionMovimientoBancario>;
+export type PostSincronizarMovimientoBancario = (cuentaBancoId: string) => Promise<ResumenSincronizacionMovimientoBancario>;
 
 export type ResumenConciliacionAutomatica = {
     analizados: number;
@@ -182,7 +194,7 @@ export type ResumenConciliacionAutomatica = {
     errores: string[];
 };
 
-export type PostConciliarAutomaticamente = () => Promise<ResumenConciliacionAutomatica>;
+export type PostConciliarAutomaticamente = (cuentaBancoId: string) => Promise<ResumenConciliacionAutomatica>;
 
 /**
  * Recibo que el usuario puede elegir a mano para liquidar el movimiento: por
@@ -190,10 +202,18 @@ export type PostConciliarAutomaticamente = () => Promise<ResumenConciliacionAuto
  * viene de la API): `${tipoRecibo}_${reciboId}`, necesario porque
  * `Listado`/`ListadoSemiControlado` requieren `Entidad`.
  */
+/**
+ * Cómo encaja un recibo candidato con el movimiento: por su importe (`completo`), por más
+ * (`parcial`, se divide) o por menos (`menor`: solo sirve sumado a otros en una conciliación
+ * de varios candidatos).
+ */
+export type EncajeCandidato = "completo" | "parcial" | "menor";
+
 export interface CandidatoConciliacion extends Entidad {
     id: string;
     tipoRecibo: TipoReciboMovimiento;
     tipoConciliacion: TipoConciliacion;
+    encaje: EncajeCandidato;
     reciboId: string;
     codigo: string;
     facturaCodigo: string | null;
@@ -237,7 +257,8 @@ export interface RemesaCandidata extends Entidad {
     recibos: ReciboRemesaCandidata[];
     /** Recibos que suman el importe del movimiento: todos si cuadra entera; vacío si no hay combinación. */
     reciboIdsPropuestos: string[];
-    /** Hay otras combinaciones de recibos por el mismo importe. */
+    /** Puede haber otras combinaciones de recibos por el mismo importe: las hay, o la propuesta
+     * salió de la búsqueda completa del servidor, que no lo comprueba. */
     propuestaAmbigua: boolean;
 }
 
@@ -251,6 +272,8 @@ export type PatchReactivarMovimientoBancario = (id: string) => Promise<void>;
 
 /** Resumen de cuadre bancario-contable de una cuenta bancaria conectada. */
 export interface CuadreCuenta {
+    /** Cuenta de la conexión bancaria. */
+    cuentaId: string;
     cuentaBancoId: string;
     nombreCuenta: string;
     institucion: string | null;
@@ -291,3 +314,16 @@ export interface PartidaHuerfana {
 }
 
 export type GetPartidasHuerfanas = (cuentaConexionId: string) => Promise<PartidaHuerfana[]>;
+
+/**
+ * Elemento de la lista única de candidatos del detalle: un recibo, una remesa o
+ * una partida contable huérfana. `fecha` es la que ordena la lista (vencimiento,
+ * cargo o fecha del asiento) y `tipo`, la conciliación que generaría.
+ */
+/** Tipos por los que se filtra la lista de candidatos. */
+export type TipoFiltroCandidato = "cobro" | "pago" | "remesa_cobro" | "remesa_pago" | "asiento";
+
+export type CandidatoListaConciliacion =
+    | { clase: "recibo"; id: string; fecha: Date; tipo: TipoConciliacion; recibo: CandidatoConciliacion }
+    | { clase: "remesa"; id: string; fecha: Date; tipo: TipoConciliacion; remesa: RemesaCandidata }
+    | { clase: "partida"; id: string; fecha: Date; tipo: TipoConciliacion; partida: PartidaHuerfana };

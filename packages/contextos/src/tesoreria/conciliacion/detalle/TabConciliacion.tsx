@@ -1,5 +1,8 @@
 import { EmitirEvento } from "@olula/lib/diseño.ts";
-import { CandidatoConciliacion, Conciliacion, MovimientoBancario } from "../diseño.js";
+import {
+    CandidatoConciliacion, CandidatoListaConciliacion, Conciliacion, MovimientoBancario, PartidaHuerfana,
+    RemesaCandidata,
+} from "../diseño.js";
 import { bloqueoConciliarMovimientoBancario } from "../dominio.js";
 import { CandidatosConciliacion } from "./candidatos/CandidatosConciliacion.js";
 import { ConciliacionesMovimiento } from "./conciliaciones/ConciliacionesMovimiento.js";
@@ -10,17 +13,20 @@ interface TabConciliacionProps {
     conciliaciones: Conciliacion[];
     candidatos: CandidatoConciliacion[];
     candidatosTexto: string;
+    remesas: RemesaCandidata[];
+    partidas: PartidaHuerfana[];
+    seleccion: CandidatoListaConciliacion[];
     publicar: EmitirEvento;
 }
 
 /**
- * Pestaña de búsqueda de candidatos para conciliar un movimiento pendiente
- * o con candidatos. Muestra las conciliaciones propuestas y el buscador de
- * recibos. Solo se monta cuando el movimiento puede conciliarse (estado
+ * Búsqueda de candidatos para conciliar un movimiento pendiente o con
+ * candidatos. Muestra las conciliaciones propuestas y la lista única de
+ * recibos, remesas y partidas contables con su buscador. Solo se monta cuando el movimiento puede conciliarse (estado
  * pendiente o candidatos).
  */
 export const TabConciliacion = ({
-    movimiento, conciliaciones, candidatos, candidatosTexto, publicar,
+    movimiento, conciliaciones, candidatos, candidatosTexto, remesas, partidas, seleccion, publicar,
 }: TabConciliacionProps) => {
 
     const bloqueo = bloqueoConciliarMovimientoBancario(movimiento);
@@ -39,7 +45,10 @@ export const TabConciliacion = ({
             <CandidatosConciliacion
                 movimiento={movimiento}
                 candidatos={candidatos}
+                remesas={remesas}
+                partidas={partidas}
                 texto={candidatosTexto}
+                seleccion={seleccion}
                 bloqueo={bloqueo}
                 publicar={publicar}
             />

@@ -1,4 +1,6 @@
-import { MaestroConDetalleConciliacion } from "./conciliacion/maestro/MaestroConDetalleConciliacion.tsx";
+import { ConfigTesoreria } from "./config/vistas/ConfigTesoreria.tsx";
+import { ConciliacionCuentaBancaria } from "./conciliacion/maestro/MaestroConDetalleConciliacion.tsx";
+import { MaestroConDetalleCuentaBancaria } from "./cuentas_bancarias/maestro/MaestroConDetalleCuentaBancaria.tsx";
 import { MaestroConDetalleConexionBancaria } from "./conexion_bancaria/maestro/MaestroConDetalleConexionBancaria.tsx";
 import { MaestroConDetalleMandato } from "./mandato/maestro/MaestroConDetalleMandato.tsx";
 import { MaestroConDetalleReciboCompra } from "./recibo_compra/maestro/MaestroConDetalleReciboCompra.tsx";
@@ -14,7 +16,8 @@ export class RouterFactoryTesoreriaOlula {
         "tesoreria/recibo_venta": MaestroConDetalleReciboVenta,
         "tesoreria/recibo_compra": MaestroConDetalleReciboCompra,
         "tesoreria/conexion_bancaria": MaestroConDetalleConexionBancaria,
-        "tesoreria/conciliacion": MaestroConDetalleConciliacion,
-        "tesoreria/cuentas/:cuenta_id/movimientos": MaestroConDetalleConciliacion,
+        "tesoreria/config": ConfigTesoreria,
+        "tesoreria/cuentas_bancarias": MaestroConDetalleCuentaBancaria,
+        "tesoreria/cuentas_bancarias/:cuenta_id/conciliacion": ConciliacionCuentaBancaria,
     };
 }
