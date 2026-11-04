@@ -1,3 +1,4 @@
+import { configuracion } from "@olula/lib/dominio.ts";
 import { RemesaPago } from "./diseño.ts";
 
 export const esRemesaDeNominas = (remesa: RemesaPago): boolean =>
@@ -6,9 +7,23 @@ export const esRemesaDeNominas = (remesa: RemesaPago): boolean =>
 export const remesaPagoConPago = (remesa: RemesaPago): boolean =>
     remesa.pagos.length > 0;
 
+/** Con pago directo de remesas de pago (Tesorería / Configuración) los recibos
+ * se pagan y contabilizan al remesarlos: la remesa de recibos no tiene pagos. */
+export const pagoDirectoRemesasPago = (): boolean =>
+    !configuracion("tesoreria.pago_diferido_prov") && !configuracion("tesoreria.pago_indirecto_prov");
+
+/** Las nóminas se pagan siempre con el pago de la remesa, sea cual sea el modo. */
+export const remesaPagoAdmitePagos = (
+    remesa: RemesaPago,
+    pagoDirecto: () => boolean = pagoDirectoRemesasPago,
+): boolean => esRemesaDeNominas(remesa) || !pagoDirecto();
+
 /** El pago es siempre total: una remesa se paga una vez, entera. */
-export const remesaPagoPagable = (remesa: RemesaPago): boolean =>
-    !!remesa.id && !remesaPagoConPago(remesa);
+export const remesaPagoPagable = (
+    remesa: RemesaPago,
+    pagoDirecto: () => boolean = pagoDirectoRemesasPago,
+): boolean =>
+    !!remesa.id && !remesaPagoConPago(remesa) && remesaPagoAdmitePagos(remesa, pagoDirecto);
 
 export type VarianteEstadoRemesaPago = "neutro" | "exito";
 

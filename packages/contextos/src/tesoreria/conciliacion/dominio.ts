@@ -2,13 +2,16 @@ import { ClausulaFiltro } from "@olula/lib/diseño.ts";
 import { plugin } from "@olula/lib/dominio.ts";
 import {
     CandidatoConciliacion,
+    CandidatoListaConciliacion,
     Conciliacion,
     EstadoMovimientoBancario,
     ItemConciliacion,
     MovimientoBancario,
     OrigenConciliacionMovimiento,
+    PartidaHuerfana,
     RemesaCandidata,
     TipoConciliacion,
+    TipoFiltroCandidato,
     TipoReciboMovimiento,
 } from "./diseño.ts";
 
@@ -111,7 +114,11 @@ export const estadosMovimientoBancarioDesdeFiltro = (filtro: ClausulaFiltro[]): 
     return clausula ? comoLista(clausula[2]) : [];
 };
 
-/** Movimientos de una cuenta bancaria de la empresa (`/tesoreria/cuentas/<cuenta_id>/movimientos`). */
+/** URL de la conciliación de una cuenta bancaria de la empresa (`cuentasbanco.codcuenta`). */
+export const urlConciliacionCuentaBancaria = (cuentaBancoId: string): string =>
+    `/tesoreria/cuentas_bancarias/${cuentaBancoId}/conciliacion`;
+
+/** Movimientos de una cuenta bancaria de la empresa (`/tesoreria/cuentas_bancarias/<cuenta_id>/conciliacion`). */
 export const filtroCuentaBanco = (cuentaBancoId: string): ClausulaFiltro =>
     ["cuenta_banco_id", "=", cuentaBancoId] as ClausulaFiltro;
 
@@ -252,6 +259,7 @@ export const conciliacionDesdeCandidato = (
         cuota: null,
         remesa: null,
         asientoId: null,
+        asiento: null,
     };
 };
 
@@ -295,6 +303,7 @@ export const conciliacionDesdeRemesa = (remesa: RemesaCandidata, reciboIds: stri
             tipoRemesa: remesa.tipoRemesa,
         },
         asientoId: null,
+        asiento: null,
     };
 };
 
@@ -311,6 +320,165 @@ export const conRemesas = (
     movimiento: MovimientoBancario,
     pagoActivas: () => boolean = remesasPagoActivas,
 ): boolean => esIngresoMovimientoBancario(movimiento) || pagoActivas();
+
+/** Una partida solo se puede vincular si su importe es el del movimiento (±0.01). */
+export const importePartidaCoincide = (partida: PartidaHuerfana, movimiento: MovimientoBancario): boolean =>
+    Math.abs(partida.importe - movimiento.importe) < 0.01;
+
+const normalizarTexto = (texto: string): string =>
+    texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+
+const contieneTexto = (texto: string, valores: (string | null)[]): boolean => {
+    const buscado = normalizarTexto(texto);
+    return !buscado || valores.some((valor) => valor !== null && normalizarTexto(valor).includes(buscado));
+};
+
+/**
+ * Recibos, remesas y partidas contables en una sola lista ordenada por fecha descendente (más recientes primero).
+ * Los recibos ya llegan filtrados por `texto` desde la API (GET `.../candidatos`);
+ * las remesas (por id, código o tercero de sus recibos) y las partidas (por número
+ * de asiento o descripción) se filtran aquí con el mismo texto. Los ya seleccionados
+ * para una conciliación de varios candidatos no aparecen: están en la selección.
+ */
+export const listaCandidatosConciliacion = (
+    recibos: CandidatoConciliacion[],
+    remesas: RemesaCandidata[],
+    partidas: PartidaHuerfana[],
+    texto: string,
+    seleccion: CandidatoListaConciliacion[] = [],
+): CandidatoListaConciliacion[] => [
+    ...recibos.map((recibo): CandidatoListaConciliacion => ({
+        clase: "recibo", id: `recibo_${recibo.id}`, fecha: recibo.fechaVencimiento,
+        tipo: recibo.tipoConciliacion, recibo,
+    })),
+    ...remesas
+        .filter((remesa) => contieneTexto(texto, [
+            remesa.id, ...remesa.recibos.flatMap((recibo) => [recibo.codigo, recibo.tercero]),
+        ]))
+        .map((remesa): CandidatoListaConciliacion => ({
+            clase: "remesa", id: `remesa_${remesa.tipoConciliacion}_${remesa.id}`, fecha: remesa.fechaCargo,
+            tipo: remesa.tipoConciliacion, remesa,
+        })),
+    ...partidas
+        .filter((partida) => contieneTexto(texto, [
+            partida.numeroAsiento, String(partida.idasiento), partida.descripcion,
+        ]))
+        .map((partida): CandidatoListaConciliacion => ({
+            clase: "partida", id: `partida_${partida.idasiento}`, fecha: partida.fecha,
+            tipo: "asiento_vinculado", partida,
+        })),
+]
+    .filter((candidato) => !seleccion.some((seleccionado) => seleccionado.id === candidato.id))
+    .sort((a, b) => b.fecha.getTime() - a.fecha.getTime());
+
+export const FILTROS_CANDIDATO: { tipo: TipoFiltroCandidato; etiqueta: string }[] = [
+    { tipo: "cobro", etiqueta: "Cobro" },
+    { tipo: "pago", etiqueta: "Pago" },
+    { tipo: "remesa_cobro", etiqueta: "Remesa de cobros" },
+    { tipo: "remesa_pago", etiqueta: "Remesa de pagos" },
+    { tipo: "asiento", etiqueta: "Asiento" },
+];
+
+const tipoFiltroCandidato = (candidato: CandidatoListaConciliacion): TipoFiltroCandidato => {
+    switch (candidato.clase) {
+        case "recibo":
+            return candidato.recibo.tipoRecibo;
+        case "remesa":
+            return esConciliacionRemesaPago(candidato.remesa.tipoConciliacion) ? "remesa_pago" : "remesa_cobro";
+        case "partida":
+            return "asiento";
+    }
+};
+
+/** Los candidatos de cualquiera de los tipos marcados; sin ninguno marcado, todos. */
+export const filtrarCandidatosPorTipo = (
+    lista: CandidatoListaConciliacion[],
+    tipos: TipoFiltroCandidato[],
+): CandidatoListaConciliacion[] =>
+    tipos.length === 0 ? lista : lista.filter((candidato) => tipos.includes(tipoFiltroCandidato(candidato)));
+
+/**
+ * Puede sumarse a otros en una conciliación de varios candidatos: lo que se liquida entero
+ * (recibos por su importe o por menos, remesas enteras) y las partidas que mueven el banco en
+ * el mismo sentido que el movimiento. Los parciales cubren siempre todo el movimiento.
+ */
+export const admiteSeleccion = (candidato: CandidatoListaConciliacion, movimiento: MovimientoBancario): boolean => {
+    switch (candidato.clase) {
+        case "recibo":
+            return candidato.recibo.encaje !== "parcial";
+        case "remesa":
+            return candidato.remesa.tipoConciliacion !== "cobro_parcial_remesa";
+        case "partida":
+            return candidato.partida.importe !== 0
+                && Math.sign(candidato.partida.importe) === Math.sign(movimiento.importe);
+    }
+};
+
+/** Lo que un candidato seleccionado cubre del movimiento, en positivo. */
+const importeCandidato = (candidato: CandidatoListaConciliacion): number => {
+    switch (candidato.clase) {
+        case "recibo":
+            return candidato.recibo.importe;
+        case "remesa":
+            return esConciliacionRemesaPago(candidato.remesa.tipoConciliacion)
+                ? candidato.remesa.total
+                : candidato.remesa.importePendiente;
+        case "partida":
+            return Math.abs(candidato.partida.importe);
+    }
+};
+
+export const sumaSeleccion = (seleccion: CandidatoListaConciliacion[]): number =>
+    redondear(seleccion.reduce((total, candidato) => total + importeCandidato(candidato), 0));
+
+/** Lo que falta (positivo) o sobra (negativo) para llegar al importe del movimiento. */
+export const diferenciaSeleccion = (movimiento: MovimientoBancario, seleccion: CandidatoListaConciliacion[]): number =>
+    redondear(Math.abs(movimiento.importe) - sumaSeleccion(seleccion));
+
+/** Solo se concilia si la selección suma exactamente el movimiento (el servidor exige lo mismo). */
+export const seleccionCuadra = (movimiento: MovimientoBancario, seleccion: CandidatoListaConciliacion[]): boolean =>
+    seleccion.length > 0 && diferenciaSeleccion(movimiento, seleccion) === 0;
+
+const itemDesdeSeleccionado = (candidato: CandidatoListaConciliacion): ItemConciliacion => {
+    const importe = importeCandidato(candidato).toFixed(2);
+    switch (candidato.clase) {
+        case "recibo": {
+            // El movimiento solo cuenta en un parcial, y los parciales no se seleccionan.
+            const item = conciliacionDesdeCandidato(movimientoBancarioVacio, candidato.recibo);
+            return { ...item, params: { ...item.params, importe } };
+        }
+        case "remesa": {
+            const { remesa } = candidato;
+            const item = conciliacionDesdeRemesa(remesa, remesa.recibos.map((recibo) => recibo.reciboId));
+            return { ...item, params: { ...item.params, importe } };
+        }
+        case "partida": {
+            const { partida } = candidato;
+            return {
+                tipo: "asiento_vinculado",
+                params: { idasiento: partida.idasiento, importe: partida.importe.toFixed(2) },
+                recibo: null,
+                cuota: null,
+                remesa: null,
+                asientoId: null,
+                asiento: {
+                    id: String(partida.idasiento),
+                    numero: partida.numeroAsiento,
+                    fecha: partida.fecha,
+                    importe: partida.importe,
+                    concepto: partida.descripcion,
+                },
+            };
+        }
+    }
+};
+
+/**
+ * Ítems de una conciliación de varios candidatos: cada uno con el `importe` que cubre (la
+ * partida, con el signo con que mueve el banco), que el servidor suma y comprueba.
+ */
+export const itemsDesdeSeleccion = (seleccion: CandidatoListaConciliacion[]): ItemConciliacion[] =>
+    seleccion.map(itemDesdeSeleccionado);
 
 export type BloqueoConciliarMovimiento = {
     bloqueado: boolean;

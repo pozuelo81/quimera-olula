@@ -8,7 +8,7 @@ import {
 
 /**
  * SINCRONIZANDO: mientras dura la llamada a `/movimiento_bancario/sincronizar`
- * (ver maestro/SincronizarMovimientoBancario.tsx, componente sin UI propia que
+ * (ver maestro/SincronizarMovimientoBancario.tsx, que muestra el spinner y
  * lanza la petición al montarse, igual que ConectarBancoConexionBancaria.tsx).
  */
 export type EstadoMaestroConciliacion = 'INICIAL' | 'SINCRONIZANDO' | 'CONCILIANDO_AUTOMATICAMENTE';
@@ -17,11 +17,11 @@ export type ContextoMaestroConciliacion = {
     estado: EstadoMaestroConciliacion;
     movimientos: ListaActivaEntidades<MovimientoBancario>;
     /**
-     * Cuenta bancaria de la empresa (`cuentasbanco.codcuenta`) cuando se entra
-     * por `/tesoreria/cuentas/<cuenta_id>/movimientos`: la lista se limita
+     * Cuenta bancaria de la empresa (`cuentasbanco.codcuenta`) de la URL
+     * `/tesoreria/cuentas_bancarias/<cuenta_id>/conciliacion`: la lista se limita
      * siempre a sus movimientos, sea cual sea el filtro del usuario.
      */
-    cuentaBancoId: string | null;
+    cuentaBancoId: string;
     /** Resumen a mostrar tras sincronizar (ver ResumenSincronizacionMovimientoBancario.tsx). */
     resumenSincronizacion: ResumenSincronizacionMovimientoBancario | null;
     /** Resumen a mostrar tras "Conciliar automáticamente" (ver ResumenConciliacionAutomatica.tsx). */

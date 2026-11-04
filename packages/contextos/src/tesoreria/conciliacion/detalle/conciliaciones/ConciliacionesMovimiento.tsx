@@ -10,6 +10,7 @@ import {
     etiquetaOrigenConciliacion,
     etiquetaTipoConciliacion,
     reciboIdsConciliacionRemesa,
+    urlAsientoConciliacion,
     urlReciboConciliacion,
     urlRemesaConciliacion,
     varianteProbabilidad,
@@ -21,13 +22,21 @@ const DescripcionItem = ({ item, divisa }: { item: ItemConciliacion; divisa: str
     const url = urlReciboConciliacion(item);
     const urlRemesa = urlRemesaConciliacion(item);
     const recibosRemesa = reciboIdsConciliacionRemesa(item);
+    const urlAsiento = item.asiento ? urlAsientoConciliacion(item) : null;
     return (
         <span className="item-conciliacion">
             <span className="tipo-conciliacion">
                 {etiquetaTipoConciliacion(item.tipo)}
                 {item.recibo && ` · ${item.recibo.codigo}`}
                 {item.remesa && ` · remesa ${item.remesa.id}`}
+                {item.asiento && ` · asiento ${item.asiento.numero ?? `#${item.asiento.id}`}`}
             </span>
+            {item.asiento && (
+                <span className="recibo-conciliacion">
+                    {`${formatearFechaDate(item.asiento.fecha)} · ${formatearMoneda(item.asiento.importe, divisa)}`}
+                    {item.asiento.concepto && ` · ${item.asiento.concepto}`}
+                </span>
+            )}
             {item.remesa && (
                 <span className="recibo-conciliacion">
                     {esConciliacionRemesaPago(item.tipo)
@@ -54,6 +63,11 @@ const DescripcionItem = ({ item, divisa }: { item: ItemConciliacion; divisa: str
             {url && (
                 <QBoton tamaño="pequeño" variante="borde" enlace={url}>
                     Ver recibo
+                </QBoton>
+            )}
+            {urlAsiento && (
+                <QBoton tamaño="pequeño" variante="borde" enlace={urlAsiento}>
+                    Ver asiento
                 </QBoton>
             )}
             {urlRemesa && (

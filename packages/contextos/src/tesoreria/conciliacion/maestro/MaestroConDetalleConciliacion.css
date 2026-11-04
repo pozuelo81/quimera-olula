@@ -1,4 +1,15 @@
 .Conciliacion {
+    .CabeceraConciliacion {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--espaciado-s);
+
+        quimera-select {
+            flex: 1 1 16em;
+        }
+    }
+
     .CuadreBancario {
         display: flex;
         flex-direction: column;
@@ -61,6 +72,12 @@
         display: flex;
         gap: var(--espaciado-xs);
         flex-wrap: wrap;
+    }
+
+    button.alerta {
+        font-family: inherit;
+        line-height: inherit;
+        cursor: pointer;
     }
 
     .alerta {

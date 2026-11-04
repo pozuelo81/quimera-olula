@@ -4,7 +4,7 @@ import { ListadoSemiControlado } from "@olula/componentes/maestro/ListadoSemiCon
 import { EmitirEvento } from "@olula/lib/diseño.ts";
 import { criteriaDefecto } from "@olula/lib/dominio.js";
 import { PagoRemesaPago, RemesaPago } from "../../diseño.js";
-import { remesaPagoConPago, remesaPagoPagable } from "../../dominio.js";
+import { remesaPagoAdmitePagos, remesaPagoConPago, remesaPagoPagable } from "../../dominio.js";
 
 const metaTablaPagos: MetaTabla<PagoRemesaPago> = [
   { id: "fecha", cabecera: "Fecha", tipo: "fecha" },
@@ -18,6 +18,12 @@ export const PagosRemesaPago = ({
   publicar: EmitirEvento;
 }) => (
   <div className="PagosRemesaPago">
+    {!remesaPagoAdmitePagos(remesa) && (
+      <p className="sin-pagos">
+        Con pago directo de remesas de pago los recibos se pagaron al remesarlos: la remesa
+        no admite pagos.
+      </p>
+    )}
     <ListadoSemiControlado
       metaTabla={metaTablaPagos}
       entidades={remesa.pagos}
