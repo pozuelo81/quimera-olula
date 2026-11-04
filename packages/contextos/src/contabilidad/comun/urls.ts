@@ -15,6 +15,7 @@ class CONTABILIDAD_Urls {
     readonly CUENTA_CODIGO_BALANCE = `/contabilidad/cuenta_codigo_balance`;
     readonly CUENTA_CODIGO_BALANCE_ABREVIADO = `/contabilidad/cuenta_codigo_balance_abreviado`;
     readonly GRUPO_EPIGRAFE = `/contabilidad/grupo_epigrafe`;
+    readonly GRUPO_CONTABLE_AMORTIZACION = `/contabilidad/grupo_contable_amortizacion`;
     readonly EPIGRAFE = `/contabilidad/epigrafe`;
     readonly LIBRO_DIARIO = `/contabilidad/libro_diario`;
     readonly LIBRO_DIARIO_DATOS = (id: string) =>

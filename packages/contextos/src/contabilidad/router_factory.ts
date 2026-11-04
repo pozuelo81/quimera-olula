@@ -1,5 +1,6 @@
 import { MaestroConDetalleAsiento } from "./asiento/vistas/maestro/MaestroConDetalleAsiento.tsx";
 import { MaestroConDetalleCodigoBalance } from "./codigo_balance/maestro/MaestroConDetalleCodigoBalance.tsx";
+import { MaestroConDetalleGrupoContableAmortizacion } from "./grupo_contable_amortizacion/maestro/MaestroConDetalleGrupoContableAmortizacion.tsx";
 import { MaestroConDetalleEjercicio } from "./ejercicio/maestro/MaestroConDetalleEjercicio.tsx";
 import { MaestroConDetalleCuentasAnuales } from "./cuentas_anuales/maestro/MaestroConDetalleCuentasAnuales.tsx";
 import { MaestroConDetalleLibroDiario } from "./libro_diario/maestro/MaestroConDetalleLibroDiario.tsx";
@@ -17,6 +18,7 @@ export class RouterFactoryContabilidadOlula {
         "contabilidad/codigo_balance": MaestroConDetalleCodigoBalance,
         "contabilidad/plantilla_asiento": MaestroConDetallePlantillaAsiento,
         "contabilidad/ejercicio": MaestroConDetalleEjercicio,
+        "contabilidad/grupo_contable_amortizacion": MaestroConDetalleGrupoContableAmortizacion,
         "contabilidad/cuentas_anuales": MaestroConDetalleCuentasAnuales,
         "contabilidad/libro_diario": MaestroConDetalleLibroDiario,
         "contabilidad/libro_mayor": MaestroConDetalleLibroMayor,
