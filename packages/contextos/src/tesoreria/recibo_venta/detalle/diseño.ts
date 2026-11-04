@@ -6,7 +6,9 @@ export type EstadoDetalleReciboVenta =
     | 'PAGANDO'
     | 'ENLACE_COBRO'
     | 'DESAGRUPANDO'
-    | 'DEVOLVIENDO';
+    | 'DEVOLVIENDO'
+    | 'ANULANDO_PAGO'
+    | 'CAMBIANDO';
 
 export type ContextoDetalleReciboVenta = {
     estado: EstadoDetalleReciboVenta;
