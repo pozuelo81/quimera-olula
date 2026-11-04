@@ -31,5 +31,9 @@ export const menuContabilidad = {
         url: "/contabilidad/cuentas_anuales",
         regla: "contabilidad.asiento",
     },
+    "Contabilidad/Informe Estado de cambios en el patrimonio neto": {
+        url: "/contabilidad/patrimonio_neto",
+        regla: "contabilidad.asiento",
+    },
     "Contabilidad/Regularización de IVA": { url: "/contabilidad/regularizacion_iva", regla: "contabilidad.asiento" },
 };
