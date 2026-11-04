@@ -1,7 +1,15 @@
 import { ProcesarContexto } from "@olula/lib/diseño.ts";
 import { ejecutarListaProcesos, MetaModelo } from "@olula/lib/dominio.ts";
 import { ReciboCompra } from "../diseño.js";
-import { getReciboCompra } from "../infraestructura.js";
+import { DevolucionRecibo } from "../../recibo_venta/detalle/devolver/diseño.js";
+import { PagoRecibo } from "../../recibo_venta/detalle/pagar/diseño.js";
+import { enDivisaExtranjeraCompra } from "../dominio.js";
+import {
+    getReciboCompra,
+    patchAnularPagoReciboCompra,
+    patchDevolverReciboCompra,
+    patchPagarReciboCompra,
+} from "../infraestructura.js";
 import { ContextoDetalleReciboCompra, EstadoDetalleReciboCompra } from "./diseño.js";
 
 type ProcesarDetalle = ProcesarContexto<EstadoDetalleReciboCompra, ContextoDetalleReciboCompra>;
@@ -33,6 +41,9 @@ export const reciboCompraInicial = (): ReciboCompra => ({
     proveedorId: null,
     nombreProveedor: '',
     idFiscal: '',
+    divisaId: '',
+    divisaEmpresaId: null,
+    pagos: [],
 });
 
 export const contextoDetalleReciboCompraInicial: ContextoDetalleReciboCompra = {
@@ -55,4 +66,42 @@ export const cargarContexto: ProcesarDetalle = async (contexto, payload) => {
         return cargarReciboCompra(idRecibo)(contexto);
     }
     return { ...contexto, estado: 'INICIAL', recibo: reciboCompraInicial() };
+};
+
+const recargarYPublicar: ProcesarDetalle = async (contexto) => {
+    const recibo = await getReciboCompra(contexto.recibo.id);
+
+    return [
+        { ...contexto, estado: 'ABIERTO', recibo },
+        [["recibo_cambiado", recibo]],
+    ];
+};
+
+/** TES-02: pago manual; publica el recibo para que el maestro refresque su fila. */
+export const pagarRecibo: ProcesarDetalle = async (contexto, payload) => {
+    const pago = payload as PagoRecibo;
+    await patchPagarReciboCompra(contexto.recibo.id, {
+        cuentaPagoId: pago.cuenta_pago_id,
+        fecha: pago.fecha.toISOString().slice(0, 10),
+        ...(enDivisaExtranjeraCompra(contexto.recibo) && { tasaConversion: pago.tasa_conversion }),
+    });
+    return recargarYPublicar(contexto);
+};
+
+/** La cuenta es la del último pago; el modal la muestra sin dejar cambiarla. */
+export const devolverRecibo: ProcesarDetalle = async (contexto, payload) => {
+    const devolucion = payload as DevolucionRecibo;
+    await patchDevolverReciboCompra(contexto.recibo.id, {
+        cuentaPagoId: devolucion.cuenta_pago_id,
+        fecha: devolucion.fecha.toISOString().slice(0, 10),
+        ...(enDivisaExtranjeraCompra(contexto.recibo) && {
+            tasaConversion: devolucion.tasa_conversion,
+        }),
+    });
+    return recargarYPublicar(contexto);
+};
+
+export const anularUltimoPago: ProcesarDetalle = async (contexto) => {
+    await patchAnularPagoReciboCompra(contexto.recibo.id);
+    return recargarYPublicar(contexto);
 };

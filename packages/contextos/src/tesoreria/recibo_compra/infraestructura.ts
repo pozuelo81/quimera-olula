@@ -1,7 +1,16 @@
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
 import { fechaDesdeApi } from "../comun/infraestructura.js";
 import ApiUrls from "../comun/urls.js";
-import { GetReciboCompra, GetRecibosCompra, ReciboCompra } from "./diseño.js";
+import { MovimientoReciboApi } from "../recibo_venta/infraestructura.js";
+import {
+    GetReciboCompra,
+    GetRecibosCompra,
+    MovimientoReciboCompra,
+    PatchAnularPagoReciboCompra,
+    PatchDevolverReciboCompra,
+    PatchPagarReciboCompra,
+    ReciboCompra,
+} from "./diseño.js";
 import { getTraza } from "#/comun/componentes/traza/infraestructura.ts";
 
 export interface ReciboCompraApi {
@@ -15,6 +24,9 @@ export interface ReciboCompraApi {
     proveedor_id: string | null;
     nombre_proveedor: string;
     id_fiscal: string;
+    divisa_id?: string;
+    divisa_empresa_id?: string | null;
+    pagos?: MovimientoReciboApi[];
 }
 
 const baseUrl = new ApiUrls().RECIBO_COMPRA;
@@ -30,6 +42,16 @@ export const reciboCompraDesdeApi = (api: ReciboCompraApi): ReciboCompra => ({
     proveedorId: api.proveedor_id,
     nombreProveedor: api.nombre_proveedor,
     idFiscal: api.id_fiscal,
+    divisaId: api.divisa_id ?? "",
+    divisaEmpresaId: api.divisa_empresa_id ?? null,
+    pagos: (api.pagos ?? []).map((pago) => ({
+        id: pago.id,
+        fecha: fechaDesdeApi(pago.fecha),
+        tipo: pago.tipo,
+        estado: pago.estado,
+        cuentaPagoId: pago.cuenta_pago_id ?? "",
+        nombreCuentaPago: pago.nombre_cuenta_pago ?? "",
+    })),
 });
 
 export const getReciboCompra: GetReciboCompra = async (id) => {
@@ -70,5 +92,39 @@ export const postOrdenarPagoReciboCompra = async (
         `${baseUrl}/${id}/ordenar_pago`,
         { cuenta_banco_id: cuentaBancoId },
         "Error al ordenar el pago al proveedor"
+    );
+};
+
+const movimientoApi = (movimiento: MovimientoReciboCompra) => ({
+    cuenta_pago_id: movimiento.cuentaPagoId,
+    fecha: movimiento.fecha,
+    ...(movimiento.tasaConversion !== undefined && {
+        tasa_conversion: String(movimiento.tasaConversion),
+    }),
+});
+
+/** TES-02: pago manual del recibo, sin pasar por el banco. */
+export const patchPagarReciboCompra: PatchPagarReciboCompra = async (id, pago) => {
+    await RestAPI.patch(
+        `${baseUrl}/${id}/pagar`,
+        movimientoApi(pago),
+        "Error al pagar el recibo de pago"
+    );
+};
+
+export const patchDevolverReciboCompra: PatchDevolverReciboCompra = async (id, devolucion) => {
+    await RestAPI.patch(
+        `${baseUrl}/${id}/devolver`,
+        movimientoApi(devolucion),
+        "Error al devolver el recibo de pago"
+    );
+};
+
+/** Borra el último pago o devolución del recibo y su asiento. */
+export const patchAnularPagoReciboCompra: PatchAnularPagoReciboCompra = async (id) => {
+    await RestAPI.patch(
+        `${baseUrl}/${id}/anular_pago`,
+        {},
+        "Error al anular el último pago del recibo"
     );
 };

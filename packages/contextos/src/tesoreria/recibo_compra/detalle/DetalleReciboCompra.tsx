@@ -8,7 +8,16 @@ import { useModelo } from "@olula/lib/useModelo.js";
 import { useEffect } from "react";
 import { bancaActiva } from "../../comun/banca.js";
 import { ReciboCompra } from "../diseño.js";
-import { reciboCompraPagable } from "../dominio.js";
+import {
+  reciboCompraAnulable,
+  reciboCompraDevolvible,
+  reciboCompraPagable,
+  ultimoMovimiento,
+} from "../dominio.js";
+import { AnularUltimoMovimientoRecibo } from "../../comun/componentes/AnularUltimoMovimientoRecibo.tsx";
+import { PagosReciboVenta } from "../../recibo_venta/detalle/pagos/PagosReciboVenta.tsx";
+import { DevolverReciboCompra } from "./devolver/DevolverReciboCompra.tsx";
+import { PagarReciboCompra } from "./pagar/PagarReciboCompra.tsx";
 import { getTrazaReciboCompra } from "../infraestructura.ts";
 import {
   contextoDetalleReciboCompraInicial,
@@ -43,7 +52,26 @@ export const DetalleReciboCompra = ({
   const titulo = (r: ReciboCompra) => r.codigo || `Recibo ${r.id}`;
   const bancaHabilitada = bancaActiva();
 
+  const ultimo = ultimoMovimiento(ctx.recibo);
+
   const acciones = [
+    // TES-02: pago y devolución manuales, como `pagosdevolprov` en el ERP.
+    reciboCompraDevolvible(ctx.recibo)
+      ? {
+          texto: "Devolver",
+          onClick: () => emitir("devolucion_solicitada"),
+        }
+      : {
+          texto: "Pagar",
+          onClick: () => emitir("pagar_solicitado"),
+          deshabilitado: !reciboCompraPagable(ctx.recibo),
+        },
+    {
+      texto: "Anular último pago o devolución",
+      onClick: () => emitir("anulacion_pago_solicitada"),
+      deshabilitado: !reciboCompraAnulable(ctx.recibo),
+      advertencia: true,
+    },
     // "Documentos relacionados" no existe en el ERP; posibilidad de habilitarla si se pide:
     // {
     //   texto: "Documentos relacionados",
@@ -65,7 +93,7 @@ export const DetalleReciboCompra = ({
       cerrarDetalle={() => emitir("recibo_deseleccionado", null, true)}
     >
       <div className="DetalleReciboCompra">
-        {bancaHabilitada && <QuimeraAcciones acciones={acciones} vertical />}
+        <QuimeraAcciones acciones={acciones} vertical />
 
         <quimera-formulario>
           <QInput label="Código" {...uiProps("codigo")} />
@@ -77,6 +105,25 @@ export const DetalleReciboCompra = ({
           <QInput label="ID Fiscal" {...uiProps("idFiscal")} />
           <QInput label="Factura" {...uiProps("facturaId")} />
         </quimera-formulario>
+
+        <PagosReciboVenta pagos={ctx.recibo.pagos} />
+
+        {ctx.estado === "PAGANDO" && (
+          <PagarReciboCompra recibo={ctx.recibo} publicar={emitir} />
+        )}
+
+        {ctx.estado === "DEVOLVIENDO" && (
+          <DevolverReciboCompra recibo={ctx.recibo} publicar={emitir} />
+        )}
+
+        {ctx.estado === "ANULANDO_PAGO" && ultimo && (
+          <AnularUltimoMovimientoRecibo
+            codigo={ctx.recibo.codigo}
+            tipo={ultimo.tipo}
+            fecha={ultimo.fecha}
+            publicar={emitir}
+          />
+        )}
 
         {ctx.estado === "ORDENANDO_PAGO" && (
           <OrdenarPagoReciboCompra recibo={ctx.recibo} publicar={emitir} />
