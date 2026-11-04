@@ -1,6 +1,6 @@
 import { Maquina } from "@olula/lib/diseño.ts";
 import { publicar } from "@olula/lib/dominio.ts";
-import { anularUltimoPago, cargarContexto, devolverRecibo, pagarRecibo } from "./detalle.js";
+import { anularUltimoPago, cambiarRecibo, cargarContexto, devolverRecibo, pagarRecibo } from "./detalle.js";
 import { ContextoDetalleReciboCompra, EstadoDetalleReciboCompra } from "./diseño.js";
 
 export const getMaquina: () => Maquina<EstadoDetalleReciboCompra, ContextoDetalleReciboCompra> = () => {
@@ -29,6 +29,8 @@ export const getMaquina: () => Maquina<EstadoDetalleReciboCompra, ContextoDetall
 
             devolucion_solicitada: 'DEVOLVIENDO',
 
+            cambio_recibo_solicitado: 'CAMBIANDO',
+
             anulacion_pago_solicitada: 'ANULANDO_PAGO',
         },
 
@@ -52,6 +54,12 @@ export const getMaquina: () => Maquina<EstadoDetalleReciboCompra, ContextoDetall
             anulacion_pago_confirmada: [anularUltimoPago],
 
             anulacion_pago_cancelada: 'ABIERTO',
+        },
+
+        CAMBIANDO: {
+            cambio_recibo_confirmado: [cambiarRecibo],
+
+            cambio_recibo_cancelado: 'ABIERTO',
         },
 
         VIENDO_TRAZA: {

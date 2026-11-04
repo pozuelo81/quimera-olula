@@ -18,6 +18,8 @@ import { AnularUltimoMovimientoRecibo } from "../../comun/componentes/AnularUlti
 import { PagosReciboVenta } from "../../recibo_venta/detalle/pagos/PagosReciboVenta.tsx";
 import { DevolverReciboCompra } from "./devolver/DevolverReciboCompra.tsx";
 import { PagarReciboCompra } from "./pagar/PagarReciboCompra.tsx";
+import { getCuentasBancoProveedor } from "#/compras/proveedor/infraestructura.ts";
+import { CambiarRecibo } from "../../comun/componentes/CambiarRecibo.tsx";
 import { getTrazaReciboCompra } from "../infraestructura.ts";
 import {
   contextoDetalleReciboCompraInicial,
@@ -67,6 +69,10 @@ export const DetalleReciboCompra = ({
           deshabilitado: !reciboCompraPagable(ctx.recibo),
         },
     {
+      texto: "Editar recibo",
+      onClick: () => emitir("cambio_recibo_solicitado"),
+    },
+    {
       texto: "Anular último pago o devolución",
       onClick: () => emitir("anulacion_pago_solicitada"),
       deshabilitado: !reciboCompraAnulable(ctx.recibo),
@@ -104,6 +110,7 @@ export const DetalleReciboCompra = ({
           <QInput label="Proveedor" {...uiProps("nombreProveedor")} />
           <QInput label="ID Fiscal" {...uiProps("idFiscal")} />
           <QInput label="Factura" {...uiProps("facturaId")} />
+          <QInput label="Cuenta de domiciliación" {...uiProps("nombreCuentaDomiciliacion")} />
         </quimera-formulario>
 
         <PagosReciboVenta pagos={ctx.recibo.pagos} />
@@ -114,6 +121,25 @@ export const DetalleReciboCompra = ({
 
         {ctx.estado === "DEVOLVIENDO" && (
           <DevolverReciboCompra recibo={ctx.recibo} publicar={emitir} />
+        )}
+
+        {ctx.estado === "CAMBIANDO" && (
+          <CambiarRecibo
+            recibo={{
+              ...ctx.recibo,
+              importeEditable:
+                ctx.recibo.estado.trim().toLowerCase() === "emitido" && !!ctx.recibo.facturaId,
+            }}
+            getCuentas={async () =>
+              ctx.recibo.proveedorId
+                ? (await getCuentasBancoProveedor(ctx.recibo.proveedorId)).map((c) => ({
+                    valor: c.id,
+                    descripcion: c.descripcion || c.iban || c.id,
+                  }))
+                : []
+            }
+            publicar={emitir}
+          />
         )}
 
         {ctx.estado === "ANULANDO_PAGO" && ultimo && (

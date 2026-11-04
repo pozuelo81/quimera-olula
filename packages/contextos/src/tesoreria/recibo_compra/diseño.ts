@@ -2,6 +2,9 @@ import { Criteria, Entidad, RespuestaLista } from "@olula/lib/diseño.ts";
 import { MovimientoRecibo } from "../recibo_venta/diseño.ts";
 
 export interface ReciboCompra extends Entidad {
+    /** Cuenta bancaria del titular en la que se domicilia (TES-06). */
+    cuentaDomiciliacionId: string | null;
+    nombreCuentaDomiciliacion: string;
     id: string;
     facturaId: string | null;
     codigo: string;

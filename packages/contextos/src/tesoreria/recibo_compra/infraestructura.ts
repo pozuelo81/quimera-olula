@@ -14,6 +14,8 @@ import {
 import { getTraza } from "#/comun/componentes/traza/infraestructura.ts";
 
 export interface ReciboCompraApi {
+    cuenta_domiciliacion_id?: string | null;
+    nombre_cuenta_domiciliacion?: string;
     id: string;
     factura_id: string | null;
     codigo: string;
@@ -32,6 +34,8 @@ export interface ReciboCompraApi {
 const baseUrl = new ApiUrls().RECIBO_COMPRA;
 
 export const reciboCompraDesdeApi = (api: ReciboCompraApi): ReciboCompra => ({
+    cuentaDomiciliacionId: api.cuenta_domiciliacion_id ?? null,
+    nombreCuentaDomiciliacion: api.nombre_cuenta_domiciliacion ?? "",
     id: api.id,
     facturaId: api.factura_id,
     codigo: api.codigo,
@@ -126,5 +130,21 @@ export const patchAnularPagoReciboCompra: PatchAnularPagoReciboCompra = async (i
         `${baseUrl}/${id}/anular_pago`,
         {},
         "Error al anular el último pago del recibo"
+    );
+};
+
+/** TES-06: vencimiento, cuenta de domiciliación e importe (si baja, el recibo se divide). */
+export const patchCambiarReciboCompra = async (
+    id: string,
+    cambios: { fechaVencimiento: string; cuentaDomiciliacionId: string; importe?: number },
+): Promise<void> => {
+    await RestAPI.patch(
+        `${baseUrl}/${id}`,
+        {
+            fecha_vencimiento: cambios.fechaVencimiento,
+            cuenta_domiciliacion_id: cambios.cuentaDomiciliacionId,
+            ...(cambios.importe !== undefined && { importe: String(cambios.importe) }),
+        },
+        "Error al guardar el recibo"
     );
 };

@@ -4,9 +4,11 @@ import { ReciboCompra } from "../diseño.js";
 import { DevolucionRecibo } from "../../recibo_venta/detalle/devolver/diseño.js";
 import { PagoRecibo } from "../../recibo_venta/detalle/pagar/diseño.js";
 import { enDivisaExtranjeraCompra } from "../dominio.js";
+import { CambiosRecibo, fechaApi } from "../../comun/recibo.ts";
 import {
     getReciboCompra,
     patchAnularPagoReciboCompra,
+    patchCambiarReciboCompra,
     patchDevolverReciboCompra,
     patchPagarReciboCompra,
 } from "../infraestructura.js";
@@ -26,6 +28,7 @@ export const metaReciboCompra: MetaModelo<ReciboCompra> = {
         nombreProveedor: { tipo: "texto" },
         idFiscal: { tipo: "texto" },
         facturaId: { tipo: "texto" },
+        nombreCuentaDomiciliacion: { tipo: "texto" },
     },
     editable: () => false,
 };
@@ -44,6 +47,8 @@ export const reciboCompraInicial = (): ReciboCompra => ({
     divisaId: '',
     divisaEmpresaId: null,
     pagos: [],
+    cuentaDomiciliacionId: null,
+    nombreCuentaDomiciliacion: '',
 });
 
 export const contextoDetalleReciboCompraInicial: ContextoDetalleReciboCompra = {
@@ -103,5 +108,16 @@ export const devolverRecibo: ProcesarDetalle = async (contexto, payload) => {
 
 export const anularUltimoPago: ProcesarDetalle = async (contexto) => {
     await patchAnularPagoReciboCompra(contexto.recibo.id);
+    return recargarYPublicar(contexto);
+};
+
+/** TES-06: si baja el importe, el servidor crea otro recibo con la diferencia. */
+export const cambiarRecibo: ProcesarDetalle = async (contexto, payload) => {
+    const cambios = payload as CambiosRecibo;
+    await patchCambiarReciboCompra(contexto.recibo.id, {
+        fechaVencimiento: fechaApi(cambios.fecha_vencimiento),
+        cuentaDomiciliacionId: cambios.cuenta_domiciliacion_id,
+        ...(cambios.importe !== contexto.recibo.importe && { importe: cambios.importe }),
+    });
     return recargarYPublicar(contexto);
 };
