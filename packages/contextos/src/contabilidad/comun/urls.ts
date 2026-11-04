@@ -34,6 +34,7 @@ class CONTABILIDAD_Urls {
         `/contabilidad/cuentas_anuales/${id}/report`;
     readonly CUENTAS_ANUALES_HOJA = (id: string, formato: string) =>
         `/contabilidad/cuentas_anuales/${id}/hoja?formato=${formato}`;
+    readonly REGULARIZACION_IVA = `/contabilidad/regularizacion_iva`;
 }
 
 export default CONTABILIDAD_Urls;

@@ -22,4 +22,5 @@ export const menuContabilidad = {
         url: "/contabilidad/cuentas_anuales",
         regla: "contabilidad.asiento",
     },
+    "Contabilidad/Regularización de IVA": { url: "/contabilidad/regularizacion_iva", regla: "contabilidad.asiento" },
 };
