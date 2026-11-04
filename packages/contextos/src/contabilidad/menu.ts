@@ -10,6 +10,18 @@ export const menuContabilidad = {
         url: "/contabilidad/codigo_balance",
         regla: "contabilidad.asiento",
     },
+    "Contabilidad/Amortizaciones": {
+        url: "/contabilidad/amortizacion",
+        regla: "contabilidad.asiento",
+    },
+    "Contabilidad/Informe Amortizaciones": {
+        url: "/contabilidad/informe_amortizaciones",
+        regla: "contabilidad.asiento",
+    },
+    "Contabilidad/Grupos contables de amortización": {
+        url: "/contabilidad/grupo_contable_amortizacion",
+        regla: "contabilidad.asiento",
+    },
     "Contabilidad/Ejercicios": { url: "/contabilidad/ejercicio", regla: "contabilidad.asiento" },
     "Contabilidad/Libro diario": {
         url: "/contabilidad/libro_diario",
