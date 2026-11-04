@@ -43,6 +43,13 @@ class CONTABILIDAD_Urls {
         `/contabilidad/cuentas_anuales/${id}/report`;
     readonly CUENTAS_ANUALES_HOJA = (id: string, formato: string) =>
         `/contabilidad/cuentas_anuales/${id}/hoja?formato=${formato}`;
+    readonly PATRIMONIO_NETO = `/contabilidad/patrimonio_neto`;
+    readonly PATRIMONIO_NETO_DATOS = (id: string) =>
+        `/contabilidad/patrimonio_neto/${id}/datos`;
+    readonly PATRIMONIO_NETO_REPORT = (id: string) =>
+        `/contabilidad/patrimonio_neto/${id}/report`;
+    readonly PATRIMONIO_NETO_HOJA = (id: string, formato: string) =>
+        `/contabilidad/patrimonio_neto/${id}/hoja?formato=${formato}`;
     readonly REGULARIZACION_IVA = `/contabilidad/regularizacion_iva`;
     readonly EJERCICIO = `/contabilidad/ejercicio`;
     readonly EJERCICIO_ALTA = `/comun/ejercicio_facturacion`;
