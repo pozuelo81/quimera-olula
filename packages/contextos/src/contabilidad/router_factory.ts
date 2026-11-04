@@ -1,3 +1,5 @@
+import { MaestroConDetalleAmortizacion } from "./amortizacion/maestro/MaestroConDetalleAmortizacion.tsx";
+import { InformeAmortizaciones } from "./amortizacion/informe/InformeAmortizaciones.tsx";
 import { MaestroConDetalleAsiento } from "./asiento/vistas/maestro/MaestroConDetalleAsiento.tsx";
 import { MaestroConDetalleCodigoBalance } from "./codigo_balance/maestro/MaestroConDetalleCodigoBalance.tsx";
 import { MaestroConDetalleGrupoContableAmortizacion } from "./grupo_contable_amortizacion/maestro/MaestroConDetalleGrupoContableAmortizacion.tsx";
@@ -14,6 +16,8 @@ import { MaestroConDetallePlantillaAsiento } from "./plantilla_asiento/maestro/M
 export class RouterFactoryContabilidadOlula {
     static router = {
         "contabilidad/asiento": MaestroConDetalleAsiento,
+        "contabilidad/amortizacion": MaestroConDetalleAmortizacion,
+        "contabilidad/informe_amortizaciones": InformeAmortizaciones,
         "contabilidad/pgc": PantallaPgc,
         "contabilidad/codigo_balance": MaestroConDetalleCodigoBalance,
         "contabilidad/plantilla_asiento": MaestroConDetallePlantillaAsiento,

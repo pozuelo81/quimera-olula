@@ -16,6 +16,13 @@ class CONTABILIDAD_Urls {
     readonly CUENTA_CODIGO_BALANCE_ABREVIADO = `/contabilidad/cuenta_codigo_balance_abreviado`;
     readonly GRUPO_EPIGRAFE = `/contabilidad/grupo_epigrafe`;
     readonly GRUPO_CONTABLE_AMORTIZACION = `/contabilidad/grupo_contable_amortizacion`;
+    readonly AMORTIZACION = `/contabilidad/amortizacion`;
+    readonly AMORTIZACION_DOTACION = `/contabilidad/amortizacion/dotacion`;
+    readonly AMORTIZACION_REGULARIZACION_VALOR = `/contabilidad/amortizacion/regularizacion_valor`;
+    readonly AMORTIZACION_GENERAR_DOTACIONES = `/contabilidad/amortizacion/generar_dotaciones`;
+    readonly AMORTIZACION_DESHACER_DOTACIONES = `/contabilidad/amortizacion/deshacer_dotaciones`;
+    readonly AMORTIZACION_INFORME = `/contabilidad/amortizacion/informe`;
+    readonly AMORTIZACION_INFORME_REPORT = `/contabilidad/amortizacion/informe/report`;
     readonly EPIGRAFE = `/contabilidad/epigrafe`;
     readonly LIBRO_DIARIO = `/contabilidad/libro_diario`;
     readonly LIBRO_DIARIO_DATOS = (id: string) =>
