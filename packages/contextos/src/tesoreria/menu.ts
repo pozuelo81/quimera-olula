@@ -7,5 +7,6 @@ export const menuTesoreria = {
     "Tesorería/Recibos de cobro": { url: "/tesoreria/recibo_venta", regla: "tesoreria.recibo_venta" },
     "Tesorería/Recibos de pago": { url: "/tesoreria/recibo_compra", regla: "tesoreria.recibo_compra" },
     "Tesorería/Conexiones bancarias": { url: "/tesoreria/conexion_bancaria", regla: "tesoreria.conexion_bancaria" },
-    "Tesorería/Conciliación bancaria": { alias: ["banco", "extracto", "movimientos"], url: "/tesoreria/conciliacion", regla: "tesoreria.conciliacion" },
+    "Tesorería/Cuentas bancarias": { alias: ["banco", "conciliación", "extracto", "movimientos"], url: "/tesoreria/cuentas_bancarias", regla: "tesoreria.cuentas_bancarias.leer" },
+    "Tesorería/Configuración": { alias: ["remesas", "pago diferido", "pago indirecto"], url: "/tesoreria/config", regla: "tesoreria.config" },
 };

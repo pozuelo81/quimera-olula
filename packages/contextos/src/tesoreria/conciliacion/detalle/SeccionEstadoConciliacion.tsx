@@ -114,16 +114,24 @@ const ItemAsientoManualConciliado = ({
     );
 };
 
-const ItemAsientoVinculadoConciliado = ({ item }: { item: ItemConciliacion }) => (
-    <div className="item-recibo-conciliado">
-        <p className="tipo-item-recibo">{etiquetaTipoConciliacion(item.tipo)}</p>
-        <quimera-formulario>
-            <QInput nombre="av-idasiento" label="Asiento contable" soloLectura
-                valor={String(item.params.idasiento ?? "—")} />
-        </quimera-formulario>
-        <EnlaceItem url={urlAsientoConciliacion(item)}>Ver asiento</EnlaceItem>
-    </div>
-);
+/** Si el asiento ya no existe (`asiento` null) solo queda el id guardado en los params. */
+const ItemAsientoVinculadoConciliado = ({ item, divisa }: { item: ItemConciliacion; divisa: string }) => {
+    const { asiento } = item;
+    return (
+        <div className="item-recibo-conciliado">
+            <p className="tipo-item-recibo">{etiquetaTipoConciliacion(item.tipo)}</p>
+            <quimera-formulario>
+                <QInput nombre="av-numero" label="Número de asiento" soloLectura
+                    valor={asiento?.numero ?? `#${String(item.params.idasiento ?? "—")}`} />
+                <QInput nombre="av-fecha" label="Fecha" soloLectura
+                    valor={asiento ? formatearFechaDate(asiento.fecha) : "—"} />
+                <QInput nombre="av-importe" label="Importe" soloLectura
+                    valor={asiento ? formatearMoneda(asiento.importe, divisa) : "—"} />
+            </quimera-formulario>
+            <EnlaceItem url={urlAsientoConciliacion(item)}>Ver asiento</EnlaceItem>
+        </div>
+    );
+};
 
 const ItemCuotaConciliada = ({ item, divisa }: { item: ItemConciliacion; divisa: string }) => {
     const { cuota } = item;
@@ -199,7 +207,11 @@ export const SeccionEstadoConciliacion = ({
                                         movimiento={movimiento}
                                     />
                                 ) : item.tipo === "asiento_vinculado" ? (
-                                    <ItemAsientoVinculadoConciliado key={idx} item={item} />
+                                    <ItemAsientoVinculadoConciliado
+                                        key={idx}
+                                        item={item}
+                                        divisa={movimiento.divisa ?? "EUR"}
+                                    />
                                 ) : item.cuota ? (
                                     <ItemCuotaConciliada
                                         key={idx}

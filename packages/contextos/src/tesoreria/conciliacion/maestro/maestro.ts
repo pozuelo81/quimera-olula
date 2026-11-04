@@ -32,52 +32,31 @@ const conClausula = (filtro: Filtro, clausula: ClausulaFiltro): Filtro => {
 
 /**
  * El criteria con el que se consulta: filtros del usuario + filtros de cuadre fijos
- * + (si la hay) la cuenta fija por URL path.
+ * + la cuenta de la URL.
  */
 const criteriaConsulta = (contexto: ContextoMaestroConciliacion, criteria: Criteria): Criteria => {
     let filtro = criteria.filtro;
     for (const clausula of contexto.filtrosCuadre) {
         filtro = conClausula(filtro, clausula);
     }
-    if (contexto.cuentaBancoId) {
-        filtro = conClausula(filtro, filtroCuentaBanco(contexto.cuentaBancoId));
-    }
+    filtro = conClausula(filtro, filtroCuentaBanco(contexto.cuentaBancoId));
     return { ...criteria, filtro };
 };
 
-/** Devuelve true si el filtro contiene una cláusula sobre cuenta_banco_id. */
-const tieneFiltrosCuenta = (filtro: Filtro): boolean => {
-    if (!Array.isArray(filtro) || filtro.length === 0) return false;
-    const clausulas = Array.isArray(filtro[0]) ? filtro as ClausulaFiltro[] : [filtro as ClausulaFiltro];
-    return clausulas.some((c) => c[0] === "cuenta_banco_id");
-};
-
-const resultadoVacio = { datos: [], total: 0 };
-
-/**
- * Devuelve true si hay cuenta seleccionada (por URL o por filtro).
- * Cuando no la hay, no se lanza la consulta para evitar cargar todos los movimientos.
- */
-const hayCuentaSeleccionada = (contexto: ContextoMaestroConciliacion, criteria: Criteria): boolean =>
-    !!contexto.cuentaBancoId || tieneFiltrosCuenta(criteria.filtro);
-
 export const recargarMovimientos: ProcesarMaestro = async (contexto, payload) => {
     const criteria = payload as Criteria;
-    if (!hayCuentaSeleccionada(contexto, criteria)) return Movimientos.recargar(contexto, resultadoVacio);
     const resultado = await getMovimientosBancarios(criteriaConsulta(contexto, criteria));
     return Movimientos.recargar(contexto, resultado);
 };
 
 export const ampliarMovimientos: ProcesarMaestro = async (contexto, payload) => {
     const criteria = payload as Criteria;
-    if (!hayCuentaSeleccionada(contexto, criteria)) return Movimientos.ampliar(contexto, resultadoVacio);
     const resultado = await getMovimientosBancarios(criteriaConsulta(contexto, criteria));
     return Movimientos.ampliar(contexto, resultado);
 };
 
 /** Recarga la lista con el criteria actual (patrón `recargarRecibosActual` de recibo_venta). */
 export const recargarMovimientosActual: ProcesarMaestro = async (contexto) => {
-    if (!hayCuentaSeleccionada(contexto, contexto.movimientos.criteria)) return Movimientos.recargar(contexto, resultadoVacio);
     const resultado = await getMovimientosBancarios(criteriaConsulta(contexto, contexto.movimientos.criteria));
     return Movimientos.recargar(contexto, resultado);
 };

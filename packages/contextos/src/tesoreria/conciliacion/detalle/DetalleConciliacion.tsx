@@ -10,17 +10,15 @@ import { ConciliarAsientoMovimientoBancario } from "../conciliar_asiento/Concili
 import { ConciliarRemesaMovimientoBancario } from "../conciliar_remesa/ConciliarRemesaMovimientoBancario.js";
 import { DesconciliarMovimientoBancario } from "../desconciliar/DesconciliarMovimientoBancario.js";
 import { MovimientoBancario } from "../diseño.js";
-import { bloqueoConciliarMovimientoBancario, conRemesas, esIngresoMovimientoBancario } from "../dominio.js";
+import { esIngresoMovimientoBancario } from "../dominio.js";
 import { IgnorarMovimientoBancario } from "../ignorar/IgnorarMovimientoBancario.js";
 import { ReactivarMovimientoBancario } from "../reactivar/ReactivarMovimientoBancario.js";
 import { contextoDetalleConciliacionInicial, metaMovimientoBancario } from "./detalle.js";
 import "./DetalleConciliacion.css";
 import { getMaquina } from "./maquina.js";
-import { RemesasConciliacion } from "./remesas/RemesasConciliacion.js";
 import { SeccionEstadoConciliacion } from "./SeccionEstadoConciliacion.js";
 import { TabConciliacion } from "./TabConciliacion.js";
 import { TabGeneral } from "./TabGeneral.js";
-import { TabPartidas } from "./TabPartidas.js";
 
 /**
  * Detalle de un movimiento bancario.
@@ -31,9 +29,9 @@ import { TabPartidas } from "./TabPartidas.js";
  *   - Siempre visible: SeccionEstadoConciliacion (etiqueta de estado + info
  *     del elemento ERP conciliado + botones Desconciliar/Reactivar).
  *   - Solo cuando el movimiento puede conciliarse (pendiente/candidatos):
- *     sub-pestañas "Recibos" (búsqueda de candidatos), "Remesas" (remesas de
- *     cobro por conciliar en un ingreso; de pago en un cargo, si su plugin está
- *     activo) y "Partidas" (asientos contables sin movimiento equivalente).
+ *     las conciliaciones propuestas y una sola lista de candidatos ordenada por
+ *     fecha con recibos, remesas (de cobro en un ingreso; de pago en un cargo,
+ *     si su plugin está activo) y partidas contables sin movimiento equivalente.
  * - Tab "General": cabecera de solo lectura del movimiento.
  *
  * Los modales (Conciliar/Desconciliar/Ignorar/Reactivar) se montan aquí
@@ -56,8 +54,8 @@ export const DetalleConciliacion = ({
     const formModelo = useModelo(metaMovimientoBancario, ctx.movimiento);
 
     const {
-        estado, movimiento, conciliaciones, conciliacionAplicada, candidatos, candidatosTexto, remesas,
-        conciliacionSeleccionada, remesaSeleccionada,
+        estado, movimiento, conciliaciones, conciliacionAplicada, candidatos, candidatosTexto, remesas, partidas,
+        conciliacionSeleccionada, seleccion, remesaSeleccionada,
     } = ctx;
 
     useEffect(() => {
@@ -69,24 +67,8 @@ export const DetalleConciliacion = ({
 
     const titulo = (m: MovimientoBancario) => m.concepto || `Movimiento ${m.id}`;
 
-    const puedeVincularPartida =
+    const puedeConciliar =
         movimiento.estado === "pendiente" || movimiento.estado === "candidatos";
-
-    const tabRemesas = conRemesas(movimiento)
-        ? [
-            <Tab label="Remesas"
-                key="tab-remesas"
-                children={
-                    <RemesasConciliacion
-                        movimiento={movimiento}
-                        remesas={remesas}
-                        bloqueo={bloqueoConciliarMovimientoBancario(movimiento)}
-                        publicar={emitir}
-                    />
-                }
-            />,
-        ]
-        : [];
 
     return (
         <Detalle
@@ -114,28 +96,17 @@ export const DetalleConciliacion = ({
                                     conciliacionAplicada={conciliacionAplicada}
                                     publicar={emitir}
                                 />
-                                {puedeVincularPartida && (
-                                    <Tabs children={[
-                                        <Tab label="Recibos"
-                                            key="tab-recibos"
-                                            children={
-                                                <TabConciliacion
-                                                    movimiento={movimiento}
-                                                    conciliaciones={conciliaciones}
-                                                    candidatos={candidatos}
-                                                    candidatosTexto={candidatosTexto}
-                                                    publicar={emitir}
-                                                />
-                                            }
-                                        />,
-                                        ...tabRemesas,
-                                        <Tab label="Partidas"
-                                            key="tab-partidas"
-                                            children={
-                                                <TabPartidas movimiento={movimiento} publicar={emitir} />
-                                            }
-                                        />,
-                                    ]} />
+                                {puedeConciliar && (
+                                    <TabConciliacion
+                                        movimiento={movimiento}
+                                        conciliaciones={conciliaciones}
+                                        candidatos={candidatos}
+                                        candidatosTexto={candidatosTexto}
+                                        remesas={remesas}
+                                        partidas={partidas}
+                                        seleccion={seleccion}
+                                        publicar={emitir}
+                                    />
                                 )}
                             </div>
                         }
