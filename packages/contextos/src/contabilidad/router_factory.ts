@@ -7,12 +7,14 @@ import { MaestroConDetalleLibroFacturasRecibidas } from "./libro_facturas_recibi
 import { MaestroConDetalleLibroMayor } from "./libro_mayor/maestro/MaestroConDetalleLibroMayor.tsx";
 import { PantallaPgc } from "./pgc/Pgc.tsx";
 import { MaestroConDetalleRegularizacionIva } from "./regularizacion_iva/maestro/MaestroConDetalleRegularizacionIva.tsx";
+import { MaestroConDetallePlantillaAsiento } from "./plantilla_asiento/maestro/MaestroConDetallePlantillaAsiento.tsx";
 
 export class RouterFactoryContabilidadOlula {
     static router = {
         "contabilidad/asiento": MaestroConDetalleAsiento,
         "contabilidad/pgc": PantallaPgc,
         "contabilidad/codigo_balance": MaestroConDetalleCodigoBalance,
+        "contabilidad/plantilla_asiento": MaestroConDetallePlantillaAsiento,
         "contabilidad/cuentas_anuales": MaestroConDetalleCuentasAnuales,
         "contabilidad/libro_diario": MaestroConDetalleLibroDiario,
         "contabilidad/libro_mayor": MaestroConDetalleLibroMayor,

@@ -2,6 +2,9 @@ class CONTABILIDAD_Urls {
     readonly ASIENTO = `/contabilidad/asiento`;
     readonly ASIENTO_RENUMERAR = `/contabilidad/asiento/renumerar`;
     readonly PARTIDA = `/contabilidad/asiento/partida`;
+    readonly ASIENTO_DESDE_PLANTILLA = `/contabilidad/asiento/desde_plantilla`;
+    readonly ASIENTO_DESDE_PLANTILLA_CALCULAR = `/contabilidad/asiento/desde_plantilla/calcular`;
+    readonly PLANTILLA_ASIENTO = `/contabilidad/plantilla_asiento`;
     readonly SUBCUENTA = `/contabilidad/subcuenta`;
     readonly CUENTA = `/contabilidad/cuenta`;
     readonly CUENTA_ESPECIAL = `/contabilidad/cuenta_especial`;
