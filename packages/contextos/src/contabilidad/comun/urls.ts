@@ -44,6 +44,8 @@ class CONTABILIDAD_Urls {
     readonly CUENTAS_ANUALES_HOJA = (id: string, formato: string) =>
         `/contabilidad/cuentas_anuales/${id}/hoja?formato=${formato}`;
     readonly REGULARIZACION_IVA = `/contabilidad/regularizacion_iva`;
+    readonly EJERCICIO = `/contabilidad/ejercicio`;
+    readonly EJERCICIO_ALTA = `/comun/ejercicio_facturacion`;
 }
 
 export default CONTABILIDAD_Urls;

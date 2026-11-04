@@ -10,6 +10,7 @@ export const menuContabilidad = {
         url: "/contabilidad/codigo_balance",
         regla: "contabilidad.asiento",
     },
+    "Contabilidad/Ejercicios": { url: "/contabilidad/ejercicio", regla: "contabilidad.asiento" },
     "Contabilidad/Libro diario": {
         url: "/contabilidad/libro_diario",
         regla: "contabilidad.asiento",
