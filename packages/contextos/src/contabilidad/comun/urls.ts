@@ -5,6 +5,12 @@ class CONTABILIDAD_Urls {
     readonly SUBCUENTA = `/contabilidad/subcuenta`;
     readonly CUENTA = `/contabilidad/cuenta`;
     readonly CUENTA_ESPECIAL = `/contabilidad/cuenta_especial`;
+    readonly CODIGO_BALANCE = `/contabilidad/codigo_balance`;
+    readonly CODIGO_BALANCE_REGENERAR = `/contabilidad/codigo_balance/regenerar`;
+    readonly CODIGO_BALANCE_SALDO = (ejercicioId: string) =>
+        `/contabilidad/codigo_balance/saldo/${encodeURIComponent(ejercicioId)}`;
+    readonly CUENTA_CODIGO_BALANCE = `/contabilidad/cuenta_codigo_balance`;
+    readonly CUENTA_CODIGO_BALANCE_ABREVIADO = `/contabilidad/cuenta_codigo_balance_abreviado`;
     readonly GRUPO_EPIGRAFE = `/contabilidad/grupo_epigrafe`;
     readonly EPIGRAFE = `/contabilidad/epigrafe`;
     readonly LIBRO_DIARIO = `/contabilidad/libro_diario`;

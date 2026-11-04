@@ -2,6 +2,10 @@ export const menuContabilidad = {
     Contabilidad: { icono: "fichero" },
     "Contabilidad/Asientos": { url: "/contabilidad/asiento", regla: "contabilidad.asiento" },
     "Contabilidad/PGC": { url: "/contabilidad/pgc", regla: "contabilidad.asiento" },
+    "Contabilidad/Códigos de balance 2008": {
+        url: "/contabilidad/codigo_balance",
+        regla: "contabilidad.asiento",
+    },
     "Contabilidad/Libro diario": {
         url: "/contabilidad/libro_diario",
         regla: "contabilidad.asiento",
