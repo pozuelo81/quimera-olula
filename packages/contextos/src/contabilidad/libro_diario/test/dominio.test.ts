@@ -4,8 +4,10 @@ import {
     admiteOpcionesDeDetalle,
     etiquetaLibroDiario,
     libroDiarioVacio,
+    metaFormularioLibroDiario,
     nombreFicheroLibroDiario,
     nuevoLibroDiarioInicial,
+    opcionesCoherentes,
 } from "../dominio.ts";
 
 const ficha = (campos: Partial<LibroDiario> = {}): LibroDiario => ({
@@ -74,5 +76,50 @@ describe("nombre del fichero", () => {
         expect(
             nombreFicheroLibroDiario(ficha({ descripcion: "Año económico" }))
         ).toBe("ano-economico.pdf");
+    });
+});
+
+describe("formulario del libro diario", () => {
+    test("las opciones booleanas de co_i_diario son casillas", () => {
+        const meta = metaFormularioLibroDiario<LibroDiario>();
+        for (const campo of [
+            "todosAsientos",
+            "todasSubcuentas",
+            "resumenMensual",
+            "datosIva",
+            "agruparMeses",
+        ]) {
+            expect(meta.campos?.[campo]?.tipo).toBe("checkbox");
+        }
+    });
+
+    test("al marcar resumen mensual apaga datos de I.V.A. y agrupar por meses", () => {
+        const meta = metaFormularioLibroDiario<LibroDiario>();
+        const resultado = meta.onChange?.(
+            ficha({
+                resumenMensual: "true" as unknown as boolean,
+                datosIva: true,
+                agruparMeses: true,
+            }),
+            "resumenMensual",
+            false
+        );
+        expect(resultado?.resumenMensual).toBe(true);
+        expect(resultado?.datosIva).toBe(false);
+        expect(resultado?.agruparMeses).toBe(false);
+    });
+
+    test("opcionesCoherentes no toca nada sin resumen mensual", () => {
+        const informe = ficha({ datosIva: true, agruparMeses: true });
+        expect(opcionesCoherentes(informe)).toBe(informe);
+    });
+
+    test("sin «todas las subcuentas» desde y hasta son obligatorias", () => {
+        const meta = metaFormularioLibroDiario<LibroDiario>();
+        const requerido = meta.campos?.subcuentaDesde?.requerido as (
+            m: LibroDiario
+        ) => boolean;
+        expect(requerido(ficha({ todasSubcuentas: false }))).toBe(true);
+        expect(requerido(ficha({ todasSubcuentas: true }))).toBe(false);
     });
 });
