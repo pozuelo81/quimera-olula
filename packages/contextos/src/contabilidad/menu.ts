@@ -1,5 +1,5 @@
 export const menuContabilidad = {
-    Contabilidad: { icono: "fichero" },
+    Contabilidad: { icono: "menu_contabilidad", area: "Finanzas" },
     "Contabilidad/Asientos": { url: "/contabilidad/asiento", regla: "contabilidad.asiento" },
     "Contabilidad/Plantillas de asiento": {
         url: "/contabilidad/plantilla_asiento",
