@@ -43,7 +43,7 @@ export const TabCriterios = ({ form, informe }: TabCriteriosProps) => {
             </quimera-formulario>
 
             <quimera-formulario>
-                <QCheckbox label="Saldo inicial" {...uiProps("saldoInicial")} />
+                <QCheckbox label="Calcular saldo inicial" {...uiProps("saldoInicial")} />
                 <QCheckbox
                     label="Excluir partidas a cero"
                     {...uiProps("excluirPartidasCero")}
