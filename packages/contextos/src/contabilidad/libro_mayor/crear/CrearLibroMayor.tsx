@@ -9,6 +9,7 @@ import { EmitirEvento } from "@olula/lib/diseño.js";
 import { useFocus } from "@olula/lib/useFocus.ts";
 import { useForm } from "@olula/lib/useForm.js";
 import { useModelo } from "@olula/lib/useModelo.ts";
+import { useRangosEjercicio } from "#/contabilidad/comun/use_rangos_ejercicio.ts";
 import { useCallback, useMemo } from "react";
 import { postLibroMayor } from "../infraestructura.ts";
 import { metaNuevoLibroMayor, nuevoLibroMayorInicial } from "./crear.ts";
@@ -31,7 +32,10 @@ export const CrearLibroMayor = ({
         modelo: informe,
         uiProps,
         valido,
+        set,
     } = useModelo(metaNuevoLibroMayor, inicial);
+
+    useRangosEjercicio(informe, set, { subcuentas: true });
 
     const crear_ = useCallback(async () => {
         const id = await postLibroMayor(informe);
@@ -89,7 +93,7 @@ export const CrearLibroMayor = ({
                         opcional
                     />
                     <QCheckbox
-                        label="Saldo inicial"
+                        label="Calcular saldo inicial"
                         {...uiProps("saldoInicial")}
                     />
                     <QCheckbox
