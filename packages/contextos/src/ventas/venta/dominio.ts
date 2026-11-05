@@ -123,6 +123,8 @@ export const metaVenta: MetaModelo<Venta> = {
         tasa_conversion: { tipo: "numero", requerido: false },
         total_divisa_empresa: { tipo: "numero", bloqueado: true },
         codigo: { bloqueado: true },
+        /** La serie se fija al crear el documento (Eneboo la bloquea en edición). */
+        serie_id: { bloqueado: true },
         divisa_id: { requerido: true },
     },
 };
