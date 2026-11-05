@@ -102,6 +102,16 @@ describe("AsientoDeDocumento — el asiento de una factura", () => {
         expect(document.querySelector(".totales-asiento-item--descuadre")).toBeNull();
     });
 
+    test("sin cabecera pinta solo la tabla de partidas", async () => {
+        getAsiento.mockResolvedValue(asientoDeFactura());
+
+        render(<AsientoDeDocumento asientoId="128" conCabecera={false} />);
+
+        expect(await screen.findByText("6000000")).toBeInTheDocument();
+        expect(document.querySelector(".CabeceraAsiento")).toBeNull();
+        expect(document.querySelector(".PartidasAsientoLista")).not.toBeNull();
+    });
+
     test("avisa si el asiento no se puede cargar", async () => {
         getAsiento.mockRejectedValue(new Error("404"));
 

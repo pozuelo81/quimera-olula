@@ -41,20 +41,67 @@ const anyoEjercicio = (ejercicioId: string): number => {
     return Number.isNaN(anyo) ? new Date().getFullYear() : anyo;
 };
 
-/** Periodo a enviar: el del trimestre elegido o las fechas a mano. Sin fecha
- * de asiento se usa el fin del periodo, como propone Eneboo. */
+/** Fechas que propone el periodo elegido en el ejercicio; con «Otro
+ * periodo» no hay propuesta y se dejan las que haya. */
+export const fechasPeriodo = (
+    ejercicioId: string,
+    trimestre: Trimestre
+): { fechaInicio: Date; fechaFin: Date } | null =>
+    trimestre === "OTRO"
+        ? null
+        : fechasTrimestre(anyoEjercicio(ejercicioId), trimestre);
+
+/** Periodo de unas fechas, como `co_regiva.qs::calculateField("periodo")`:
+ * un trimestre natural completo o «Otro periodo». */
+export const trimestreDeFechas = (
+    fechaInicio: Date | null,
+    fechaFin: Date | null
+): Trimestre => {
+    if (!fechaInicio || !fechaFin) return "OTRO";
+    const trimestre = (Object.keys(MESES_TRIMESTRE) as Exclude<Trimestre, "OTRO">[])
+        .find((t) => {
+            const fechas = fechasTrimestre(fechaInicio.getFullYear(), t);
+            return (
+                fechaInicio.getMonth() === fechas.fechaInicio.getMonth() &&
+                fechaInicio.getDate() === 1 &&
+                fechaFin.getFullYear() === fechaInicio.getFullYear() &&
+                fechaFin.getMonth() === fechas.fechaFin.getMonth() &&
+                fechaFin.getDate() === fechas.fechaFin.getDate()
+            );
+        });
+    return trimestre ?? "OTRO";
+};
+
+/** Como `co_regiva.qs::bufferChanged`: al cambiar el periodo (o el
+ * ejercicio) se cargan sus fechas y al cambiar las fechas se recalcula el
+ * periodo. Las fechas siempre se pueden modificar a mano. */
+export const cambiarNuevaRegularizacion = (
+    nueva: NuevaRegularizacionIva,
+    campo: string
+): NuevaRegularizacionIva => {
+    if (campo === "trimestre" || campo === "ejercicioId") {
+        const fechas = fechasPeriodo(nueva.ejercicioId, nueva.trimestre);
+        return fechas ? { ...nueva, ...fechas } : nueva;
+    }
+    if (campo === "fechaInicio" || campo === "fechaFin") {
+        return {
+            ...nueva,
+            trimestre: trimestreDeFechas(nueva.fechaInicio, nueva.fechaFin),
+        };
+    }
+    return nueva;
+};
+
+/** Periodo a enviar: las fechas del formulario (cargadas del periodo o
+ * cambiadas a mano). Sin fecha de asiento se usa el fin del periodo, como
+ * propone Eneboo. */
 export const periodoNuevaRegularizacion = (
     nueva: NuevaRegularizacionIva
-): PeriodoRegularizacion => {
-    const fechas =
-        nueva.trimestre === "OTRO"
-            ? { fechaInicio: nueva.fechaInicio, fechaFin: nueva.fechaFin }
-            : fechasTrimestre(anyoEjercicio(nueva.ejercicioId), nueva.trimestre);
-    return {
-        ...fechas,
-        fechaAsiento: nueva.fechaAsiento ?? fechas.fechaFin,
-    };
-};
+): PeriodoRegularizacion => ({
+    fechaInicio: nueva.fechaInicio,
+    fechaFin: nueva.fechaFin,
+    fechaAsiento: nueva.fechaAsiento ?? nueva.fechaFin,
+});
 
 /** Trimestre siguiente al último regularizado del ejercicio (Eneboo propone
  * empezar el día después de la última regularización). */

@@ -4,10 +4,12 @@ import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
 import { QuimeraAcciones } from "@olula/componentes/moleculas/qacciones.tsx";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
 import { formatearFechaDate, puede } from "@olula/lib/dominio.ts";
+import { AsientoDeDocumento } from "#/contabilidad/asiento/vistas/detalle/AsientoDeDocumento.tsx";
 import { useEffect } from "react";
 import { BorrarRegularizacionIva } from "../borrar/BorrarRegularizacionIva.tsx";
 import { etiquetaRegularizacionIva } from "../dominio.ts";
 import { contextoDetalleRegularizacionIvaInicial } from "./detalle.ts";
+import "./DetalleRegularizacionIva.css";
 import { getMaquina } from "./maquina.ts";
 
 /** Solo lectura, como el formulario de Eneboo una vez calculado: para
@@ -65,14 +67,17 @@ export const DetalleRegularizacionIva = ({
                 <quimera-formulario>
                     {campo("Ejercicio", "ejercicioId", regularizacion.ejercicioId)}
                     {campo("Periodo", "periodo", regularizacion.periodo)}
-                    {campo("Desde", "fechaInicio", formatearFechaDate(regularizacion.fechaInicio))}
-                    {campo("Hasta", "fechaFin", formatearFechaDate(regularizacion.fechaFin))}
-                    {campo("Fecha del asiento", "fechaAsiento", formatearFechaDate(regularizacion.fechaAsiento))}
-                    {campo("Nº de asiento", "numeroAsiento", String(regularizacion.numeroAsiento ?? ""))}
-                    {campo("Importe", "importe", String(regularizacion.importe ?? ""))}
+                    {campo("Fecha desde", "fechaInicio", formatearFechaDate(regularizacion.fechaInicio))}
+                    {campo("Fecha hasta", "fechaFin", formatearFechaDate(regularizacion.fechaFin))}
                     {campo("Subcuenta H.P. deudora", "codigoSubcuentaDeudora", regularizacion.codigoSubcuentaDeudora)}
                     {campo("Subcuenta H.P. acreedora", "codigoSubcuentaAcreedora", regularizacion.codigoSubcuentaAcreedora)}
+                    {campo("Nº de asiento", "numeroAsiento", String(regularizacion.numeroAsiento ?? ""))}
+                    {campo("Fecha de asiento", "fechaAsiento", formatearFechaDate(regularizacion.fechaAsiento))}
                 </quimera-formulario>
+                <AsientoDeDocumento
+                    asientoId={regularizacion.asientoId || null}
+                    conCabecera={false}
+                />
             </div>
 
             {estado === "BORRANDO" && (

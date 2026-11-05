@@ -7,6 +7,7 @@ import {
     NuevaRegularizacionIva,
     PostRegularizacionIva,
     RegularizacionIva,
+    SubcuentasRegularizacionIva,
 } from "./diseño.ts";
 import { periodoNuevaRegularizacion } from "./dominio.ts";
 
@@ -87,6 +88,25 @@ export const postRegularizacionIva: PostRegularizacionIva = async (nueva) => {
         "Error al regularizar el IVA",
     );
     return String(respuesta.id);
+};
+
+export interface SubcuentasRegularizacionIvaApi {
+    codigo_subcuenta_deudora: string | null;
+    codigo_subcuenta_acreedora: string | null;
+}
+
+/** Subcuentas H.P. deudora (IVADEU) y acreedora (IVAACR) que propone el
+ * servidor para el ejercicio. */
+export const getSubcuentasRegularizacionIva = async (
+    ejercicioId: string
+): Promise<SubcuentasRegularizacionIva> => {
+    const { datos } = await RestAPI.get<{ datos: SubcuentasRegularizacionIvaApi }>(
+        `${baseUrl}/subcuentas_defecto/${encodeURIComponent(ejercicioId)}`
+    );
+    return {
+        codigoSubcuentaDeudora: datos.codigo_subcuenta_deudora ?? "",
+        codigoSubcuentaAcreedora: datos.codigo_subcuenta_acreedora ?? "",
+    };
 };
 
 export const deleteRegularizacionIva: DeleteRegularizacionIva = async (id) => {

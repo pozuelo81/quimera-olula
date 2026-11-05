@@ -29,6 +29,11 @@ export interface NuevaRegularizacionIva extends Modelo {
     codigoSubcuentaAcreedora: string;
 }
 
+export interface SubcuentasRegularizacionIva {
+    codigoSubcuentaDeudora: string;
+    codigoSubcuentaAcreedora: string;
+}
+
 export interface PeriodoRegularizacion {
     fechaInicio: Date;
     fechaFin: Date;
