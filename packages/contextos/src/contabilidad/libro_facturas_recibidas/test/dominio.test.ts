@@ -1,5 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { LibroFacturasRecibidas } from "../diseño.ts";
+import { metaLibroFacturasRecibidas } from "../detalle/detalle.ts";
+import { metaNuevoLibroFacturasRecibidas } from "../crear/crear.ts";
 import {
     admiteNumeroDesde,
     admitePorcentaje,
@@ -75,5 +77,37 @@ describe("nombre del fichero", () => {
         expect(
             nombreFicheroLibroFacturasRecibidas(ficha({ descripcion: "" }))
         ).toBe("facturas-recibidas-2026.pdf");
+    });
+});
+
+describe("casillas del formulario", () => {
+    const CHECKS = [
+        "todos",
+        "conIva",
+        "mostrarTotalFactura",
+        "mostrarNif",
+        "mostrarDocumento",
+        "mostrarAsiento",
+        "numeracionAutomatica",
+    ];
+
+    test("alta y ficha pintan como casilla los bool de co_i_facturasrec", () => {
+        for (const meta of [
+            metaNuevoLibroFacturasRecibidas,
+            metaLibroFacturasRecibidas,
+        ]) {
+            for (const campo of CHECKS) {
+                expect(meta.campos?.[campo]?.tipo).toBe("checkbox");
+            }
+        }
+    });
+
+    test("al cambiar, las casillas quedan como booleanos", () => {
+        const resultado = metaLibroFacturasRecibidas.onChange?.(
+            ficha({ mostrarAsiento: "false" as unknown as boolean }),
+            "mostrarAsiento",
+            true
+        );
+        expect(resultado?.mostrarAsiento).toBe(false);
     });
 });
