@@ -33,4 +33,10 @@ describe("configuración de almacén", () => {
         const modelo = { grupo: "" };
         expect(conImpuestoDefecto(modelo, "grupo", null)).toBe(modelo);
     });
+
+    test("la línea nueva solo toma el impuesto con «Utilizar I.V.A. por defecto»", () => {
+        expect(impuestoDefecto({ impuestoId: "RED", usarIvaDefecto: true }, "linea")).toBe("RED");
+        expect(impuestoDefecto({ impuestoId: "RED", usarIvaDefecto: false }, "linea")).toBeNull();
+        expect(impuestoDefecto({ impuestoId: "", usarIvaDefecto: true }, "linea")).toBeNull();
+    });
 });

@@ -40,8 +40,10 @@ export const ConfigAlmacen = () => {
                     onChange={(valor) => cambiar("usarIvaDefecto", valor === "true")}
                 />
                 <p className="descripcion-config">
-                    En el escritorio, con esta opción las líneas nuevas de los documentos de compra y venta
-                    toman este impuesto. Pendiente en Olula: de momento solo se guarda.
+                    Los artículos nuevos que se den de alta sin impuesto toman el I.V.A. por defecto.
+                    Con «Utilizar I.V.A. por defecto», las líneas nuevas de presupuestos, pedidos, albaranes
+                    y facturas de venta y de compra nacen con este impuesto; al elegir un artículo, la línea
+                    toma el impuesto del artículo.
                 </p>
                 {aviso && <p className="descripcion-config">{aviso}</p>}
             </section>
