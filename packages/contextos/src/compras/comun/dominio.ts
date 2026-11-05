@@ -56,3 +56,13 @@ export const widgetsDocumentoCompra = (
         { id: "medio", titulo: textos.medio, operacion: "promedio", campo: "total", formato: "moneda", pie: "Media del total" },
     ],
 });
+
+/**
+ * Al cambiar el artículo de una línea nueva, el servidor vuelve a calcular el coste y, si se
+ * ha elegido un artículo, el impuesto: la línea toma el del artículo aunque llevase el I.V.A.
+ * por defecto o el de otro artículo (como lineas*prov.qs al cambiar la referencia).
+ */
+export const reinicioAlCambiarArticulo = (cambios: { referencia?: string | null }) => ({
+    ...(cambios.referencia !== undefined ? { pvpUnitario: null } : {}),
+    ...(cambios.referencia ? { grupoIvaProductoId: null } : {}),
+});
