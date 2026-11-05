@@ -6,7 +6,9 @@
  * Las fichas se guardan planas en cada módulo, igual que en el formulario del
  * ERP; estos tipos son los del borde con la API, que los recibe anidados.
  */
-import { Entidad } from "@olula/lib/diseño.ts";
+import { Entidad, Modelo } from "@olula/lib/diseño.ts";
+import { MetaModelo } from "@olula/lib/dominio.ts";
+import { conChecks } from "./checks_informe.ts";
 
 export interface FiltroIva {
     todos: boolean;
@@ -84,6 +86,30 @@ export interface ResultadoLibroIvaApi {
     datos: FilaLibroIvaApi[];
     total: number;
 }
+
+/** Campos `bool` de `co_i_facturasemi`/`co_i_facturasrec` que se editan
+ * como casilla. */
+export const CHECKS_LIBRO_IVA = [
+    "todos",
+    "conIva",
+    "mostrarTotalFactura",
+    "mostrarNif",
+    "mostrarDocumento",
+    "mostrarAsiento",
+    "numeracionAutomatica",
+] as const;
+
+/** Meta común del alta y de la ficha de los dos libros de I.V.A. */
+export const metaFormularioLibroIva = <T extends Modelo>(): MetaModelo<T> =>
+    conChecks<T>(
+        {
+            campos: {
+                descripcion: { requerido: true },
+                ejercicioId: { requerido: true },
+            },
+        },
+        CHECKS_LIBRO_IVA
+    );
 
 const numeroATexto = (valor: number | null): string =>
     valor === null || valor === undefined ? "" : String(valor);
