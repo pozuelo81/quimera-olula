@@ -54,9 +54,9 @@ export const CrearArticulo = ({
     >
       <>
         <quimera-formulario>
+          <QInput label="Referencia" autoSeleccion={true} {...nuevoArticulo.uiProps("id")} />
           <QInput
             label="Descripción"
-            autoSeleccion={true}
             {...nuevoArticulo.uiProps("descripcion")}
           />
           <GrupoIvaProducto {...nuevoArticulo.uiProps("grupoIvaProductoId")} />

@@ -40,7 +40,8 @@ export const CrearArticulo = ({ publicar }: { publicar: EmitirEvento }) => {
     >
       <div className="CrearArticulo">
         <quimera-formulario>
-          <QInput label="Descripción" {...uiProps("descripcion")} ref={focus} />
+          <QInput label="Referencia" {...uiProps("id")} ref={focus} />
+          <QInput label="Descripción" {...uiProps("descripcion")} />
           <GrupoIvaProducto {...uiProps("grupoIvaProductoId")} />
         </quimera-formulario>
         <div className="botones maestro-botones">

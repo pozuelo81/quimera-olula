@@ -129,6 +129,7 @@ export const postArticulo: PostArticulo = async (Articulo) => {
     return await RestAPI.post(
         baseUrlArticulo,
         {
+            id: (Articulo.id ?? "").trim(),
             descripcion: Articulo.descripcion ?? "",
             ...(Articulo.grupoIvaProductoId ? { grupo_iva_producto_id: Articulo.grupoIvaProductoId } : {}),
         },
