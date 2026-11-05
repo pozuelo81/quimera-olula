@@ -33,20 +33,20 @@ describe("regularización de IVA infraestructura (co_regiva)", () => {
         expect(r.fechaFin.getDate()).toBe(31);
     });
 
-    test("nuevaRegularizacionIvaAApi envía el periodo y omite subcuentas vacías", () => {
+    test("nuevaRegularizacionIvaAApi envía las fechas del formulario y omite subcuentas vacías", () => {
         expect(nuevaRegularizacionIvaAApi({
             ejercicioId: "2026",
-            trimestre: "T3",
-            fechaInicio: new Date(),
-            fechaFin: new Date(),
+            trimestre: "OTRO",
+            fechaInicio: new Date(2026, 6, 15, 12),
+            fechaFin: new Date(2026, 8, 20, 12),
             fechaAsiento: null,
             codigoSubcuentaDeudora: "",
             codigoSubcuentaAcreedora: "4750000001",
         })).toEqual({
             ejercicio_id: "2026",
-            fecha_inicio: "2026-07-01",
-            fecha_fin: "2026-09-30",
-            fecha_asiento: "2026-09-30",
+            fecha_inicio: "2026-07-15",
+            fecha_fin: "2026-09-20",
+            fecha_asiento: "2026-09-20",
             codigo_subcuenta_acreedora: "4750000001",
         });
     });

@@ -1,22 +1,27 @@
 import { MetaModelo } from "@olula/lib/dominio.js";
 import { ejercicioActual } from "#/contabilidad/asiento/dominio.ts";
 import { NuevaRegularizacionIva, RegularizacionIva } from "../diseño.ts";
-import { fechasTrimestre, trimestreSiguiente } from "../dominio.ts";
+import {
+    cambiarNuevaRegularizacion,
+    fechasTrimestre,
+    trimestreSiguiente,
+} from "../dominio.ts";
 
 export const metaNuevaRegularizacionIva: MetaModelo<NuevaRegularizacionIva> = {
     campos: {
         ejercicioId: { requerido: true, maximo: 4 },
         trimestre: { requerido: true, tipo: "selector" },
-        fechaInicio: { requerido: false, tipo: "fecha" },
-        fechaFin: { requerido: false, tipo: "fecha" },
+        fechaInicio: { requerido: true, tipo: "fecha" },
+        fechaFin: { requerido: true, tipo: "fecha" },
         fechaAsiento: { requerido: false, tipo: "fecha" },
         codigoSubcuentaDeudora: { requerido: false },
         codigoSubcuentaAcreedora: { requerido: false },
     },
     validacion: (m) =>
-        m.trimestre !== "OTRO" || m.fechaInicio <= m.fechaFin
+        !m.fechaInicio || !m.fechaFin || m.fechaInicio <= m.fechaFin
             ? true
             : "La fecha de inicio debe ser anterior a la de fin",
+    onChange: (modelo, campo) => cambiarNuevaRegularizacion(modelo, campo),
 };
 
 export const nuevaRegularizacionIvaInicial = (

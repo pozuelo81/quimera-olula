@@ -7,14 +7,18 @@ import { EmitirEvento } from "@olula/lib/diseño.js";
 import { useFocus } from "@olula/lib/useFocus.ts";
 import { useForm } from "@olula/lib/useForm.js";
 import { useModelo } from "@olula/lib/useModelo.ts";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { RegularizacionIva } from "../diseño.ts";
 import { opcionesTrimestre } from "../dominio.ts";
-import { postRegularizacionIva } from "../infraestructura.ts";
+import {
+    getSubcuentasRegularizacionIva,
+    postRegularizacionIva,
+} from "../infraestructura.ts";
 import {
     metaNuevaRegularizacionIva,
     nuevaRegularizacionIvaInicial,
 } from "./crear.ts";
+import "./CrearRegularizacionIva.css";
 
 export const CrearRegularizacionIva = ({
     publicar,
@@ -28,10 +32,31 @@ export const CrearRegularizacionIva = ({
         [regularizaciones]
     );
 
-    const { modelo, uiProps, valido } = useModelo(
+    const { modelo, uiProps, valido, set } = useModelo(
         metaNuevaRegularizacionIva,
         inicial
     );
+
+    const modeloActual = useRef(modelo);
+    modeloActual.current = modelo;
+
+    // Como co_regiva.qs::init: subcuentas H.P. deudora (IVADEU) y acreedora
+    // (IVAACR) del ejercicio, que se vuelven a proponer al cambiarlo.
+    const { ejercicioId } = modelo;
+    useEffect(() => {
+        if (ejercicioId.length !== 4) return;
+        let vigente = true;
+        getSubcuentasRegularizacionIva(ejercicioId)
+            .then((subcuentas) => {
+                if (!vigente || modeloActual.current.ejercicioId !== ejercicioId) return;
+                set({ ...modeloActual.current, ...subcuentas });
+            })
+            .catch(() => {});
+        return () => {
+            vigente = false;
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [ejercicioId]);
 
     const crear_ = useCallback(async () => {
         const id = await postRegularizacionIva(modelo);
@@ -62,22 +87,18 @@ export const CrearRegularizacionIva = ({
                         opciones={opcionesTrimestre}
                         {...uiProps("trimestre")}
                     />
-                    {modelo.trimestre === "OTRO" && (
-                        <>
-                            <QDate label="Desde" {...uiProps("fechaInicio")} />
-                            <QDate label="Hasta" {...uiProps("fechaFin")} />
-                        </>
-                    )}
+                    <QDate label="Fecha desde" {...uiProps("fechaInicio")} />
+                    <QDate label="Fecha hasta" {...uiProps("fechaFin")} />
                     <QDate
                         label="Fecha del asiento (por defecto, fin del periodo)"
                         {...uiProps("fechaAsiento")}
                     />
                     <QInput
-                        label="Subcuenta H.P. deudora (por defecto, IVADEU)"
+                        label="Subcuenta H.P. deudora"
                         {...uiProps("codigoSubcuentaDeudora")}
                     />
                     <QInput
-                        label="Subcuenta H.P. acreedora (por defecto, IVAACR)"
+                        label="Subcuenta H.P. acreedora"
                         {...uiProps("codigoSubcuentaAcreedora")}
                     />
                 </quimera-formulario>
