@@ -18,4 +18,5 @@ export const menuVentas = {
     "Ventas/Artículos": { url: "/ventas/articulo", regla: "ventas.articulo" },
     "Ventas/Tarifas": { url: "/ventas/tarifa", regla: "ventas.tarifa.leer" },
     "Ventas/Agentes": { url: "/ventas/agente", regla: "ventas.agente" },
+    "Ventas/Configuración": { alias: ["borrador", "copia de correos", "observaciones del cliente"], url: "/ventas/config", regla: "ventas.config" },
 };

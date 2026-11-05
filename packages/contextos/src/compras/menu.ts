@@ -6,4 +6,5 @@ export const menuCompras = {
     "Compras/Facturas": { alias: ["facturas recibidas", "proveedores"], url: "/compras/factura", regla: "compras.factura" },
     "Compras/Proveedores": { url: "/compras/proveedor", regla: "compras.proveedor" },
     "Compras/Artículos": { url: "/compras/articulo", regla: "compras.articulo" },
+    "Compras/Configuración": { alias: ["artículos de proveedor"], url: "/compras/config", regla: "compras.config" },
 };

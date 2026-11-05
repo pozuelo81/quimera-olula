@@ -1,3 +1,4 @@
+import { ConfigCompras } from "./config/vistas/ConfigCompras.tsx";
 import { MaestroConDetalleAlbaran } from "./albaran/maestro/MaestroConDetalleAlbaran.tsx";
 import { MaestroConDetalleArticulo } from "./articulo/maestro/MaestroConDetalleArticulo.tsx";
 import { MaestroConDetalleFactura } from "./factura/maestro/MaestroConDetalleFactura.tsx";
@@ -7,6 +8,7 @@ import { AlbaranarPedido } from "./albaranar_pedido/vistas/detalle/AlbaranarPedi
 
 export class RouterFactoryComprasOlula {
     static router = {
+        "compras/config": ConfigCompras,
         "compras/pedido": MaestroConDetallePedido,
         "compras/albaran": MaestroConDetalleAlbaran,
         "compras/factura": MaestroConDetalleFactura,
