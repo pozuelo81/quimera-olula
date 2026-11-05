@@ -50,7 +50,7 @@ export const checksNormalizados = <T extends Modelo>(
 export const conChecks = <T extends Modelo>(
     meta: MetaModelo<T>,
     checks: readonly string[],
-    ajustar?: (modelo: T) => T
+    ajustar?: (modelo: T, campo: string) => T
 ): MetaModelo<T> => ({
     ...meta,
     campos: { ...camposCheck<T>(checks), ...meta.campos },
@@ -59,6 +59,6 @@ export const conChecks = <T extends Modelo>(
             ? meta.onChange(modelo, campo, valorAnterior, otros)
             : modelo;
         const normalizado = checksNormalizados(base, checks);
-        return ajustar ? ajustar(normalizado) : normalizado;
+        return ajustar ? ajustar(normalizado, campo) : normalizado;
     },
 });

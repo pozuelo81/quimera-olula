@@ -82,7 +82,6 @@ export const CrearLibroFacturasEmitidas = ({
                         label="% de I.V.A."
                         {...uiProps("porcentaje")}
                         soloLectura={!admitePorcentaje(informe)}
-                        opcional
                     />
                     <QCheckbox label="Solo con I.V.A." {...uiProps("conIva")} />
                     <QCheckbox
