@@ -111,3 +111,34 @@ describe("casillas del formulario", () => {
         expect(resultado?.mostrarAsiento).toBe(false);
     });
 });
+
+describe("% de I.V.A.", () => {
+    test("es un número decimal libre en alta y ficha", () => {
+        for (const meta of [
+            metaNuevoLibroFacturasRecibidas,
+            metaLibroFacturasRecibidas,
+        ]) {
+            expect(meta.campos?.porcentaje?.tipo).toBe("decimal");
+            expect(meta.campos?.porcentaje?.decimales).toBe(2);
+        }
+    });
+
+    test("al marcar todos los tipos pasa a 0 (co_i_facturasrec.qs)", () => {
+        const resultado = metaLibroFacturasRecibidas.onChange?.(
+            ficha({
+                todos: "true" as unknown as boolean,
+                porcentaje: 4,
+            }),
+            "todos",
+            false
+        );
+        expect(resultado?.porcentaje).toBe(0);
+    });
+
+    test("sin todos los tipos es obligatorio", () => {
+        const requerido = metaLibroFacturasRecibidas.campos?.porcentaje
+            ?.requerido as (m: LibroFacturasRecibidas) => boolean;
+        expect(requerido(ficha({ todos: false }))).toBe(true);
+        expect(requerido(ficha({ todos: true }))).toBe(false);
+    });
+});
