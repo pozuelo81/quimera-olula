@@ -17,13 +17,12 @@ export const opcionesActualizarArticulosProveedor: {
 const EXPLICACION: Record<ActualizarArticulosProveedor, string> = {
     "No Actualizar": "Los artículos de proveedor solo cambian a mano.",
     "Albaranes de proveedor": "Al guardar un albarán de proveedor, cada artículo de sus líneas queda "
-        + "como artículo de ese proveedor con el coste y la divisa del albarán.",
+        + "como artículo de ese proveedor con el coste y la divisa del albarán (se aplica en segundo plano, "
+        + "unos segundos después de guardar).",
     "Facturas de proveedor": "Al guardar una factura de proveedor, cada artículo de sus líneas queda "
-        + "como artículo de ese proveedor con el coste y la divisa de la factura.",
+        + "como artículo de ese proveedor con el coste y la divisa de la factura (se aplica en segundo plano, "
+        + "unos segundos después de guardar).",
 };
 
-/** Olula aún no actualiza los artículos de proveedor al guardar albaranes ni facturas. */
-const AVISO_SIN_APLICAR = " Pendiente en Olula: de momento la opción solo se guarda.";
-
 export const explicacionActualizarArticulosProveedor = (valor: ActualizarArticulosProveedor): string =>
-    EXPLICACION[valor] + (valor === "No Actualizar" ? "" : AVISO_SIN_APLICAR);
+    EXPLICACION[valor];
