@@ -3,10 +3,12 @@ import { Articulo } from "../diseño.ts";
 
 export const nuevoArticuloInicial = (): Partial<Articulo> => ({
     descripcion: "",
+    grupoIvaProductoId: "",
 });
 
 export const metaNuevoArticulo: MetaModelo<Partial<Articulo>> = {
     campos: {
         descripcion: { requerido: true, validacion: (m) => stringNoVacio(m.descripcion || "") },
+        grupoIvaProductoId: { requerido: false },
     },
 };

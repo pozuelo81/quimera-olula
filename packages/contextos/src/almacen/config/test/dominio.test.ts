@@ -1,4 +1,4 @@
-import { avisoIvaDefecto, configAlmacenPorDefecto } from "#/almacen/config/dominio.ts";
+import { avisoIvaDefecto, configAlmacenPorDefecto, conImpuestoDefecto, impuestoDefecto } from "#/almacen/config/dominio.ts";
 import { configAlmacenAApi, configAlmacenDesdeApi } from "#/almacen/config/infraestructura.ts";
 import { describe, expect, test } from "vitest";
 
@@ -18,5 +18,19 @@ describe("configuración de almacén", () => {
         expect(avisoIvaDefecto({ impuestoId: "", usarIvaDefecto: true })).not.toBe("");
         expect(avisoIvaDefecto({ impuestoId: "GEN", usarIvaDefecto: true })).toBe("");
         expect(avisoIvaDefecto({ impuestoId: "", usarIvaDefecto: false })).toBe("");
+    });
+
+    test("el artículo nuevo toma el impuesto de la configuración, con o sin la casilla", () => {
+        expect(impuestoDefecto({ impuestoId: "RED", usarIvaDefecto: false }, "articulo")).toBe("RED");
+        expect(impuestoDefecto({ impuestoId: "RED", usarIvaDefecto: true }, "articulo")).toBe("RED");
+        expect(impuestoDefecto({ impuestoId: "", usarIvaDefecto: true }, "articulo")).toBeNull();
+    });
+
+    test("propone el impuesto solo si el campo está vacío", () => {
+        expect(conImpuestoDefecto({ grupo: "" }, "grupo", "RED")).toEqual({ grupo: "RED" });
+        expect(conImpuestoDefecto({ grupo: null }, "grupo", "RED")).toEqual({ grupo: "RED" });
+        expect(conImpuestoDefecto({ grupo: "GEN" }, "grupo", "RED")).toEqual({ grupo: "GEN" });
+        const modelo = { grupo: "" };
+        expect(conImpuestoDefecto(modelo, "grupo", null)).toBe(modelo);
     });
 });
