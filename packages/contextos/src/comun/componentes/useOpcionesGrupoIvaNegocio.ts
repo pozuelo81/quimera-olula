@@ -1,6 +1,6 @@
 import { capitalizarDescripcion } from "#/ventas/comun/dominio.ts";
 import { obtenerDatosSelector } from "@olula/lib/infraestructura.ts";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export type OpcionGrupoIvaNegocio = { valor: string; descripcion: string };
 
@@ -23,4 +23,17 @@ export const useOpcionesGrupoIvaNegocio = (): OpcionGrupoIvaNegocio[] => {
   }, []);
 
   return opciones;
+};
+
+/**
+ * Descripción de un grupo de IVA de negocio por su código (la misma lista que
+ * el selector), para mostrarlo en la franja de datos clave de los documentos.
+ */
+export const useDescripcionGrupoIvaNegocio = (): ((id: string) => string | undefined) => {
+  const opciones = useOpcionesGrupoIvaNegocio();
+
+  return useCallback(
+    (id: string) => opciones.find((grupo) => grupo.valor === id)?.descripcion,
+    [opciones]
+  );
 };

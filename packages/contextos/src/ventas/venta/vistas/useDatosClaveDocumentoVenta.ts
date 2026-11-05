@@ -1,4 +1,4 @@
-import { useOpcionesGrupoIvaNegocio } from "#/comun/componentes/useOpcionesGrupoIvaNegocio.ts";
+import { useDescripcionGrupoIvaNegocio } from "#/comun/componentes/useOpcionesGrupoIvaNegocio.ts";
 import { useCallback } from "react";
 import { datosClaveDocumentoVenta, DocumentoDatosClave } from "../dominio.ts";
 
@@ -8,14 +8,11 @@ import { datosClaveDocumentoVenta, DocumentoDatosClave } from "../dominio.ts";
  * de la pestaña Datos).
  */
 export const useDatosClaveDocumentoVenta = () => {
-    const gruposIva = useOpcionesGrupoIvaNegocio();
+    const descripcionGrupoIva = useDescripcionGrupoIvaNegocio();
 
     return useCallback(
         (documento: DocumentoDatosClave) =>
-            datosClaveDocumentoVenta(
-                documento,
-                (id) => gruposIva.find((grupo) => grupo.valor === id)?.descripcion
-            ),
-        [gruposIva]
+            datosClaveDocumentoVenta(documento, descripcionGrupoIva),
+        [descripcionGrupoIva]
     );
 };
