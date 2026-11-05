@@ -6,10 +6,6 @@ export const menuContabilidad = {
         regla: "contabilidad.asiento",
     },
     "Contabilidad/PGC": { url: "/contabilidad/pgc", regla: "contabilidad.asiento" },
-    "Contabilidad/Códigos de balance 2008": {
-        url: "/contabilidad/codigo_balance",
-        regla: "contabilidad.asiento",
-    },
     "Contabilidad/Amortizaciones": {
         url: "/contabilidad/amortizacion",
         regla: "contabilidad.asiento",
