@@ -118,6 +118,10 @@ export const nuevoLibroDiarioInicial = (
     resumenMensual: false,
     orden1: "Asiento",
     tipoOrden1: ASCENDENTE,
+    orden2: NO_ORDENAR,
+    tipoOrden2: ASCENDENTE,
+    orden3: NO_ORDENAR,
+    tipoOrden3: ASCENDENTE,
 });
 
 export const nombreFicheroLibroDiario = (

@@ -6,11 +6,13 @@ import { EmitirEvento } from "@olula/lib/diseño.ts";
 import { formatearFechaDate, puede } from "@olula/lib/dominio.ts";
 import { preferencias } from "@olula/lib/preferencias.ts";
 import { useEffect } from "react";
+import { AsientoDeDocumento } from "#/contabilidad/asiento/vistas/detalle/AsientoDeDocumento.tsx";
 import { ejercicioActual, PREFERENCIA_EJERCICIO_ACTUAL } from "#/contabilidad/asiento/dominio.ts";
 import { CerrarEjercicio } from "../cerrar/CerrarEjercicio.tsx";
 import { DeshacerCierreEjercicio } from "../deshacer_cierre/DeshacerCierreEjercicio.tsx";
 import { Ejercicio } from "../diseño.ts";
 import {
+    asientosDelEjercicio,
     etiquetaEjercicio,
     puedeCerrar,
     puedeDeshacerCierre,
@@ -31,7 +33,7 @@ export const DetalleEjercicio = ({
     publicar?: EmitirEvento;
 }) => {
     const { ctx, emitir } = useMaquina(getMaquina, contextoDetalleEjercicioInicial, publicar);
-    const { estado, ejercicio } = ctx;
+    const { estado, ejercicio, siguiente } = ctx;
 
     useEffect(() => {
         emitir("ejercicio_id_cambiada", id, true);
@@ -67,7 +69,6 @@ export const DetalleEjercicio = ({
     const campo = (label: string, nombre: string, valor: string) => (
         <QInput label={label} nombre={nombre} valor={valor} soloLectura />
     );
-    const asiento = (n: number | null) => (n ? String(n) : "");
 
     return (
         <Detalle
@@ -89,10 +90,15 @@ export const DetalleEjercicio = ({
                     {campo("Estado", "estado", ejercicio.estado + (esActual ? " (ejercicio actual)" : ""))}
                     {campo("Dígitos de subcuenta", "digitosSubcuenta", String(ejercicio.digitosSubcuenta))}
                     {campo("Plan contable", "tienePgc", ejercicio.tienePgc ? `PGC ${ejercicio.planContable || "08"}` : "Sin plan contable")}
-                    {campo("Asiento de apertura", "asientoAperturaId", asiento(ejercicio.asientoAperturaId))}
-                    {campo("Asiento de pérdidas y ganancias", "asientoPygId", asiento(ejercicio.asientoPygId))}
-                    {campo("Asiento de cierre", "asientoCierreId", asiento(ejercicio.asientoCierreId))}
                 </quimera-formulario>
+                {asientosDelEjercicio(ejercicio, siguiente).map(({ titulo, asientoId }) => (
+                    <AsientoDeDocumento
+                        key={asientoId}
+                        asientoId={asientoId}
+                        conCabecera={false}
+                        titulo={titulo}
+                    />
+                ))}
             </div>
 
             {estado === "GENERANDO_PGC" && (

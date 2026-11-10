@@ -1,4 +1,4 @@
-import { Ejercicio, NuevoEjercicio, OpcionesCierre } from "./diseño.ts";
+import { AsientoDelEjercicio, Ejercicio, NuevoEjercicio, OpcionesCierre } from "./diseño.ts";
 
 const DIGITOS_SUBCUENTA_DEFECTO = 10;
 
@@ -74,6 +74,26 @@ export const ejercicioSiguiente = (ejercicio: Ejercicio, ejercicios: Ejercicio[]
         .filter((e) => e.fechaInicio.getTime() > ejercicio.fechaInicio.getTime())
         .sort((a, b) => a.fechaInicio.getTime() - b.fechaInicio.getTime());
     return posteriores[0]?.id ?? "";
+};
+
+/** Asientos que el cierre deja enlazados (Eneboo `ejercicios.idasiento*`):
+ * la apertura de este ejercicio (si vino del cierre del anterior), la
+ * regularización de pérdidas y ganancias, el cierre y la apertura que el
+ * cierre dejó en el ejercicio siguiente (se guarda en ese ejercicio). */
+export const asientosDelEjercicio = (
+    ejercicio: Ejercicio,
+    siguiente: Ejercicio | null
+): AsientoDelEjercicio[] => {
+    const asientos: [string, number | null][] = [
+        ["Asiento de apertura", ejercicio.asientoAperturaId],
+        ["Asiento de regularización (pérdidas y ganancias)", ejercicio.asientoPygId],
+        ["Asiento de cierre", ejercicio.asientoCierreId],
+        [`Asiento de apertura del ejercicio ${siguiente?.id ?? ""}`,
+            ejercicio.asientoCierreId ? siguiente?.asientoAperturaId ?? null : null],
+    ];
+    return asientos
+        .filter(([, id]) => !!id)
+        .map(([titulo, id]) => ({ titulo, asientoId: String(id) }));
 };
 
 export const opcionesCierreIniciales = (

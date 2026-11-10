@@ -253,7 +253,11 @@ export const nuevoLibroDiarioAApi = (nuevo: NuevoLibroDiario) => ({
     datos_iva: nuevo.datosIva,
     agrupar_meses: nuevo.agruparMeses,
     resumen_mensual: nuevo.resumenMensual,
-    ordenes: ordenesAApi([[nuevo.orden1, nuevo.tipoOrden1]]),
+    ordenes: ordenesAApi([
+        [nuevo.orden1, nuevo.tipoOrden1],
+        [nuevo.orden2, nuevo.tipoOrden2],
+        [nuevo.orden3, nuevo.tipoOrden3],
+    ]),
 });
 
 const TIENE_RANGO_ASIENTOS: (keyof CambiosLibroDiario)[] = [

@@ -90,6 +90,21 @@ describe("alta de la ficha", () => {
             { criterio: "Asiento", sentido: "Ascendente" },
         ]);
     });
+
+    test("el alta manda también los niveles de orden 2 y 3", () => {
+        const api = nuevoLibroDiarioAApi({
+            ...nuevoLibroDiarioInicial("2026"),
+            orden2: "Fecha",
+            tipoOrden2: "Descendente",
+            orden3: "Subcuenta",
+        });
+
+        expect(api.ordenes).toEqual([
+            { criterio: "Asiento", sentido: "Ascendente" },
+            { criterio: "Fecha", sentido: "Descendente" },
+            { criterio: "Subcuenta", sentido: "Ascendente" },
+        ]);
+    });
 });
 
 describe("cambios de la ficha", () => {

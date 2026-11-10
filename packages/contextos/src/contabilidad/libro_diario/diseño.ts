@@ -120,6 +120,10 @@ export interface NuevoLibroDiario extends Modelo {
     resumenMensual: boolean;
     orden1: CriterioOrden;
     tipoOrden1: SentidoOrden;
+    orden2: CriterioOrden;
+    tipoOrden2: SentidoOrden;
+    orden3: CriterioOrden;
+    tipoOrden3: SentidoOrden;
 }
 
 /** Los campos de un rango viajan juntos aunque solo cambie uno: la API recibe
