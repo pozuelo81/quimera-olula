@@ -112,6 +112,15 @@ describe("AsientoDeDocumento — el asiento de una factura", () => {
         expect(document.querySelector(".PartidasAsientoLista")).not.toBeNull();
     });
 
+    test("con título lo pinta con el número y la fecha del asiento", async () => {
+        getAsiento.mockResolvedValue(asientoDeFactura());
+
+        render(<AsientoDeDocumento asientoId="128" conCabecera={false} titulo="Asiento de cierre" />);
+
+        expect(await screen.findByText("Asiento de cierre · Nº 45 · 01/03/2026")).toBeInTheDocument();
+        expect(document.querySelector(".CabeceraAsiento")).toBeNull();
+    });
+
     test("avisa si el asiento no se puede cargar", async () => {
         getAsiento.mockRejectedValue(new Error("404"));
 

@@ -57,6 +57,18 @@ export const getEjercicios: GetEjercicios = async (criteria) =>
 export const getEjercicio: GetEjercicio = async (id) =>
     RestAPI.getItem<Ejercicio, EjercicioApi>(`${baseUrl}/${id}`, ejercicioDesdeApi);
 
+/** El ejercicio que empieza justo después (donde el cierre deja la apertura),
+ * con el mismo criterio que el servidor: el primero con fecha de inicio
+ * posterior. */
+export const getEjercicioSiguiente = async (ejercicio: Ejercicio): Promise<Ejercicio | null> => {
+    const { datos } = await getEjercicios({
+        filtro: [["fecha_inicio", ">", fechaAApi(ejercicio.fechaInicio)]],
+        orden: ["fecha_inicio", "ASC"],
+        paginacion: { limite: 1, pagina: 1 },
+    });
+    return datos[0] ?? null;
+};
+
 export const nuevoEjercicioAApi = (nuevo: NuevoEjercicio, empresaId: number | null) => ({
     id: nuevo.id,
     empresa_id: String(empresaId ?? 1),

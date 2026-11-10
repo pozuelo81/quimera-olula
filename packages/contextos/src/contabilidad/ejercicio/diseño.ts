@@ -53,5 +53,11 @@ export interface ResultadoCierre {
     ejercicioDestinoCreado: boolean;
 }
 
+/** Un asiento que el cierre deja enlazado al ejercicio, con su título. */
+export interface AsientoDelEjercicio {
+    titulo: string;
+    asientoId: string;
+}
+
 export type GetEjercicios = (criteria: Criteria) => RespuestaLista<Ejercicio>;
 export type GetEjercicio = (id: string) => Promise<Ejercicio>;

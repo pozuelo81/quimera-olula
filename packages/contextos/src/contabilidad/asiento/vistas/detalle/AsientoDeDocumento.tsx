@@ -1,21 +1,27 @@
+import { formatearFechaDate } from "@olula/lib/dominio.ts";
 import { Asiento } from "../../diseño.ts";
 import { getAsiento } from "../../infraestructura.ts";
 import { CabeceraAsiento } from "./CabeceraAsiento.tsx";
 import { PartidasAsientoLista } from "./PartidasAsientoLista.tsx";
+import "./AsientoDeDocumento.css";
 import { useEffect, useState } from "react";
 
 /** El asiento de un documento (factura de compra o de venta, regularización
  * de IVA...). Recibe solo el id: el documento no trae el asiento. Sin
  * cabecera muestra solo la tabla de partidas, para documentos que ya enseñan
- * el número y la fecha del asiento en su formulario. */
+ * el número y la fecha del asiento en su formulario. Con título lo pinta
+ * encima junto al número y la fecha (varios asientos en un formulario, como
+ * los del cierre de un ejercicio). */
 interface AsientoDeDocumentoProps {
     asientoId: string | null;
     conCabecera?: boolean;
+    titulo?: string;
 }
 
 export const AsientoDeDocumento = ({
     asientoId,
     conCabecera = true,
+    titulo,
 }: AsientoDeDocumentoProps) => {
     const [asiento, setAsiento] = useState<Asiento | null>(null);
     const [cargando, setCargando] = useState(false);
@@ -46,6 +52,11 @@ export const AsientoDeDocumento = ({
 
     return (
         <div className="AsientoDeDocumento">
+            {titulo && (
+                <h3 className="titulo-asiento">
+                    {`${titulo} · Nº ${asiento.numero} · ${formatearFechaDate(asiento.fecha)}`}
+                </h3>
+            )}
             {conCabecera && <CabeceraAsiento asiento={asiento} />}
             <PartidasAsientoLista partidas={asiento.partidas} />
         </div>

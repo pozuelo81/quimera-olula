@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { Ejercicio } from "../diseño.ts";
 import {
+    asientosDelEjercicio,
     ejercicioSiguiente,
     ejercicioVacio,
     esAvisoCuentasSinCodigoBalance,
@@ -57,6 +58,27 @@ describe("ejercicios: cierre", () => {
         expect(puedeDeshacerCierre(ejercicio("2026", 2026))).toBe(false);
         expect(puedeDeshacerCierre(ejercicio("2026", 2026, { estado: "CERRADO" }))).toBe(true);
         expect(puedeDeshacerCierre(ejercicio("2026", 2026, { asientoPygId: 7 }))).toBe(true);
+    });
+
+    test("asientos del cierre que enseña el formulario, con su título", () => {
+        expect(asientosDelEjercicio(ejercicio("2026", 2026), null)).toEqual([]);
+
+        const cerrado = ejercicio("2026", 2026, {
+            estado: "CERRADO", asientoAperturaId: 3, asientoPygId: 7, asientoCierreId: 8,
+        });
+        const siguiente = ejercicio("2027", 2027, { asientoAperturaId: 9 });
+        expect(asientosDelEjercicio(cerrado, siguiente)).toEqual([
+            { titulo: "Asiento de apertura", asientoId: "3" },
+            { titulo: "Asiento de regularización (pérdidas y ganancias)", asientoId: "7" },
+            { titulo: "Asiento de cierre", asientoId: "8" },
+            { titulo: "Asiento de apertura del ejercicio 2027", asientoId: "9" },
+        ]);
+
+        // Solo regularizado: ni cierre ni apertura del siguiente.
+        const regularizado = ejercicio("2026", 2026, { asientoPygId: 7 });
+        expect(asientosDelEjercicio(regularizado, siguiente)).toEqual([
+            { titulo: "Asiento de regularización (pérdidas y ganancias)", asientoId: "7" },
+        ]);
     });
 
     test("la apertura va al primer ejercicio posterior, o se crea", () => {
