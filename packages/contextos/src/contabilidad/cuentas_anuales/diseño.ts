@@ -91,6 +91,8 @@ export interface FilaInformeCuentasAnuales {
     concepto: string;
     saldoActual: number | null;
     saldoAnterior: number | null;
+    /** Negrita coherente por nivel, decidida por el servidor (concepto e importes). */
+    negrita: boolean;
 }
 
 export interface BalanceCuentasAnuales {
