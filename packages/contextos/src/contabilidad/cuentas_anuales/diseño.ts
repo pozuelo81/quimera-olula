@@ -82,12 +82,25 @@ export interface AvisoCuentaSinBalance {
     haber: number;
 }
 
+export type TipoFilaInforme = "cabecera" | "detalle" | "desglose" | "subtotal" | "total";
+
+/** Fila ya presentada por el servidor (la misma que pintan el PDF y la hoja de cálculo). */
+export interface FilaInformeCuentasAnuales {
+    tipo: TipoFilaInforme;
+    nivel: number;
+    concepto: string;
+    saldoActual: number | null;
+    saldoAnterior: number | null;
+}
+
 export interface BalanceCuentasAnuales {
     datos: LineaCuentasAnuales[];
     total: number;
     subtotales: SubtotalCuentasAnuales[];
     totalesGrupo: TotalGrupoCuentasAnuales[];
     avisosSinCodigoBalance: AvisoCuentaSinBalance[];
+    /** Si el servidor las manda, la web pinta estas filas tal cual. */
+    filas?: FilaInformeCuentasAnuales[];
 }
 
 export interface NuevaCuentasAnuales extends Modelo {

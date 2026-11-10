@@ -131,7 +131,7 @@ export const TabResultado = ({
     const [descargando, setDescargando] = useState(false);
 
     const filas = useMemo(
-        () => (balance ? filasDelBalance(balance) : []),
+        () => (balance ? balance.filas ?? filasDelBalance(balance) : []),
         [balance]
     );
 
