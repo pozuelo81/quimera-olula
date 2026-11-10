@@ -101,8 +101,12 @@ export interface BalanceCuentasAnualesApi {
         concepto: string;
         saldo_actual: number | null;
         saldo_anterior: number | null;
+        negrita?: boolean;
     }[];
 }
+
+/** Si el servidor no dice la negrita (versiones anteriores), la deciden los tipos. */
+export const NEGRITA_POR_TIPO: TipoFilaInforme[] = ["cabecera", "subtotal", "total"];
 
 export const balanceDesdeApi = (
     api: BalanceCuentasAnualesApi
@@ -146,6 +150,7 @@ export const balanceDesdeApi = (
             concepto: f.concepto,
             saldoActual: f.saldo_actual,
             saldoAnterior: f.saldo_anterior,
+            negrita: f.negrita ?? NEGRITA_POR_TIPO.includes(f.tipo),
         })),
     }),
     avisosSinCodigoBalance: api.avisos_sin_codigo_balance.map((a) => ({

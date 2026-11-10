@@ -1,6 +1,9 @@
 import { describe, expect, test } from "vitest";
-import { LibroDiario } from "../diseño.ts";
+import { FilaLibroDiario, LibroDiario } from "../diseño.ts";
 import {
+    CABECERAS_IVA_LIBRO_DIARIO,
+    CABECERAS_LIBRO_DIARIO,
+    celdasFilaLibroDiario,
     admiteOpcionesDeDetalle,
     etiquetaLibroDiario,
     libroDiarioVacio,
@@ -121,5 +124,133 @@ describe("formulario del libro diario", () => {
         ) => boolean;
         expect(requerido(ficha({ todasSubcuentas: false }))).toBe(true);
         expect(requerido(ficha({ todasSubcuentas: true }))).toBe(false);
+    });
+});
+
+const fila = (campos: Partial<FilaLibroDiario>): FilaLibroDiario => ({
+    tipo: "partida",
+    nivel: 1,
+    titulo: "",
+    fecha: null,
+    asientoNumero: null,
+    documento: "",
+    codigoSubcuenta: "",
+    descripcionSubcuenta: "",
+    debe: null,
+    haber: null,
+    descuadre: null,
+    codigoSerie: null,
+    factura: null,
+    baseImponible: null,
+    iva: null,
+    recargo: null,
+    ...campos,
+});
+
+const columnas = (celdas: { columnas: number }[]): number =>
+    celdas.reduce((suma, c) => suma + c.columnas, 0);
+
+describe("celdas del resultado agrupado (B11-3/4)", () => {
+    const ancho = CABECERAS_LIBRO_DIARIO.length;
+    const anchoIva = ancho + CABECERAS_IVA_LIBRO_DIARIO.length;
+
+    test("el mes ocupa toda la fila", () => {
+        const celdas = celdasFilaLibroDiario(
+            fila({ tipo: "mes", nivel: 0, titulo: "ENERO 2026" }),
+            true
+        );
+
+        expect(celdas).toHaveLength(1);
+        expect(celdas[0].texto).toBe("ENERO 2026");
+        expect(celdas[0].columnas).toBe(anchoIva);
+    });
+
+    test("el asiento lleva fecha, número y concepto", () => {
+        const celdas = celdasFilaLibroDiario(
+            fila({
+                tipo: "asiento",
+                nivel: 0,
+                titulo: "Venta",
+                fecha: new Date("2026-01-15T12:00:00"),
+                asientoNumero: 10,
+            }),
+            false
+        );
+
+        expect(celdas.map((c) => c.texto).slice(0, 3)).toEqual([
+            "15/01/2026",
+            "10",
+            "Venta",
+        ]);
+        expect(columnas(celdas)).toBe(ancho);
+    });
+
+    test("la partida va debajo con sus datos y sin repetir fecha y número", () => {
+        const celdas = celdasFilaLibroDiario(
+            fila({
+                titulo: "Cobro",
+                documento: "F-1",
+                codigoSubcuenta: "4300000001",
+                descripcionSubcuenta: "Cliente",
+                debe: 12100,
+                haber: 0,
+            }),
+            false
+        );
+
+        expect(celdas.map((c) => c.texto)).toEqual([
+            "",
+            "",
+            "F-1",
+            "4300000001",
+            "Cliente",
+            "Cobro",
+            "12.100,00",
+            "0,00",
+        ]);
+    });
+
+    test("con datos de I.V.A., solo la partida que los tiene los muestra", () => {
+        const conIva = celdasFilaLibroDiario(
+            fila({
+                debe: 121,
+                haber: 0,
+                codigoSerie: "A",
+                factura: 7,
+                baseImponible: 100,
+                iva: 21,
+                recargo: 0,
+            }),
+            true
+        );
+        const sinIva = celdasFilaLibroDiario(fila({ debe: 100, haber: 0 }), true);
+
+        expect(conIva.slice(ancho).map((c) => c.texto)).toEqual([
+            "A",
+            "7",
+            "100,00",
+            "21,00",
+            "0,00",
+        ]);
+        expect(sinIva.slice(ancho).every((c) => c.texto === "")).toBe(true);
+        expect(columnas(conIva)).toBe(anchoIva);
+    });
+
+    test("el total del mes lleva su descuadre, debe y haber", () => {
+        const celdas = celdasFilaLibroDiario(
+            fila({
+                tipo: "total_mes",
+                nivel: 0,
+                titulo: "Total ENERO 2026",
+                debe: 171,
+                haber: 171,
+                descuadre: 0,
+            }),
+            false
+        );
+
+        expect(celdas[0].texto).toBe("Total ENERO 2026 · Descuadre 0,00");
+        expect(columnas(celdas)).toBe(ancho);
+        expect(celdas[1].texto).toBe("171,00");
     });
 });

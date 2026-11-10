@@ -198,4 +198,57 @@ describe("resultado del informe", () => {
         expect(resultado.totalesMes).toEqual([]);
         expect(resultado.resumenMensual).toEqual([]);
     });
+
+    test("sin filas del servidor (versión anterior) quedan a null", () => {
+        expect(resultadoDesdeApi(resultadoApi).filas).toBeNull();
+    });
+
+    test("mapea las filas agrupadas por asiento (B11-3)", () => {
+        const resultado = resultadoDesdeApi({
+            ...resultadoApi,
+            filas: [
+                {
+                    tipo: "asiento",
+                    nivel: 0,
+                    titulo: "Venta",
+                    fecha: "2026-06-15",
+                    asiento_numero: 42,
+                },
+                {
+                    tipo: "partida",
+                    nivel: 1,
+                    titulo: "Cobro",
+                    fecha: "2026-06-15",
+                    asiento_numero: 42,
+                    documento: "F-1",
+                    codigo_subcuenta: "57000000",
+                    descripcion_subcuenta: "Caja",
+                    debe: 1000,
+                    haber: 0,
+                    codigo_serie: "A",
+                    factura: 7,
+                    base_imponible: 826.45,
+                    iva: 21,
+                    recargo: 0,
+                },
+                {
+                    tipo: "total",
+                    nivel: 0,
+                    titulo: "Totales",
+                    debe: 1000,
+                    haber: 1000,
+                    descuadre: 0,
+                },
+            ],
+        });
+
+        const [asiento, partida, total] = resultado.filas ?? [];
+        expect(asiento.asientoNumero).toBe(42);
+        expect(asiento.debe).toBeNull();
+        expect(partida.nivel).toBe(1);
+        expect(partida.descripcionSubcuenta).toBe("Caja");
+        expect(partida.factura).toBe(7);
+        expect(partida.baseImponible).toBe(826.45);
+        expect(total.descuadre).toBe(0);
+    });
 });
