@@ -1,3 +1,5 @@
+import { mostrarPestanaContabilidad } from "#/contabilidad/subcuentas_tercero/dominio.ts";
+import { TabContabilidad } from "#/contabilidad/subcuentas_tercero/detalle/TabContabilidad.tsx";
 import { Detalle } from "@olula/componentes/detalle/Detalle.tsx";
 import { Tab, Tabs } from "@olula/componentes/detalle/tabs/Tabs.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
@@ -121,6 +123,21 @@ export const DetalleProveedor = ({
                 />
               }
             />,
+            ...(mostrarPestanaContabilidad()
+              ? [
+                  <Tab
+                    key="tab-contabilidad"
+                    label="Contabilidad"
+                    children={
+                      <TabContabilidad
+                        tipo="proveedor"
+                        terceroId={proveedor.id}
+                        codigoSubcuenta={proveedor.subcuentaCodigo}
+                      />
+                    }
+                  />,
+                ]
+              : []),
           ]}
         />
       </div>

@@ -1,3 +1,5 @@
+import { mostrarPestanaContabilidad } from "#/contabilidad/subcuentas_tercero/dominio.ts";
+import { TabContabilidad } from "#/contabilidad/subcuentas_tercero/detalle/TabContabilidad.tsx";
 import { CambiarIdFiscal } from "#/ventas/comun/componentes/moleculas/CambiarIdFiscal/CambiarIdFiscal.tsx";
 import { Detalle } from "@olula/componentes/detalle/Detalle.tsx";
 import { Tab, Tabs } from "@olula/componentes/detalle/tabs/Tabs.tsx";
@@ -153,6 +155,22 @@ export const DetalleCliente = ({
                         key="tab-6"
                         label="Documentos"
                         children={<TabDocumentos clienteId={ctx.cliente.id} />}
+                      />,
+                    ]
+                  : []),
+                ...(mostrarPestanaContabilidad()
+                  ? [
+                      <Tab
+                        key="tab-7"
+                        label="Contabilidad"
+                        children={
+                          <div className="detalle-cliente-tab-contenido">
+                            <TabContabilidad
+                              tipo="cliente"
+                              terceroId={ctx.cliente.id}
+                            />
+                          </div>
+                        }
                       />,
                     ]
                   : []),
