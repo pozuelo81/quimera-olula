@@ -77,15 +77,6 @@ export const puedeCerrar = (e: Ejercicio): boolean =>
 export const puedeReabrir = (e: Ejercicio): boolean =>
     !!e.id && e.estado === "CERRADO";
 
-/** Ejercicio siguiente (el primero que empieza después), o "" si hay que
- * crearlo: el servidor lo crea con el PGC de este. */
-export const ejercicioSiguiente = (ejercicio: Ejercicio, ejercicios: Ejercicio[]): string => {
-    const posteriores = ejercicios
-        .filter((e) => e.fechaInicio.getTime() > ejercicio.fechaInicio.getTime())
-        .sort((a, b) => a.fechaInicio.getTime() - b.fechaInicio.getTime());
-    return posteriores[0]?.id ?? "";
-};
-
 /** Asientos enlazados al ejercicio (Eneboo `ejercicios.idasiento*`, pestaña
  * Asientos de ejercicios.ui): la apertura (si vino del cierre del anterior),
  * la regularización de pérdidas y ganancias y el cierre, los que haya. */
@@ -108,17 +99,51 @@ export const urlAsiento = (asientoId: string, ejercicioId: string): string => {
     return `/contabilidad/asiento?${params.toString()}`;
 };
 
+/** Ejercicios donde puede ir el asiento de apertura
+ * (co_cerrarejer.qs::tbnEjercicio_clicked y validarCierre): abiertos, que
+ * empiezan después del que se cierra y sin asiento de apertura, por fecha. */
+export const ejerciciosApertura = (ejercicio: Ejercicio, ejercicios: Ejercicio[]): Ejercicio[] =>
+    ejercicios
+        .filter((e) => e.estado === "ABIERTO" && !e.asientoAperturaId
+            && e.fechaInicio.getTime() > ejercicio.fechaInicio.getTime())
+        .sort((a, b) => a.fechaInicio.getTime() - b.fechaInicio.getTime());
+
+/** Modal de cierre: fecha de fin del ejercicio (co_cerrarejer.qs::init),
+ * pérdidas y ganancias y cierre siempre (si la regularización ya se hizo no
+ * se repite), apertura marcada en el primer ejercicio posible. */
 export const opcionesCierreIniciales = (
     ejercicio: Ejercicio,
     ejercicios: Ejercicio[]
-): OpcionesCierre => ({
-    fecha: ejercicio.fechaFin,
-    regularizar: !ejercicio.asientoPygId,
-    cerrar: !ejercicio.asientoCierreId,
-    abrir: true,
-    ejercicioDestinoId: ejercicioSiguiente(ejercicio, ejercicios),
-    ignorarCuentasSinCodigoBalance: false,
+): OpcionesCierre => {
+    const destino = ejerciciosApertura(ejercicio, ejercicios)[0]?.id ?? "";
+    return {
+        fecha: ejercicio.fechaFin,
+        regularizar: true,
+        cerrar: true,
+        abrir: true,
+        ejercicioDestinoId: destino,
+        ignorarCuentasSinCodigoBalance: false,
+    };
+};
+
+/** Lo que se manda al servidor: si la regularización ya existe (ejercicio
+ * regularizado pero sin cerrar) no se vuelve a hacer. */
+export const opcionesCierreAEnviar = (ejercicio: Ejercicio, o: OpcionesCierre): OpcionesCierre => ({
+    ...o,
+    regularizar: o.regularizar && !ejercicio.asientoPygId,
+    ejercicioDestinoId: o.abrir ? o.ejercicioDestinoId : "",
 });
+
+/** co_cerrarejer.qs::validarCierre. */
+export const validarOpcionesCierre = (ejercicio: Ejercicio, o: OpcionesCierre): string | true => {
+    if (o.fecha < ejercicio.fechaInicio || o.fecha > ejercicio.fechaFin) {
+        return "La fecha debe estar dentro del ejercicio";
+    }
+    if (o.abrir && !o.ejercicioDestinoId) {
+        return "Debe seleccionar el ejercicio sobre el que se creará el asiento de apertura";
+    }
+    return true;
+};
 
 export const esAvisoCuentasSinCodigoBalance = (error: unknown): boolean => {
     const e = error as { estado?: number; descripcion?: string } | null;

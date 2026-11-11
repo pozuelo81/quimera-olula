@@ -2,10 +2,11 @@ import { describe, expect, test } from "vitest";
 import { Ejercicio } from "../diseño.ts";
 import {
     asientosDelEjercicio,
-    ejercicioSiguiente,
+    ejerciciosApertura,
     ejercicioVacio,
     esAvisoCuentasSinCodigoBalance,
     nuevoEjercicioPropuesto,
+    opcionesCierreAEnviar,
     opcionesCierreIniciales,
     puedeCerrar,
     puedeReabrir,
@@ -13,8 +14,9 @@ import {
     seriesDesdeTexto,
     textoAviso,
     urlAsiento,
+    validarOpcionesCierre,
 } from "../dominio.ts";
-import { fechaAApi } from "../infraestructura.ts";
+import { fechaAApi, opcionesCierreAApi } from "../infraestructura.ts";
 
 const ejercicio = (id: string, anyo: number, cambios: Partial<Ejercicio> = {}): Ejercicio => ({
     ...ejercicioVacio(),
@@ -83,20 +85,42 @@ describe("ejercicios: cierre", () => {
         expect(urlAsiento("42", "")).toBe("/contabilidad/asiento?id=42");
     });
 
-    test("la apertura va al primer ejercicio posterior, o se crea", () => {
+    test("ejercicios de apertura: abiertos, posteriores y sin apertura, por fecha (A5b)", () => {
         const e26 = ejercicio("2026", 2026);
-        const lista = [e26, ejercicio("2028", 2028), ejercicio("2027", 2027)];
-        expect(ejercicioSiguiente(e26, lista)).toBe("2027");
-        expect(ejercicioSiguiente(e26, [e26])).toBe("");
+        const lista = [
+            e26, ejercicio("2028", 2028), ejercicio("2027", 2027),
+            ejercicio("2029", 2029, { estado: "CERRADO" }),
+            ejercicio("2030", 2030, { asientoAperturaId: 4 }),
+            ejercicio("2025", 2025),
+        ];
+        expect(ejerciciosApertura(e26, lista).map((e) => e.id)).toEqual(["2027", "2028"]);
+        expect(ejerciciosApertura(e26, [e26])).toEqual([]);
     });
 
-    test("opciones iniciales: fecha de fin y solo los asientos que faltan", () => {
-        const e26 = ejercicio("2026", 2026, { asientoPygId: 5 });
-        const opciones = opcionesCierreIniciales(e26, [e26]);
+    test("modal de cierre: fin del ejercicio, los tres asientos y el primer ejercicio de apertura (A5b)", () => {
+        const e26 = ejercicio("2026", 2026);
+        const opciones = opcionesCierreIniciales(e26, [e26, ejercicio("2027", 2027)]);
         expect(fechaAApi(opciones.fecha)).toBe("2026-12-31");
-        expect(opciones.regularizar).toBe(false);
+        expect(opciones.regularizar).toBe(true);
         expect(opciones.cerrar).toBe(true);
         expect(opciones.abrir).toBe(true);
+        expect(opciones.ejercicioDestinoId).toBe("2027");
+        expect(validarOpcionesCierre(e26, opciones)).toBe(true);
+
+        expect(validarOpcionesCierre(e26, { ...opciones, ejercicioDestinoId: "" }))
+            .toMatch(/ejercicio sobre el que se creará el asiento de apertura/);
+        expect(validarOpcionesCierre(e26, { ...opciones, abrir: false, ejercicioDestinoId: "" })).toBe(true);
+        expect(validarOpcionesCierre(e26, { ...opciones, fecha: new Date(2027, 0, 1, 12) }))
+            .toMatch(/dentro del ejercicio/);
+    });
+
+    test("al enviar: no repite la regularización y sin apertura no manda ejercicio (A5b)", () => {
+        const regularizado = ejercicio("2026", 2026, { asientoPygId: 5 });
+        const opciones = opcionesCierreIniciales(regularizado, [regularizado, ejercicio("2027", 2027)]);
+        expect(opcionesCierreAEnviar(regularizado, opciones).regularizar).toBe(false);
+        expect(opcionesCierreAEnviar(regularizado, { ...opciones, abrir: false }).ejercicioDestinoId).toBe("");
+        const api = opcionesCierreAApi(opcionesCierreAEnviar(regularizado, opciones));
+        expect(api).toMatchObject({ fecha: "2026-12-31", cerrar: true, abrir: true, ejercicio_destino_id: "2027" });
     });
 
     test("reconoce el aviso de cuentas sin código de balance", () => {
