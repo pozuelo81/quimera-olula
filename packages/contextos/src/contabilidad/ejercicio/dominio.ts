@@ -5,6 +5,7 @@ import {
     Ejercicio,
     NuevoEjercicio,
     OpcionesCierre,
+    TipoAsientoEjercicio,
 } from "./diseño.ts";
 
 const DIGITOS_SUBCUENTA_DEFECTO = 10;
@@ -83,24 +84,26 @@ export const ejercicioSiguiente = (ejercicio: Ejercicio, ejercicios: Ejercicio[]
     return posteriores[0]?.id ?? "";
 };
 
-/** Asientos que el cierre deja enlazados (Eneboo `ejercicios.idasiento*`):
- * la apertura de este ejercicio (si vino del cierre del anterior), la
- * regularización de pérdidas y ganancias, el cierre y la apertura que el
- * cierre dejó en el ejercicio siguiente (se guarda en ese ejercicio). */
-export const asientosDelEjercicio = (
-    ejercicio: Ejercicio,
-    siguiente: Ejercicio | null
-): AsientoDelEjercicio[] => {
-    const asientos: [string, number | null][] = [
-        ["Asiento de apertura", ejercicio.asientoAperturaId],
-        ["Asiento de regularización (pérdidas y ganancias)", ejercicio.asientoPygId],
-        ["Asiento de cierre", ejercicio.asientoCierreId],
-        [`Asiento de apertura del ejercicio ${siguiente?.id ?? ""}`,
-            ejercicio.asientoCierreId ? siguiente?.asientoAperturaId ?? null : null],
+/** Asientos enlazados al ejercicio (Eneboo `ejercicios.idasiento*`, pestaña
+ * Asientos de ejercicios.ui): la apertura (si vino del cierre del anterior),
+ * la regularización de pérdidas y ganancias y el cierre, los que haya. */
+export const asientosDelEjercicio = (ejercicio: Ejercicio): AsientoDelEjercicio[] => {
+    const asientos: [TipoAsientoEjercicio, string, number | null][] = [
+        ["APERTURA", "Asiento de apertura", ejercicio.asientoAperturaId],
+        ["REGULARIZACION", "Asiento de regularización (pérdidas y ganancias)", ejercicio.asientoPygId],
+        ["CIERRE", "Asiento de cierre", ejercicio.asientoCierreId],
     ];
     return asientos
-        .filter(([, id]) => !!id)
-        .map(([titulo, id]) => ({ titulo, asientoId: String(id) }));
+        .filter(([, , id]) => !!id)
+        .map(([tipo, titulo, id]) => ({ tipo, titulo, asientoId: String(id) }));
+};
+
+/** «Ir a ver asiento»: Contabilidad > Asientos con el asiento abierto y el
+ * listado filtrado por su ejercicio (`?id=` como el resto de pantallas). */
+export const urlAsiento = (asientoId: string, ejercicioId: string): string => {
+    const params = new URLSearchParams({ id: asientoId });
+    if (ejercicioId) params.set("ejercicio_id", `eq__${ejercicioId}`);
+    return `/contabilidad/asiento?${params.toString()}`;
 };
 
 export const opcionesCierreIniciales = (

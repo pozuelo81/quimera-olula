@@ -1,8 +1,10 @@
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
+import { getAsiento } from "#/contabilidad/asiento/infraestructura.ts";
 import ApiUrls from "#/contabilidad/comun/urls.ts";
 import {
     Ejercicio,
     EstadoEjercicio,
+    FilaAsientoEjercicio,
     GenerarPgc,
     GetEjercicio,
     GetEjercicios,
@@ -11,7 +13,7 @@ import {
     ResultadoCierre,
     SerieEjercicio,
 } from "./diseño.ts";
-import { seriesDesdeTexto } from "./dominio.ts";
+import { asientosDelEjercicio, seriesDesdeTexto } from "./dominio.ts";
 
 const urls = new ApiUrls();
 const baseUrl = urls.EJERCICIO;
@@ -57,18 +59,6 @@ export const getEjercicios: GetEjercicios = async (criteria) =>
 
 export const getEjercicio: GetEjercicio = async (id) =>
     RestAPI.getItem<Ejercicio, EjercicioApi>(`${baseUrl}/${id}`, ejercicioDesdeApi);
-
-/** El ejercicio que empieza justo después (donde el cierre deja la apertura),
- * con el mismo criterio que el servidor: el primero con fecha de inicio
- * posterior. */
-export const getEjercicioSiguiente = async (ejercicio: Ejercicio): Promise<Ejercicio | null> => {
-    const { datos } = await getEjercicios({
-        filtro: [["fecha_inicio", ">", fechaAApi(ejercicio.fechaInicio)]],
-        orden: ["fecha_inicio", "ASC"],
-        paginacion: { limite: 1, pagina: 1 },
-    });
-    return datos[0] ?? null;
-};
 
 export const nuevoEjercicioAApi = (nuevo: NuevoEjercicio, empresaId: number | null) => ({
     id: nuevo.id,
@@ -247,3 +237,29 @@ export const getOpcionesSeries = async (): Promise<{ valor: string; descripcion:
         descripcion: s.descripcion ? `${s.id} — ${s.descripcion}` : s.id,
     }));
 };
+
+/** Tabla de asientos del ejercicio: número, fecha, concepto e importe de
+ * cada asiento enlazado. Si uno ya no existe (borrado desde contabilidad) se
+ * enseña la fila sin datos. */
+export const getFilasAsientosEjercicio = async (
+    ejercicio: Ejercicio,
+): Promise<FilaAsientoEjercicio[]> =>
+    Promise.all(asientosDelEjercicio(ejercicio).map(async ({ tipo, titulo, asientoId }) => {
+        const vacia: FilaAsientoEjercicio = {
+            id: asientoId, tipo, titulo, numero: null, ejercicioId: ejercicio.id,
+            fecha: null, concepto: "(no se encuentra el asiento)", importe: null,
+        };
+        try {
+            const a = await getAsiento(asientoId);
+            return {
+                ...vacia,
+                numero: a.numero,
+                ejercicioId: a.ejercicioId || ejercicio.id,
+                fecha: a.fecha,
+                concepto: a.concepto,
+                importe: a.importe,
+            };
+        } catch {
+            return vacia;
+        }
+    }));

@@ -4,9 +4,9 @@ import { Listado } from "@olula/componentes/maestro/Listado.js";
 import { MaestroDetalle } from "@olula/componentes/maestro/MaestroDetalle.tsx";
 import { puede } from "@olula/lib/dominio.ts";
 import { listaActivaEntidadesInicial } from "@olula/lib/ListaActivaEntidades.js";
-import { useEffect, useMemo } from "react";
+import { ComponentType, useEffect, useMemo } from "react";
 import { CrearEjercicio } from "../crear/CrearEjercicio.tsx";
-import { DetalleEjercicio } from "../detalle/DetalleEjercicio.tsx";
+import { DetalleEjercicio, PropsDetalleEjercicio } from "../detalle/DetalleEjercicio.tsx";
 import { Ejercicio } from "../diseño.ts";
 import { criteriaEjerciciosDefecto, metaTablaEjercicio } from "./diseño.ts";
 import { getMaquina } from "./maquina.ts";
@@ -17,7 +17,12 @@ import { getMaquina } from "./maquina.ts";
 export const MaestroConDetalleEjercicio = ({
     titulo = "Apertura y Cierre de Ejercicio",
     conAlta = false,
-}: { titulo?: string; conAlta?: boolean } = {}) => {
+    Detalle = DetalleEjercicio,
+}: {
+    titulo?: string;
+    conAlta?: boolean;
+    Detalle?: ComponentType<PropsDetalleEjercicio>;
+} = {}) => {
 
     const criteriaInicial = useMemo(criteriaEjerciciosDefecto, []);
 
@@ -67,7 +72,7 @@ export const MaestroConDetalleEjercicio = ({
                     </>
                 }
                 Detalle={
-                    <DetalleEjercicio
+                    <Detalle
                         id={ejercicios.activo}
                         ejercicios={ejercicios.lista}
                         publicar={emitir}

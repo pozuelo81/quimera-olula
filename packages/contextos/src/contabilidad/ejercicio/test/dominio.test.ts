@@ -12,6 +12,7 @@ import {
     puedeGenerarPgc,
     seriesDesdeTexto,
     textoAviso,
+    urlAsiento,
 } from "../dominio.ts";
 import { fechaAApi } from "../infraestructura.ts";
 
@@ -60,25 +61,25 @@ describe("ejercicios: cierre", () => {
         expect(puedeDeshacerCierre(ejercicio("2026", 2026, { asientoPygId: 7 }))).toBe(true);
     });
 
-    test("asientos del cierre que enseña el formulario, con su título", () => {
-        expect(asientosDelEjercicio(ejercicio("2026", 2026), null)).toEqual([]);
+    test("asientos del ejercicio: apertura, regularización y cierre, los que haya (A4)", () => {
+        expect(asientosDelEjercicio(ejercicio("2026", 2026))).toEqual([]);
 
         const cerrado = ejercicio("2026", 2026, {
             estado: "CERRADO", asientoAperturaId: 3, asientoPygId: 7, asientoCierreId: 8,
         });
-        const siguiente = ejercicio("2027", 2027, { asientoAperturaId: 9 });
-        expect(asientosDelEjercicio(cerrado, siguiente)).toEqual([
-            { titulo: "Asiento de apertura", asientoId: "3" },
-            { titulo: "Asiento de regularización (pérdidas y ganancias)", asientoId: "7" },
-            { titulo: "Asiento de cierre", asientoId: "8" },
-            { titulo: "Asiento de apertura del ejercicio 2027", asientoId: "9" },
+        expect(asientosDelEjercicio(cerrado)).toEqual([
+            { tipo: "APERTURA", titulo: "Asiento de apertura", asientoId: "3" },
+            { tipo: "REGULARIZACION", titulo: "Asiento de regularización (pérdidas y ganancias)", asientoId: "7" },
+            { tipo: "CIERRE", titulo: "Asiento de cierre", asientoId: "8" },
         ]);
 
-        // Solo regularizado: ni cierre ni apertura del siguiente.
         const regularizado = ejercicio("2026", 2026, { asientoPygId: 7 });
-        expect(asientosDelEjercicio(regularizado, siguiente)).toEqual([
-            { titulo: "Asiento de regularización (pérdidas y ganancias)", asientoId: "7" },
-        ]);
+        expect(asientosDelEjercicio(regularizado).map((a) => a.tipo)).toEqual(["REGULARIZACION"]);
+    });
+
+    test("«Ir a ver asiento» abre Contabilidad > Asientos filtrado por su ejercicio", () => {
+        expect(urlAsiento("42", "2027")).toBe("/contabilidad/asiento?id=42&ejercicio_id=eq__2027");
+        expect(urlAsiento("42", "")).toBe("/contabilidad/asiento?id=42");
     });
 
     test("la apertura va al primer ejercicio posterior, o se crea", () => {

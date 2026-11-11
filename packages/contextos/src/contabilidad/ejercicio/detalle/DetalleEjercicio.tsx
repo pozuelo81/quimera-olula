@@ -3,39 +3,32 @@ import { Detalle } from "@olula/componentes/detalle/Detalle.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
 import { QuimeraAcciones } from "@olula/componentes/moleculas/qacciones.tsx";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
-import { puede } from "@olula/lib/dominio.ts";
-import { preferencias } from "@olula/lib/preferencias.ts";
+import { formatearFechaDate, puede } from "@olula/lib/dominio.ts";
 import { useEffect } from "react";
-import { AsientoDeDocumento } from "#/contabilidad/asiento/vistas/detalle/AsientoDeDocumento.tsx";
-import { ejercicioActual, PREFERENCIA_EJERCICIO_ACTUAL } from "#/contabilidad/asiento/dominio.ts";
+import { FilaFormulario } from "#/contabilidad/comun/componentes/FilaFormulario.tsx";
+import { AsientosEjercicio } from "../asientos/AsientosEjercicio.tsx";
 import { CerrarEjercicio } from "../cerrar/CerrarEjercicio.tsx";
 import { DeshacerCierreEjercicio } from "../deshacer_cierre/DeshacerCierreEjercicio.tsx";
 import { Ejercicio } from "../diseño.ts";
-import {
-    asientosDelEjercicio,
-    etiquetaEjercicio,
-    puedeCerrar,
-    puedeDeshacerCierre,
-    puedeGenerarPgc,
-} from "../dominio.ts";
-import { GenerarPgcEjercicio } from "../generar_pgc/GenerarPgcEjercicio.tsx";
-import { SeriesEjercicio } from "../series/SeriesEjercicio.tsx";
-import { DatosEjercicio } from "./DatosEjercicio.tsx";
-import { patchEjercicioActual } from "../infraestructura.ts";
+import { etiquetaEjercicio, puedeCerrar, puedeDeshacerCierre } from "../dominio.ts";
 import { contextoDetalleEjercicioInicial } from "./detalle.ts";
 import { getMaquina } from "./maquina.ts";
 
+export interface PropsDetalleEjercicio {
+    id?: string;
+    ejercicios: Ejercicio[];
+    publicar?: EmitirEvento;
+}
+
+/** Contabilidad > Apertura y Cierre de Ejercicio: datos del ejercicio, que
+ * aquí no se cambian, y los asientos de apertura, regularización y cierre. */
 export const DetalleEjercicio = ({
     id,
     ejercicios,
     publicar = async () => {},
-}: {
-    id?: string;
-    ejercicios: Ejercicio[];
-    publicar?: EmitirEvento;
-}) => {
+}: PropsDetalleEjercicio) => {
     const { ctx, emitir } = useMaquina(getMaquina, contextoDetalleEjercicioInicial, publicar);
-    const { estado, ejercicio, siguiente } = ctx;
+    const { estado, ejercicio } = ctx;
 
     useEffect(() => {
         emitir("ejercicio_id_cambiada", id, true);
@@ -45,25 +38,8 @@ export const DetalleEjercicio = ({
     if (!ejercicio.id) return null;
 
     const autorizado = puede("contabilidad.asiento");
-    const esActual = ejercicioActual() === ejercicio.id;
-    const claveDatos = [ejercicio.id, ejercicio.nombre, ejercicio.fechaInicio.getTime(),
-        ejercicio.fechaFin.getTime(), ejercicio.digitosSubcuenta, ejercicio.tienePgc].join("|");
-
-    const marcarActual = async () => {
-        await patchEjercicioActual(ejercicio.id);
-        try {
-            preferencias.set(PREFERENCIA_EJERCICIO_ACTUAL, ejercicio.id);
-        } catch {
-            // Sin almacenamiento local queda guardado solo en el servidor.
-        }
-        await emitir("ejercicio_actual_cambiado");
-    };
 
     const acciones = [
-        { texto: "Usar como ejercicio actual", onClick: marcarActual,
-            deshabilitado: !autorizado || esActual },
-        { texto: "Generar PGC", onClick: () => emitir("generar_pgc_solicitado"),
-            deshabilitado: !autorizado || !puedeGenerarPgc(ejercicio) },
         { texto: "Cerrar ejercicio", onClick: () => emitir("cierre_solicitado"),
             deshabilitado: !autorizado || !puedeCerrar(ejercicio) },
         { texto: "Deshacer cierre", onClick: () => emitir("deshacer_cierre_solicitado"),
@@ -87,30 +63,17 @@ export const DetalleEjercicio = ({
                     <QuimeraAcciones acciones={acciones} vertical />
                 </div>
                 <quimera-formulario>
-                    {campo("Código", "id", ejercicio.id)}
-                    <DatosEjercicio
-                        key={claveDatos}
-                        ejercicio={ejercicio}
-                        editable={autorizado}
-                        onGuardado={() => emitir("datos_guardados")}
-                    />
-                    {campo("Estado", "estado", ejercicio.estado + (esActual ? " (ejercicio actual)" : ""))}
-                    {campo("Plan contable", "tienePgc", ejercicio.tienePgc ? `PGC ${ejercicio.planContable || "08"}` : "Sin plan contable")}
+                    <FilaFormulario columnas="1fr 3fr 1.5fr 1.5fr 1.5fr">
+                        {campo("Código", "id", ejercicio.id)}
+                        {campo("Nombre", "nombre", ejercicio.nombre)}
+                        {campo("Inicio", "fechaInicio", formatearFechaDate(ejercicio.fechaInicio))}
+                        {campo("Fin", "fechaFin", formatearFechaDate(ejercicio.fechaFin))}
+                        {campo("Estado", "estado", ejercicio.estado)}
+                    </FilaFormulario>
                 </quimera-formulario>
-                <SeriesEjercicio ejercicio={ejercicio} ejercicios={ejercicios} editable={autorizado} />
-                {asientosDelEjercicio(ejercicio, siguiente).map(({ titulo, asientoId }) => (
-                    <AsientoDeDocumento
-                        key={asientoId}
-                        asientoId={asientoId}
-                        conCabecera={false}
-                        titulo={titulo}
-                    />
-                ))}
+                <AsientosEjercicio ejercicio={ejercicio} />
             </div>
 
-            {estado === "GENERANDO_PGC" && (
-                <GenerarPgcEjercicio ejercicio={ejercicio} ejercicios={ejercicios} publicar={emitir} />
-            )}
             {estado === "CERRANDO" && (
                 <CerrarEjercicio ejercicio={ejercicio} ejercicios={ejercicios} publicar={emitir} />
             )}
