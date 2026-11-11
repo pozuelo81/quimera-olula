@@ -15,4 +15,8 @@ export const menuFiscal = {
         url: "/fiscal/regimen_iva_verifactu",
         regla: "comun.regimen_iva_verifactu",
     },
+    "Fiscalidad/Causas exención IVA Veri*Factu": {
+        url: "/fiscal/causa_exencion_iva",
+        regla: "comun.causa_exencion_iva",
+    },
 };
