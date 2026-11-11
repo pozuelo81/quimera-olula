@@ -42,8 +42,8 @@ const MAPA_API: [keyof DatosImpuesto, string, ((v: unknown) => unknown)?][] = [
 
 const subcuentasCambiadas = (previo: DatosImpuesto, actual: DatosImpuesto) =>
     Object.fromEntries(SUBCUENTAS
-        .filter(({ sufijo }) => actual[campo(sufijo)] !== previo[campo(sufijo)])
-        .map(({ sufijo }) => [sufijo, actual[campo(sufijo)].trim()]));
+        .filter(({ sufijo }) => texto(actual[campo(sufijo)]).trim() !== texto(previo[campo(sufijo)]).trim())
+        .map(({ sufijo }) => [sufijo, texto(actual[campo(sufijo)]).trim()]));
 
 /** Lo cambiado; las subcuentas van en `subcuentas` (vacía = quitarla) con el
  * ejercicio actual, que completa el punto y da los ids. */
@@ -71,7 +71,7 @@ const campos = {
     iva: { requerido: true, tipo: "decimal" as const },
     recargo: { requerido: true, tipo: "decimal" as const },
     tipoBienes: { tipo: "selector" as const },
-    ...Object.fromEntries(SUBCUENTAS.map(({ sufijo }) => [campo(sufijo), { maximo: 15 }])),
+    ...Object.fromEntries(SUBCUENTAS.map(({ sufijo }) => [campo(sufijo), { maximo: 15, requerido: false }])),
 };
 
 export const metaImpuesto: MetaModelo<Impuesto> = { campos };

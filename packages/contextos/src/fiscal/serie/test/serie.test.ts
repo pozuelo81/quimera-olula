@@ -33,4 +33,9 @@ describe("series (series.mtd)", () => {
         const nueva = { ...serieDesdeApi(api), id: "B", codigoCuenta: "700" };
         expect(metaNuevaSerie.validacion!(nueva)).toContain("no las dos");
     });
+
+    test("campo vaciado (null) no rompe la validación", () => {
+        const nueva = { ...serieDesdeApi(api), id: "B", codigoCuenta: null as unknown as string };
+        expect(metaNuevaSerie.validacion!(nueva)).toBe(true);
+    });
 });
