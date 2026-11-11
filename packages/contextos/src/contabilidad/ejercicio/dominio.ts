@@ -5,6 +5,7 @@ import {
     Ejercicio,
     NuevoEjercicio,
     OpcionesCierre,
+    TipoAsientoEjercicio,
 } from "./diseño.ts";
 
 const DIGITOS_SUBCUENTA_DEFECTO = 10;
@@ -68,52 +69,96 @@ export const seriesDesdeTexto = (texto: string): string[] =>
 
 export const puedeGenerarPgc = (e: Ejercicio): boolean => !!e.id && !e.tienePgc;
 
+/** «Cerrar Ejercicio» solo con el ejercicio abierto y «Reabrir Ejercicio»
+ * solo con el ejercicio cerrado (co_masterasientosejer.qs::pbnCerrar_clicked). */
 export const puedeCerrar = (e: Ejercicio): boolean =>
-    !!e.id && e.estado === "ABIERTO" && e.tienePgc;
+    !!e.id && e.estado === "ABIERTO";
 
-export const puedeDeshacerCierre = (e: Ejercicio): boolean =>
-    !!e.id && (e.estado === "CERRADO" || !!e.asientoPygId || !!e.asientoCierreId);
+export const puedeReabrir = (e: Ejercicio): boolean =>
+    !!e.id && e.estado === "CERRADO";
 
-/** Ejercicio siguiente (el primero que empieza después), o "" si hay que
- * crearlo: el servidor lo crea con el PGC de este. */
-export const ejercicioSiguiente = (ejercicio: Ejercicio, ejercicios: Ejercicio[]): string => {
-    const posteriores = ejercicios
-        .filter((e) => e.fechaInicio.getTime() > ejercicio.fechaInicio.getTime())
-        .sort((a, b) => a.fechaInicio.getTime() - b.fechaInicio.getTime());
-    return posteriores[0]?.id ?? "";
-};
-
-/** Asientos que el cierre deja enlazados (Eneboo `ejercicios.idasiento*`):
- * la apertura de este ejercicio (si vino del cierre del anterior), la
- * regularización de pérdidas y ganancias, el cierre y la apertura que el
- * cierre dejó en el ejercicio siguiente (se guarda en ese ejercicio). */
-export const asientosDelEjercicio = (
-    ejercicio: Ejercicio,
-    siguiente: Ejercicio | null
-): AsientoDelEjercicio[] => {
-    const asientos: [string, number | null][] = [
-        ["Asiento de apertura", ejercicio.asientoAperturaId],
-        ["Asiento de regularización (pérdidas y ganancias)", ejercicio.asientoPygId],
-        ["Asiento de cierre", ejercicio.asientoCierreId],
-        [`Asiento de apertura del ejercicio ${siguiente?.id ?? ""}`,
-            ejercicio.asientoCierreId ? siguiente?.asientoAperturaId ?? null : null],
+/** Asientos enlazados al ejercicio (Eneboo `ejercicios.idasiento*`, pestaña
+ * Asientos de ejercicios.ui): la apertura (si vino del cierre del anterior),
+ * la regularización de pérdidas y ganancias y el cierre, los que haya. */
+export const asientosDelEjercicio = (ejercicio: Ejercicio): AsientoDelEjercicio[] => {
+    const asientos: [TipoAsientoEjercicio, string, number | null][] = [
+        ["APERTURA", "Asiento de apertura", ejercicio.asientoAperturaId],
+        ["REGULARIZACION", "Asiento de regularización (pérdidas y ganancias)", ejercicio.asientoPygId],
+        ["CIERRE", "Asiento de cierre", ejercicio.asientoCierreId],
     ];
     return asientos
-        .filter(([, id]) => !!id)
-        .map(([titulo, id]) => ({ titulo, asientoId: String(id) }));
+        .filter(([, , id]) => !!id)
+        .map(([tipo, titulo, id]) => ({ tipo, titulo, asientoId: String(id) }));
 };
 
+/** «Ir a ver asiento»: Contabilidad > Asientos con el asiento abierto y el
+ * listado filtrado por su ejercicio (`?id=` como el resto de pantallas). */
+export const urlAsiento = (asientoId: string, ejercicioId: string): string => {
+    const params = new URLSearchParams({ id: asientoId });
+    if (ejercicioId) params.set("ejercicio_id", `eq__${ejercicioId}`);
+    return `/contabilidad/asiento?${params.toString()}`;
+};
+
+/** Ejercicios donde puede ir el asiento de apertura
+ * (co_cerrarejer.qs::tbnEjercicio_clicked y validarCierre): abiertos, que
+ * empiezan después del que se cierra y sin asiento de apertura, por fecha. */
+export const ejerciciosApertura = (ejercicio: Ejercicio, ejercicios: Ejercicio[]): Ejercicio[] =>
+    ejercicios
+        .filter((e) => e.estado === "ABIERTO" && !e.asientoAperturaId
+            && e.fechaInicio.getTime() > ejercicio.fechaInicio.getTime())
+        .sort((a, b) => a.fechaInicio.getTime() - b.fechaInicio.getTime());
+
+/** Modal de cierre: fecha de fin del ejercicio (co_cerrarejer.qs::init),
+ * pérdidas y ganancias y cierre siempre (si la regularización ya se hizo no
+ * se repite), apertura marcada en el primer ejercicio posible. */
 export const opcionesCierreIniciales = (
     ejercicio: Ejercicio,
     ejercicios: Ejercicio[]
-): OpcionesCierre => ({
-    fecha: ejercicio.fechaFin,
-    regularizar: !ejercicio.asientoPygId,
-    cerrar: !ejercicio.asientoCierreId,
-    abrir: true,
-    ejercicioDestinoId: ejercicioSiguiente(ejercicio, ejercicios),
-    ignorarCuentasSinCodigoBalance: false,
+): OpcionesCierre => {
+    const destino = ejerciciosApertura(ejercicio, ejercicios)[0]?.id ?? "";
+    return {
+        fecha: ejercicio.fechaFin,
+        regularizar: true,
+        cerrar: true,
+        abrir: true,
+        ejercicioDestinoId: destino,
+        ignorarCuentasSinCodigoBalance: false,
+    };
+};
+
+/** Lo que se manda al servidor: si la regularización ya existe (ejercicio
+ * regularizado pero sin cerrar) no se vuelve a hacer. */
+export const opcionesCierreAEnviar = (ejercicio: Ejercicio, o: OpcionesCierre): OpcionesCierre => ({
+    ...o,
+    regularizar: o.regularizar && !ejercicio.asientoPygId,
+    ejercicioDestinoId: o.abrir ? o.ejercicioDestinoId : "",
 });
+
+/** co_cerrarejer.qs::validarCierre. */
+export const validarOpcionesCierre = (ejercicio: Ejercicio, o: OpcionesCierre): string | true => {
+    if (o.fecha < ejercicio.fechaInicio || o.fecha > ejercicio.fechaFin) {
+        return "La fecha debe estar dentro del ejercicio";
+    }
+    if (o.abrir && !o.ejercicioDestinoId) {
+        return "Debe seleccionar el ejercicio sobre el que se creará el asiento de apertura";
+    }
+    return true;
+};
+
+/** Aviso de «Reabrir Ejercicio» (co_masterasientosejer.qs::reabrirEjercicio):
+ * se borran la regularización y el cierre de este ejercicio y la apertura del
+ * siguiente, y el ejercicio queda abierto. */
+export const mensajeReabrir = (ejercicio: Ejercicio, ejercicios: Ejercicio[]): string => {
+    const siguiente = ejercicios
+        .filter((e) => e.fechaInicio.getTime() > ejercicio.fechaInicio.getTime())
+        .sort((a, b) => a.fechaInicio.getTime() - b.fechaInicio.getTime())[0];
+    const apertura = siguiente
+        ? `el asiento de apertura del ejercicio siguiente (${etiquetaEjercicio(siguiente)})`
+        : "el asiento de apertura del ejercicio siguiente, si lo hay";
+    return `Se van a borrar los asientos de pérdidas y ganancias y de cierre del ejercicio `
+        + `${etiquetaEjercicio(ejercicio)} y ${apertura}. El ejercicio ${ejercicio.id} `
+        + `quedará abierto. ¿Desea continuar?`;
+};
 
 export const esAvisoCuentasSinCodigoBalance = (error: unknown): boolean => {
     const e = error as { estado?: number; descripcion?: string } | null;

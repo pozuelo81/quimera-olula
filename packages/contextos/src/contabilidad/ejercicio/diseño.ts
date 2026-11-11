@@ -53,10 +53,26 @@ export interface ResultadoCierre {
     ejercicioDestinoCreado: boolean;
 }
 
-/** Un asiento que el cierre deja enlazado al ejercicio, con su título. */
+export type TipoAsientoEjercicio = "APERTURA" | "REGULARIZACION" | "CIERRE";
+
+/** Un asiento enlazado al ejercicio (Eneboo `ejercicios.idasiento*`). */
 export interface AsientoDelEjercicio {
+    tipo: TipoAsientoEjercicio;
     titulo: string;
     asientoId: string;
+}
+
+/** Fila de la tabla de asientos del ejercicio: el enlace con los datos del
+ * asiento (número, fecha, concepto e importe). */
+export interface FilaAsientoEjercicio extends Entidad {
+    id: string;
+    tipo: TipoAsientoEjercicio;
+    titulo: string;
+    numero: number | null;
+    ejercicioId: string;
+    fecha: Date | null;
+    concepto: string;
+    importe: number | null;
 }
 
 export type GetEjercicios = (criteria: Criteria) => RespuestaLista<Ejercicio>;

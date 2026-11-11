@@ -8,6 +8,7 @@ import { useFocus } from "@olula/lib/useFocus.ts";
 import { useForm } from "@olula/lib/useForm.js";
 import { useModelo } from "@olula/lib/useModelo.ts";
 import { useCallback, useMemo } from "react";
+import { FilaFormulario } from "#/contabilidad/comun/componentes/FilaFormulario.tsx";
 import { Ejercicio } from "../diseño.ts";
 import { etiquetaEjercicio, nuevoEjercicioPropuesto } from "../dominio.ts";
 import { postEjercicio } from "../infraestructura.ts";
@@ -30,6 +31,9 @@ export const CrearEjercicio = ({
         })),
     ], [ejercicios]);
 
+    // Al copiar el plan de otro ejercicio la longitud de subcuenta es la suya.
+    const origenPgc = ejercicios.find((e) => e.id === modelo.ejercicioOrigenPgc);
+
     const crear_ = useCallback(async () => {
         const id = await postEjercicio(modelo, ejercicios[0]?.empresaId ?? null);
         publicar("ejercicio_creado", id);
@@ -43,14 +47,19 @@ export const CrearEjercicio = ({
         <QModal abierto={true} nombre="crearEjercicio" titulo="Nuevo ejercicio" onCerrar={cancelar}>
             <div className="CrearEjercicio">
                 <quimera-formulario>
-                    <QInput label="Código" {...uiProps("id")} ref={focus} />
-                    <QInput label="Nombre" {...uiProps("nombre")} />
-                    <QDate label="Inicio" {...uiProps("fechaInicio")} />
-                    <QDate label="Fin" {...uiProps("fechaFin")} />
+                    <FilaFormulario columnas="1fr 3fr">
+                        <QInput label="Código" {...uiProps("id")} ref={focus} />
+                        <QInput label="Nombre" {...uiProps("nombre")} />
+                    </FilaFormulario>
+                    <FilaFormulario>
+                        <QDate label="Inicio" {...uiProps("fechaInicio")} />
+                        <QDate label="Fin" {...uiProps("fechaFin")} />
+                        {origenPgc
+                            ? <QInput label="Dígitos de subcuenta" nombre="digitosSubcuenta"
+                                valor={String(origenPgc.digitosSubcuenta)} soloLectura />
+                            : <QInput label="Dígitos de subcuenta" {...uiProps("digitosSubcuenta")} />}
+                    </FilaFormulario>
                     <QSelect label="Plan contable" opciones={opcionesPgc} {...uiProps("ejercicioOrigenPgc")} />
-                    {!modelo.ejercicioOrigenPgc && (
-                        <QInput label="Dígitos de subcuenta" {...uiProps("digitosSubcuenta")} />
-                    )}
                     <QInput label="Series (separadas por comas)" {...uiProps("series")} />
                 </quimera-formulario>
                 <div className="botones maestro-botones">

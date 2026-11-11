@@ -10,14 +10,17 @@ import { useModelo } from "@olula/lib/useModelo.ts";
 import { useCallback, useMemo, useState } from "react";
 import { Ejercicio, OpcionesCierre } from "../diseño.ts";
 import {
+    ejerciciosApertura,
     esAvisoCuentasSinCodigoBalance,
     etiquetaEjercicio,
+    opcionesCierreAEnviar,
     opcionesCierreIniciales,
     textoAviso,
+    validarOpcionesCierre,
 } from "../dominio.ts";
 import { patchCerrarEjercicio } from "../infraestructura.ts";
 
-const metaOpcionesCierre: MetaModelo<OpcionesCierre> = {
+const metaOpcionesCierre = (ejercicio: Ejercicio): MetaModelo<OpcionesCierre> => ({
     campos: {
         fecha: { requerido: true, tipo: "fecha" },
         regularizar: { tipo: "checkbox" },
@@ -26,11 +29,11 @@ const metaOpcionesCierre: MetaModelo<OpcionesCierre> = {
         ejercicioDestinoId: { requerido: false, tipo: "selector" },
         ignorarCuentasSinCodigoBalance: { tipo: "checkbox" },
     },
-    validacion: (m) =>
-        m.regularizar || m.cerrar || m.abrir ? true : "Marque al menos un asiento",
-};
+    validacion: (m) => validarOpcionesCierre(ejercicio, m),
+});
 
-/** co_cerrarejer: asiento de pérdidas y ganancias, de cierre y de apertura. */
+/** co_cerrarejer: fecha de los asientos, pérdidas y ganancias y cierre
+ * (siempre), y apertura en el ejercicio que se elija. */
 export const CerrarEjercicio = ({
     ejercicio,
     ejercicios,
@@ -44,23 +47,22 @@ export const CerrarEjercicio = ({
         () => opcionesCierreIniciales(ejercicio, ejercicios),
         [ejercicio, ejercicios]
     );
-    const { modelo, uiProps, valido } = useModelo(metaOpcionesCierre, inicial);
+    const meta = useMemo(() => metaOpcionesCierre(ejercicio), [ejercicio]);
+    const { modelo, uiProps, valido } = useModelo(meta, inicial);
     const [aviso, setAviso] = useState("");
 
-    const destinos = useMemo(() => [
-        { valor: "", descripcion: "Crear el ejercicio siguiente" },
-        ...ejercicios
-            .filter((e) => e.estado === "ABIERTO"
-                && e.fechaInicio.getTime() > ejercicio.fechaInicio.getTime())
+    const destinos = useMemo(
+        () => ejerciciosApertura(ejercicio, ejercicios)
             .map((e) => ({ valor: e.id, descripcion: etiquetaEjercicio(e) })),
-    ], [ejercicios, ejercicio.fechaInicio]);
+        [ejercicios, ejercicio],
+    );
 
     const aceptar_ = useCallback(async () => {
         try {
-            await patchCerrarEjercicio(ejercicio.id, {
+            await patchCerrarEjercicio(ejercicio.id, opcionesCierreAEnviar(ejercicio, {
                 ...modelo,
                 ignorarCuentasSinCodigoBalance: !!aviso || modelo.ignorarCuentasSinCodigoBalance,
-            });
+            }));
         } catch (error) {
             if (esAvisoCuentasSinCodigoBalance(error) && !aviso) {
                 setAviso(textoAviso(error));
@@ -69,22 +71,28 @@ export const CerrarEjercicio = ({
             throw error;
         }
         publicar("ejercicio_cerrado");
-    }, [ejercicio.id, modelo, aviso, publicar]);
+    }, [ejercicio, modelo, aviso, publicar]);
     const [aceptar, cancelar] = useForm(aceptar_, () => publicar("cancelado"));
 
     return (
         <QModal abierto={true} nombre="cerrarEjercicio"
-            titulo={`Cierre del ejercicio ${etiquetaEjercicio(ejercicio)}`}
+            titulo={`Cerrar el ejercicio ${etiquetaEjercicio(ejercicio)}`}
             onCerrar={cancelar}>
             <quimera-formulario>
                 <QDate label="Fecha de los asientos de regularización y cierre" {...uiProps("fecha")} />
-                <QCheckbox label="Asiento de pérdidas y ganancias" {...uiProps("regularizar")} />
-                <QCheckbox label="Asiento de cierre (deja el ejercicio cerrado)" {...uiProps("cerrar")} />
+                <QCheckbox label="Asiento de pérdidas y ganancias" {...uiProps("regularizar")} soloLectura />
+                <QCheckbox label="Asiento cierre" {...uiProps("cerrar")} soloLectura />
                 <QCheckbox label="Asiento de apertura" {...uiProps("abrir")} />
                 {modelo.abrir && (
                     <QSelect label="Ejercicio de apertura" opciones={destinos} {...uiProps("ejercicioDestinoId")} />
                 )}
             </quimera-formulario>
+            {modelo.abrir && destinos.length === 0 && (
+                <p className="aviso">
+                    No hay ningún ejercicio abierto posterior sin asiento de apertura. Créelo en
+                    Fiscalidad &gt; Ejercicios fiscales o desmarque «Asiento de apertura».
+                </p>
+            )}
             {aviso && (
                 <p className="aviso">{aviso} Pulse de nuevo «Cerrar» para continuar.</p>
             )}

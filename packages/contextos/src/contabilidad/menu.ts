@@ -18,7 +18,10 @@ export const menuContabilidad = {
         url: "/contabilidad/grupo_contable_amortizacion",
         regla: "contabilidad.asiento",
     },
-    "Contabilidad/Ejercicios": { url: "/contabilidad/ejercicio", regla: "contabilidad.asiento" },
+    "Contabilidad/Apertura y Cierre de Ejercicio": {
+        url: "/contabilidad/ejercicio",
+        regla: "contabilidad.asiento",
+    },
     "Contabilidad/Libro diario": {
         url: "/contabilidad/libro_diario",
         regla: "contabilidad.asiento",
