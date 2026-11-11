@@ -1,4 +1,11 @@
-import { AsientoDelEjercicio, Ejercicio, NuevoEjercicio, OpcionesCierre } from "./diseño.ts";
+import { MetaModelo } from "@olula/lib/dominio.ts";
+import {
+    AsientoDelEjercicio,
+    DatosEjercicio,
+    Ejercicio,
+    NuevoEjercicio,
+    OpcionesCierre,
+} from "./diseño.ts";
 
 const DIGITOS_SUBCUENTA_DEFECTO = 10;
 
@@ -124,3 +131,43 @@ export const textoAviso = (error: unknown): string => {
         return descripcion.replace(`${AVISO_CUENTAS_SIN_CODIGO_BALANCE}: `, "");
     }
 };
+
+export const datosEjercicio = (e: Ejercicio): DatosEjercicio => ({
+    nombre: e.nombre,
+    fechaInicio: e.fechaInicio,
+    fechaFin: e.fechaFin,
+    digitosSubcuenta: e.digitosSubcuenta,
+});
+
+/** ejercicios.mtd (nombre NOT NULL, 100) y ejercicios.qs::validaFechas /
+ * validaSubcuenta. */
+export const metaDatosEjercicio: MetaModelo<DatosEjercicio> = {
+    campos: {
+        nombre: { requerido: true, maximo: 100 },
+        fechaInicio: { requerido: true, tipo: "fecha" },
+        fechaFin: { requerido: true, tipo: "fecha" },
+        digitosSubcuenta: { requerido: true, tipo: "numero" },
+    },
+    validacion: (m) => {
+        if (m.fechaInicio > m.fechaFin) {
+            return "La fecha de inicio del ejercicio debe ser menor que la de fin";
+        }
+        const digitos = Number(m.digitosSubcuenta);
+        if (digitos < 5 || digitos > 15) {
+            return "La longitud de la subcuenta debe estar entre 5 y 15 caracteres";
+        }
+        return true;
+    },
+};
+
+const mismoDia = (a: Date, b: Date): boolean => a.toDateString() === b.toDateString();
+
+/** Lo que cambia de la cabecera: nombre y fechas van a /comun/ejercicio_facturacion
+ * y la longitud de subcuenta a /contabilidad/ejercicio. */
+export const cambiosDatosEjercicio = (previo: DatosEjercicio, actual: DatosEjercicio) => ({
+    ...(actual.nombre !== previo.nombre ? { nombre: actual.nombre.trim() } : {}),
+    ...(!mismoDia(actual.fechaInicio, previo.fechaInicio) ? { fechaInicio: actual.fechaInicio } : {}),
+    ...(!mismoDia(actual.fechaFin, previo.fechaFin) ? { fechaFin: actual.fechaFin } : {}),
+    ...(Number(actual.digitosSubcuenta) !== Number(previo.digitosSubcuenta)
+        ? { digitosSubcuenta: Number(actual.digitosSubcuenta) } : {}),
+});
