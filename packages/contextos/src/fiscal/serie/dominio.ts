@@ -52,9 +52,10 @@ export const nuevaSerieAApi = (nueva: NuevaSerie) => ({
     ejercicio_id: ejercicioActual(),
 });
 
-/** series.qs::controlCtaSubcta: cuenta de ventas o subcuenta, no las dos. */
+/** series.qs::controlCtaSubcta: cuenta de ventas o subcuenta, no las dos.
+ * Al vaciar un campo el formulario deja null, de ahí el `texto`. */
 const validacion = (m: DatosSerie) =>
-    m.codigoCuenta.trim() && m.codigoSubcuenta.trim()
+    texto(m.codigoCuenta).trim() && texto(m.codigoSubcuenta).trim()
         ? "Indique la cuenta de ventas o la subcuenta de ventas, no las dos"
         : true;
 
@@ -62,8 +63,8 @@ const campos = {
     descripcion: { maximo: 100 },
     irpf: { tipo: "decimal" as const },
     sinIva: { tipo: "checkbox" as const },
-    codigoCuenta: { maximo: 6 },
-    codigoSubcuenta: { maximo: 15 },
+    codigoCuenta: { maximo: 6, requerido: false },
+    codigoSubcuenta: { maximo: 15, requerido: false },
     rectificativa: { tipo: "checkbox" as const },
     simplificada: { tipo: "checkbox" as const },
 };
