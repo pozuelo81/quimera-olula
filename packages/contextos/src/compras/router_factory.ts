@@ -5,6 +5,7 @@ import { MaestroConDetalleFactura } from "./factura/maestro/MaestroConDetalleFac
 import { MaestroConDetallePedido } from "./pedido/maestro/MaestroConDetallePedido.tsx";
 import { MaestroConDetalleProveedor } from "./proveedor/maestro/MaestroConDetalleProveedor.tsx";
 import { AlbaranarPedido } from "./albaranar_pedido/vistas/detalle/AlbaranarPedido.tsx";
+import { InformesCompras } from "./informe/InformesCompras.tsx";
 
 export class RouterFactoryComprasOlula {
     static router = {
@@ -15,5 +16,6 @@ export class RouterFactoryComprasOlula {
         "compras/proveedor": MaestroConDetalleProveedor,
         "compras/articulo": MaestroConDetalleArticulo,
         "compras/albaranar-pedido/:id": AlbaranarPedido,
+        "compras/informe": InformesCompras,
     };
 }

@@ -51,7 +51,14 @@ export type FichaInforme = Entidad & {
     [criterio: string]: ValorCriterio;
 };
 
-export type ModoInforme = "detalle" | "resumen";
+/** `resumen_lineas`: «Resumen por líneas» de los pedidos de proveedor. */
+export type ModoInforme = "detalle" | "resumen" | "resumen_lineas";
+
+/** Un botón «Calcular …» de la pestaña Resultado. */
+export interface ModoCalculo {
+    modo: ModoInforme;
+    etiqueta: string;
+}
 
 export interface PestañaInforme {
     /** Clave de la pestaña en la API (`/ventas/informe/<clave>`). */
@@ -67,6 +74,8 @@ export interface PestañaInforme {
     inicial: Record<string, ValorCriterio>;
     /** Reglas del formulario al cambiar un campo (`bufferChanged`). */
     ajustar?: (ficha: FichaInforme, campo: string) => FichaInforme;
+    /** Botones de cálculo; por defecto «Calcular detalle» y «Calcular resumen». */
+    modos?: ModoCalculo[];
 }
 
 export type TipoColumnaResultado =

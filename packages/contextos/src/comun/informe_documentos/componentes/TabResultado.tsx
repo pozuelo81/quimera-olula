@@ -4,12 +4,13 @@ import { ContextoError } from "@olula/lib/contexto.ts";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
 import { useCallback, useContext, useState } from "react";
 import { FichaInforme, ModoInforme, PestañaInforme, ResultadoInforme } from "../diseño.ts";
-import { nombreFicheroInforme } from "../dominio.ts";
+import { MODOS_POR_DEFECTO, nombreFicheroInforme } from "../dominio.ts";
 import { getReportInforme } from "../infraestructura.ts";
 import { TablaResultado } from "./TablaResultado.tsx";
 
-/** «Calcular detalle», «Calcular resumen» y «Descargar PDF» (el PDF de lo
- * último que se ha calculado: los documentos uno tras otro o el resumen). */
+/** Un botón por modo de la pestaña («Calcular detalle», «Calcular resumen»…)
+ * y «Descargar PDF» (el PDF de lo último que se ha calculado: los documentos
+ * uno tras otro o el resumen). */
 export const TabResultado = ({
     pestaña,
     ficha,
@@ -53,19 +54,18 @@ export const TabResultado = ({
     return (
         <div className="TabResultadoInforme">
             <div className="maestro-botones">
-                <QBoton onClick={() => calcular("detalle")} deshabilitado={!!ocupado}>
-                    {ocupado === "detalle" ? "Calculando…" : "Calcular detalle"}
-                </QBoton>
-                <QBoton onClick={() => calcular("resumen")} deshabilitado={!!ocupado}>
-                    {ocupado === "resumen" ? "Calculando…" : "Calcular resumen"}
-                </QBoton>
+                {(pestaña.modos ?? MODOS_POR_DEFECTO).map(({ modo: modoCalculo, etiqueta }) => (
+                    <QBoton key={modoCalculo} onClick={() => calcular(modoCalculo)} deshabilitado={!!ocupado}>
+                        {ocupado === modoCalculo ? "Calculando…" : etiqueta}
+                    </QBoton>
+                ))}
                 <QBoton variante="borde" onClick={descargar} deshabilitado={!!ocupado || !modo}>
                     Descargar PDF
                 </QBoton>
             </div>
 
             {!resultado && (
-                <p>Pulsa «Calcular detalle» o «Calcular resumen». «Descargar PDF» descarga lo último calculado.</p>
+                <p>Pulsa un botón «Calcular». «Descargar PDF» descarga lo último calculado.</p>
             )}
 
             {resultado && (
