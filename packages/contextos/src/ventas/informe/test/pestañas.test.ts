@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { PEDIDOS, PESTAÑAS_VENTAS, PRESUPUESTOS } from "../pestañas.tsx";
+import { ALBARANES, PEDIDOS, PESTAÑAS_VENTAS, PRESUPUESTOS } from "../pestañas.tsx";
 
 const ids = (filas: { id: string }[][]) => filas.flat().map((campo) => campo.id);
 
@@ -40,6 +40,10 @@ describe("pestañas de Ventas > Informes", () => {
         expect(ids(PEDIDOS.filas)).toEqual(
             expect.arrayContaining(["servido", "serie_id", "referencia", "mostrar_lineas", "solo_pendientes"])
         );
+    });
+
+    test("albaranes: pendiente de facturar", () => {
+        expect(ids(ALBARANES.filas)).toContain("pte_factura");
     });
 
 

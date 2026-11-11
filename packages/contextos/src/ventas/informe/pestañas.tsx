@@ -88,4 +88,17 @@ export const PEDIDOS: PestañaInforme = {
     inicial: { ...INICIAL_COMUN, servido: "Todos", mostrar_lineas: false, solo_pendientes: false },
 };
 
-export const PESTAÑAS_VENTAS: PestañaInforme[] = [PRESUPUESTOS, PEDIDOS];
+export const ALBARANES: PestañaInforme = {
+    clave: "albaranes",
+    titulo: "Albaranes",
+    url: "/ventas/informe/albaranes",
+    regla: "ventas.albaran.leer",
+    filas: [
+        ...filasComunes("albarán"),
+        [combo("pte_factura", "Pte. factura", TODOS_SI_NO)],
+        ...filasOrden("Albaranes"),
+    ],
+    inicial: { ...INICIAL_COMUN, pte_factura: "Todos" },
+};
+
+export const PESTAÑAS_VENTAS: PestañaInforme[] = [PRESUPUESTOS, PEDIDOS, ALBARANES];
