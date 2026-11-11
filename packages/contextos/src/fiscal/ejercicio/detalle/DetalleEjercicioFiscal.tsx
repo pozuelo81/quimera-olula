@@ -14,7 +14,7 @@ import {
     asientosDelEjercicio,
     etiquetaEjercicio,
     puedeCerrar,
-    puedeDeshacerCierre,
+    puedeReabrir,
     puedeGenerarPgc,
 } from "#/contabilidad/ejercicio/dominio.ts";
 import { GenerarPgcEjercicio } from "#/contabilidad/ejercicio/generar_pgc/GenerarPgcEjercicio.tsx";
@@ -63,7 +63,7 @@ export const DetalleEjercicioFiscal = ({
         { texto: "Cerrar ejercicio", onClick: () => emitir("cierre_solicitado"),
             deshabilitado: !autorizado || !puedeCerrar(ejercicio) },
         { texto: "Deshacer cierre", onClick: () => emitir("deshacer_cierre_solicitado"),
-            deshabilitado: !autorizado || !puedeDeshacerCierre(ejercicio), advertencia: true },
+            deshabilitado: !autorizado || !puedeReabrir(ejercicio), advertencia: true },
     ];
 
     const campo = (label: string, nombre: string, valor: string) => (

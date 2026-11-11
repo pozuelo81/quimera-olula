@@ -69,11 +69,13 @@ export const seriesDesdeTexto = (texto: string): string[] =>
 
 export const puedeGenerarPgc = (e: Ejercicio): boolean => !!e.id && !e.tienePgc;
 
+/** «Cerrar Ejercicio» solo con el ejercicio abierto y «Reabrir Ejercicio»
+ * solo con el ejercicio cerrado (co_masterasientosejer.qs::pbnCerrar_clicked). */
 export const puedeCerrar = (e: Ejercicio): boolean =>
-    !!e.id && e.estado === "ABIERTO" && e.tienePgc;
+    !!e.id && e.estado === "ABIERTO";
 
-export const puedeDeshacerCierre = (e: Ejercicio): boolean =>
-    !!e.id && (e.estado === "CERRADO" || !!e.asientoPygId || !!e.asientoCierreId);
+export const puedeReabrir = (e: Ejercicio): boolean =>
+    !!e.id && e.estado === "CERRADO";
 
 /** Ejercicio siguiente (el primero que empieza después), o "" si hay que
  * crearlo: el servidor lo crea con el PGC de este. */

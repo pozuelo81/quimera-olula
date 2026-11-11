@@ -8,7 +8,7 @@ import {
     nuevoEjercicioPropuesto,
     opcionesCierreIniciales,
     puedeCerrar,
-    puedeDeshacerCierre,
+    puedeReabrir,
     puedeGenerarPgc,
     seriesDesdeTexto,
     textoAviso,
@@ -54,11 +54,12 @@ describe("ejercicios: cierre", () => {
     test("acciones según el estado", () => {
         expect(puedeGenerarPgc(ejercicio("2026", 2026))).toBe(false);
         expect(puedeGenerarPgc(ejercicio("2027", 2027, { tienePgc: false }))).toBe(true);
+        // A5: Cerrar solo si está abierto y Reabrir solo si está cerrado.
         expect(puedeCerrar(ejercicio("2026", 2026))).toBe(true);
         expect(puedeCerrar(ejercicio("2026", 2026, { estado: "CERRADO" }))).toBe(false);
-        expect(puedeDeshacerCierre(ejercicio("2026", 2026))).toBe(false);
-        expect(puedeDeshacerCierre(ejercicio("2026", 2026, { estado: "CERRADO" }))).toBe(true);
-        expect(puedeDeshacerCierre(ejercicio("2026", 2026, { asientoPygId: 7 }))).toBe(true);
+        expect(puedeReabrir(ejercicio("2026", 2026))).toBe(false);
+        expect(puedeReabrir(ejercicio("2026", 2026, { estado: "CERRADO" }))).toBe(true);
+        expect(puedeReabrir(ejercicio("2026", 2026, { asientoPygId: 7 }))).toBe(false);
     });
 
     test("asientos del ejercicio: apertura, regularización y cierre, los que haya (A4)", () => {

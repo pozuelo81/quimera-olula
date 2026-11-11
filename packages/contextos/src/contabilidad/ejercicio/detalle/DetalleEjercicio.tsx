@@ -10,7 +10,7 @@ import { AsientosEjercicio } from "../asientos/AsientosEjercicio.tsx";
 import { CerrarEjercicio } from "../cerrar/CerrarEjercicio.tsx";
 import { DeshacerCierreEjercicio } from "../deshacer_cierre/DeshacerCierreEjercicio.tsx";
 import { Ejercicio } from "../diseño.ts";
-import { etiquetaEjercicio, puedeCerrar, puedeDeshacerCierre } from "../dominio.ts";
+import { etiquetaEjercicio, puedeCerrar, puedeReabrir } from "../dominio.ts";
 import { contextoDetalleEjercicioInicial } from "./detalle.ts";
 import { getMaquina } from "./maquina.ts";
 
@@ -40,10 +40,10 @@ export const DetalleEjercicio = ({
     const autorizado = puede("contabilidad.asiento");
 
     const acciones = [
-        { texto: "Cerrar ejercicio", onClick: () => emitir("cierre_solicitado"),
+        { texto: "Cerrar Ejercicio", onClick: () => emitir("cierre_solicitado"),
             deshabilitado: !autorizado || !puedeCerrar(ejercicio) },
-        { texto: "Deshacer cierre", onClick: () => emitir("deshacer_cierre_solicitado"),
-            deshabilitado: !autorizado || !puedeDeshacerCierre(ejercicio), advertencia: true },
+        { texto: "Reabrir Ejercicio", onClick: () => emitir("deshacer_cierre_solicitado"),
+            deshabilitado: !autorizado || !puedeReabrir(ejercicio), advertencia: true },
     ];
 
     const campo = (label: string, nombre: string, valor: string) => (
