@@ -62,7 +62,6 @@ export const MaestroConDetalleCliente = () => {
         }
         Detalle={<DetalleCliente id={ctx.clientes.activo} publicar={emitir} />}
         seleccionada={ctx.clientes.activo}
-        modoDisposicion="maestro-50"
       />
 
       {ctx.estado === "CREANDO_CLIENTE" && (
