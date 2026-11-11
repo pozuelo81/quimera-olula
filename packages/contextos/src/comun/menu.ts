@@ -4,6 +4,7 @@ export const menuComun = {
     // Organización y cada tabla una pantalla suya ("Tablas generales/Países").
     // Sin pantallas visibles el grupo no se pinta.
     "Tablas generales": { icono: "menu_tablas_generales", area: "Organización" },
+    "Tablas generales/Países": { alias: ["país", "ISO", "U.E."], url: "/comun/pais", regla: "comun.pais" },
     "Dashboards": { icono: "grafico_barras", url: "/comun/dashboard", area: "Sistema" },
     "Asistente IA": { icono: "asistente", area: "Sistema" },
     "Asistente IA/Chat": { url: "/comun/asistente" },
