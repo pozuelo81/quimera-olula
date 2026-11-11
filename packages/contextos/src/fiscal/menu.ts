@@ -4,4 +4,5 @@
  */
 export const menuFiscal = {
     Fiscalidad: { icono: "menu_fiscalidad", area: "Comercial" },
+    "Fiscalidad/Ejercicios fiscales": { url: "/fiscal/ejercicio", regla: "contabilidad.asiento" },
 };

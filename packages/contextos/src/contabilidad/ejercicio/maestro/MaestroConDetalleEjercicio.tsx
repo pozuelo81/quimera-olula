@@ -11,8 +11,9 @@ import { Ejercicio } from "../diseño.ts";
 import { criteriaEjerciciosDefecto, metaTablaEjercicio } from "./diseño.ts";
 import { getMaquina } from "./maquina.ts";
 
-/** Ejercicios contables (Eneboo masterejercicios + co_cerrarejer). */
-export const MaestroConDetalleEjercicio = () => {
+/** Ejercicios contables (Eneboo masterejercicios + co_cerrarejer). La misma
+ * pantalla es Fiscalidad > Ejercicios fiscales (ejercicios.ui de facturación). */
+export const MaestroConDetalleEjercicio = ({ titulo = "Ejercicios" }: { titulo?: string } = {}) => {
 
     const criteriaInicial = useMemo(criteriaEjerciciosDefecto, []);
 
@@ -40,7 +41,7 @@ export const MaestroConDetalleEjercicio = () => {
                 seleccionada={ejercicios.activo}
                 Maestro={
                     <>
-                        <h2>Ejercicios</h2>
+                        <h2>{titulo}</h2>
                         <Listado<Ejercicio>
                             metaTabla={metaTablaEjercicio}
                             criteria={ejercicios.criteria}

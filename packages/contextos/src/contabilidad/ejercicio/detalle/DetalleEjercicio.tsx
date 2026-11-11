@@ -3,7 +3,7 @@ import { Detalle } from "@olula/componentes/detalle/Detalle.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
 import { QuimeraAcciones } from "@olula/componentes/moleculas/qacciones.tsx";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
-import { formatearFechaDate, puede } from "@olula/lib/dominio.ts";
+import { puede } from "@olula/lib/dominio.ts";
 import { preferencias } from "@olula/lib/preferencias.ts";
 import { useEffect } from "react";
 import { AsientoDeDocumento } from "#/contabilidad/asiento/vistas/detalle/AsientoDeDocumento.tsx";
@@ -19,6 +19,8 @@ import {
     puedeGenerarPgc,
 } from "../dominio.ts";
 import { GenerarPgcEjercicio } from "../generar_pgc/GenerarPgcEjercicio.tsx";
+import { SeriesEjercicio } from "../series/SeriesEjercicio.tsx";
+import { DatosEjercicio } from "./DatosEjercicio.tsx";
 import { patchEjercicioActual } from "../infraestructura.ts";
 import { contextoDetalleEjercicioInicial } from "./detalle.ts";
 import { getMaquina } from "./maquina.ts";
@@ -44,6 +46,8 @@ export const DetalleEjercicio = ({
 
     const autorizado = puede("contabilidad.asiento");
     const esActual = ejercicioActual() === ejercicio.id;
+    const claveDatos = [ejercicio.id, ejercicio.nombre, ejercicio.fechaInicio.getTime(),
+        ejercicio.fechaFin.getTime(), ejercicio.digitosSubcuenta, ejercicio.tienePgc].join("|");
 
     const marcarActual = async () => {
         await patchEjercicioActual(ejercicio.id);
@@ -84,13 +88,16 @@ export const DetalleEjercicio = ({
                 </div>
                 <quimera-formulario>
                     {campo("Código", "id", ejercicio.id)}
-                    {campo("Nombre", "nombre", ejercicio.nombre)}
-                    {campo("Inicio", "fechaInicio", formatearFechaDate(ejercicio.fechaInicio))}
-                    {campo("Fin", "fechaFin", formatearFechaDate(ejercicio.fechaFin))}
+                    <DatosEjercicio
+                        key={claveDatos}
+                        ejercicio={ejercicio}
+                        editable={autorizado}
+                        onGuardado={() => emitir("datos_guardados")}
+                    />
                     {campo("Estado", "estado", ejercicio.estado + (esActual ? " (ejercicio actual)" : ""))}
-                    {campo("Dígitos de subcuenta", "digitosSubcuenta", String(ejercicio.digitosSubcuenta))}
                     {campo("Plan contable", "tienePgc", ejercicio.tienePgc ? `PGC ${ejercicio.planContable || "08"}` : "Sin plan contable")}
                 </quimera-formulario>
+                <SeriesEjercicio ejercicio={ejercicio} ejercicios={ejercicios} editable={autorizado} />
                 {asientosDelEjercicio(ejercicio, siguiente).map(({ titulo, asientoId }) => (
                     <AsientoDeDocumento
                         key={asientoId}

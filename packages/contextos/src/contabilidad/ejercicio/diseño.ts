@@ -61,3 +61,18 @@ export interface AsientoDelEjercicio {
 
 export type GetEjercicios = (criteria: Criteria) => RespuestaLista<Ejercicio>;
 export type GetEjercicio = (id: string) => Promise<Ejercicio>;
+
+/** Cabecera editable de `ejercicios.ui` (Fiscalidad > Ejercicios fiscales). */
+export interface DatosEjercicio extends Modelo {
+    nombre: string;
+    fechaInicio: Date;
+    fechaFin: Date;
+    digitosSubcuenta: number;
+}
+
+/** Fila de `secuenciasejercicios` (pestaña Series de `ejercicios.ui`). */
+export interface SerieEjercicio extends Entidad {
+    id: string;
+    serieId: string;
+    descripcion: string;
+}

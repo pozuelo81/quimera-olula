@@ -18,6 +18,7 @@ export const getMaquina: () => Maquina<EstadoDetalleEjercicio, ContextoDetalleEj
         cierre_solicitado: "CERRANDO",
         deshacer_cierre_solicitado: "DESHACIENDO",
         ejercicio_actual_cambiado: [refrescarEjercicio],
+        datos_guardados: [refrescarEjercicio],
     },
 
     GENERANDO_PGC: { ...volver, pgc_generado: [refrescarEjercicio] },

@@ -9,6 +9,7 @@ import {
     NuevoEjercicio,
     OpcionesCierre,
     ResultadoCierre,
+    SerieEjercicio,
 } from "./diseño.ts";
 import { seriesDesdeTexto } from "./dominio.ts";
 
@@ -168,4 +169,81 @@ export const patchDeshacerCierre = async (id: string): Promise<void> => {
         {},
         "Error al deshacer el cierre",
     );
+};
+
+const urlEjercicioFacturacion = (id: string) =>
+    `${urls.EJERCICIO_ALTA}/${encodeURIComponent(id)}`;
+
+/** Nombre y fechas (`ejercicios.ui`); la longitud de subcuenta va por la
+ * contabilidad, que no la deja cambiar si ya hay PGC. */
+export const patchDatosEjercicio = async (
+    id: string,
+    cambios: { nombre?: string; fechaInicio?: Date; fechaFin?: Date; digitosSubcuenta?: number },
+): Promise<void> => {
+    const datos: Record<string, string> = {};
+    if (cambios.nombre !== undefined) datos.nombre = cambios.nombre;
+    if (cambios.fechaInicio) datos.fecha_inicio = fechaAApi(cambios.fechaInicio);
+    if (cambios.fechaFin) datos.fecha_fin = fechaAApi(cambios.fechaFin);
+    if (Object.keys(datos).length > 0) {
+        await RestAPI.patch(urlEjercicioFacturacion(id), datos, "Error al guardar el ejercicio");
+    }
+    if (cambios.digitosSubcuenta !== undefined) {
+        await RestAPI.patch(
+            `${baseUrl}/${id}`,
+            { digitos_subcuenta: cambios.digitosSubcuenta },
+            "Error al cambiar la longitud de subcuenta",
+        );
+    }
+};
+
+interface SerieEjercicioApi {
+    id: number;
+    serie_id: string;
+    descripcion: string | null;
+}
+
+export const serieEjercicioDesdeApi = (api: SerieEjercicioApi): SerieEjercicio => ({
+    id: String(api.id),
+    serieId: api.serie_id,
+    descripcion: api.descripcion ?? "",
+});
+
+export const getSeriesEjercicio = async (id: string): Promise<SerieEjercicio[]> => {
+    const respuesta = await RestAPI.get<{ datos: SerieEjercicioApi[] }>(
+        `${urlEjercicioFacturacion(id)}/serie`,
+    );
+    return respuesta.datos.map(serieEjercicioDesdeApi);
+};
+
+export const postSerieEjercicio = async (id: string, serieId: string): Promise<void> => {
+    await RestAPI.post(
+        `${urlEjercicioFacturacion(id)}/serie`, { serie_id: serieId },
+        "Error al añadir la serie al ejercicio",
+    );
+};
+
+export const deleteSerieEjercicio = async (id: string, serieId: string): Promise<void> => {
+    await RestAPI.delete(
+        `${urlEjercicioFacturacion(id)}/serie/${encodeURIComponent(serieId)}`,
+        "Error al quitar la serie del ejercicio",
+    );
+};
+
+/** Botón «Copiar series» de `ejercicios.ui`. */
+export const postCopiarSeries = async (id: string, ejercicioOrigenId: string): Promise<void> => {
+    await RestAPI.post(
+        `${urlEjercicioFacturacion(id)}/copiar_series`, { ejercicio_origen_id: ejercicioOrigenId },
+        "Error al copiar las series",
+    );
+};
+
+/** Series del maestro (Fiscalidad > Series) para elegir la que se añade. */
+export const getOpcionesSeries = async (): Promise<{ valor: string; descripcion: string }[]> => {
+    const respuesta = await RestAPI.get<{ datos: { id: string; descripcion: string | null }[] }>(
+        "/comun/serie_facturacion",
+    );
+    return respuesta.datos.map((s) => ({
+        valor: s.id,
+        descripcion: s.descripcion ? `${s.id} — ${s.descripcion}` : s.id,
+    }));
 };
