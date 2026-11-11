@@ -3,12 +3,13 @@ import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { useModelo } from "@olula/lib/useModelo.ts";
 import { useCallback, useMemo } from "react";
 import { FilaFormulario } from "#/contabilidad/comun/componentes/FilaFormulario.tsx";
-import { DatosEjercicio as Datos, Ejercicio } from "../diseño.ts";
-import { cambiosDatosEjercicio, datosEjercicio, metaDatosEjercicio } from "../dominio.ts";
-import { patchDatosEjercicio } from "../infraestructura.ts";
+import { DatosEjercicio as Datos, Ejercicio } from "#/contabilidad/ejercicio/diseño.ts";
+import { cambiosDatosEjercicio, datosEjercicio, metaDatosEjercicio } from "#/contabilidad/ejercicio/dominio.ts";
+import { patchDatosEjercicio } from "#/contabilidad/ejercicio/infraestructura.ts";
 
-/** Cabecera editable de `ejercicios.ui`: nombre, fechas y longitud de
- * subcuenta (bloqueada si el ejercicio ya tiene PGC, como ejercicios.qs). */
+/** Cabecera editable de `ejercicios.ui`: Código (no se cambia) y Nombre en
+ * una fila; Inicio, Fin y longitud de subcuenta (bloqueada si el ejercicio ya
+ * tiene PGC, como ejercicios.qs) en otra. */
 export const DatosEjercicio = ({
     ejercicio,
     editable,
@@ -31,7 +32,10 @@ export const DatosEjercicio = ({
 
     return (
         <>
-            <QInput label="Nombre" {...uiProps("nombre")} deshabilitado={!editable} />
+            <FilaFormulario columnas="1fr 3fr">
+                <QInput label="Código" nombre="id" valor={ejercicio.id} soloLectura />
+                <QInput label="Nombre" {...uiProps("nombre")} deshabilitado={!editable} />
+            </FilaFormulario>
             <FilaFormulario>
                 <QDate label="Inicio" {...uiProps("fechaInicio")} deshabilitado={!editable} />
                 <QDate label="Fin" {...uiProps("fechaFin")} deshabilitado={!editable} />
