@@ -1,4 +1,5 @@
 import { EjerciciosFiscales } from "./ejercicio/EjerciciosFiscales.tsx";
+import { MaestroGruposIvaNegocio } from "./grupo_iva_negocio/MaestroGruposIvaNegocio.tsx";
 import { MaestroImpuestos } from "./impuesto/MaestroImpuestos.tsx";
 import { MaestroSeries } from "./serie/MaestroSeries.tsx";
 
@@ -7,5 +8,6 @@ export class RouterFactoryFiscalOlula {
         "fiscal/ejercicio": EjerciciosFiscales,
         "fiscal/serie": MaestroSeries,
         "fiscal/impuesto": MaestroImpuestos,
+        "fiscal/grupo_iva_negocio": MaestroGruposIvaNegocio,
     };
 }
