@@ -5,6 +5,7 @@ export const menuComun = {
     // Sin pantallas visibles el grupo no se pinta.
     "Tablas generales": { icono: "menu_tablas_generales", area: "Organización" },
     "Tablas generales/Países": { alias: ["país", "ISO", "U.E."], url: "/comun/pais", regla: "comun.pais" },
+    "Tablas generales/Provincias": { alias: ["provincia"], url: "/comun/provincia", regla: "comun.provincia" },
     "Dashboards": { icono: "grafico_barras", url: "/comun/dashboard", area: "Sistema" },
     "Asistente IA": { icono: "asistente", area: "Sistema" },
     "Asistente IA/Chat": { url: "/comun/asistente" },

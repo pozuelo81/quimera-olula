@@ -6,6 +6,7 @@ import { MaestroConDetalleCredencialExterna } from "./credencial_externa/maestro
 import { MaestroConDetalleIaFlujo } from "./ia_flujo/maestro/MaestroConDetalleIaFlujo.tsx";
 import { MaestroConDetalleIaMemoria } from "./ia_memoria/maestro/MaestroConDetalleIaMemoria.tsx";
 import { MaestroConDetallePais } from "./pais/maestro/MaestroConDetallePais.tsx";
+import { MaestroConDetalleProvincia } from "./provincia/maestro/MaestroConDetalleProvincia.tsx";
 import { MaestroConDetalleIaTareaProgramada } from "./tarea_programada_ia/maestro/MaestroConDetalleIaTareaProgramada.tsx";
 
 export class RouterFactoryComunOlula {
@@ -22,6 +23,7 @@ export class RouterFactoryComunOlula {
         "comun/credencial-externa": MaestroConDetalleCredencialExterna,
         "comun/credencial-externa/:id": MaestroConDetalleCredencialExterna,
         "comun/pais": MaestroConDetallePais,
+        "comun/provincia": MaestroConDetalleProvincia,
         "comun/dashboard": PaginaDashboards,
         "comun/dashboard/:id": PaginaDashboard,
         "dashboard/:clave": PaginaDashboardModulo,
