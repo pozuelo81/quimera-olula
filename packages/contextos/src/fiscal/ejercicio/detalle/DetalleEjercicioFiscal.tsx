@@ -103,9 +103,10 @@ export const DetalleEjercicioFiscal = ({
                     <Tab key="secuencias" label="Secuencias contabilidad">
                         <SecuenciasContabilidad ejercicioId={ejercicio.id} />
                     </Tab>,
+                    <Tab key="asientos" label="Asientos">
+                        <AsientosEjercicio ejercicio={ejercicio} />
+                    </Tab>,
                 ]} />
-                <h3>Asientos</h3>
-                <AsientosEjercicio ejercicio={ejercicio} />
             </div>
 
             {serieSecuencias && (

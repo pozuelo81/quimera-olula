@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter } from "react-router";
+import { MemoryRouter, Route, Routes, useLocation } from "react-router";
 import { describe, expect, test, vi } from "vitest";
 
 vi.mock("@olula/lib/dominio.ts", async (original) => ({
@@ -23,7 +23,10 @@ vi.mock("#/contabilidad/ejercicio/infraestructura.ts", async (original) => ({
     }),
     getSeriesEjercicio: async () => [{ id: "1", serieId: "A", descripcion: "SERIE A" }],
     getOpcionesSeries: async () => [],
-    getFilasAsientosEjercicio: async () => [],
+    getFilasAsientosEjercicio: async () => [{
+        id: "12", tipo: "APERTURA", titulo: "Asiento de apertura", numero: 1, ejercicioId: "2026",
+        fecha: new Date(2026, 0, 1, 12), concepto: "Asiento de apertura de ejercicio 2026", importe: 50,
+    }],
 }));
 
 import { DetalleEjercicioFiscal } from "../detalle/DetalleEjercicioFiscal.tsx";
@@ -31,8 +34,18 @@ import { DetalleEjercicioFiscal } from "../detalle/DetalleEjercicioFiscal.tsx";
 const filaDe = (texto: string) =>
     screen.getByText(texto, { selector: ".etiqueta" }).closest(".FilaFormulario");
 
+const Destino = () => {
+    const { pathname, search } = useLocation();
+    return <p>{`destino ${pathname}${search}`}</p>;
+};
+
 const pintar = () => render(
-    <MemoryRouter><DetalleEjercicioFiscal id="2026" ejercicios={[]} /></MemoryRouter>
+    <MemoryRouter initialEntries={["/fiscal/ejercicio"]}>
+        <Routes>
+            <Route path="/fiscal/ejercicio" element={<DetalleEjercicioFiscal id="2026" ejercicios={[]} />} />
+            <Route path="/contabilidad/asiento" element={<Destino />} />
+        </Routes>
+    </MemoryRouter>
 );
 
 describe("edición de ejercicio fiscal (B4a)", () => {
@@ -68,5 +81,15 @@ describe("edición de ejercicio fiscal (B4a)", () => {
         await userEvent.click(screen.getByText("Secuencias contabilidad"));
         expect(await screen.findByText("nasiento")).toBeInTheDocument();
         expect(screen.getByText("8")).toBeInTheDocument();
+    });
+
+    test("pestaña «Asientos» con «Ir a ver asiento» (B4d)", async () => {
+        pintar();
+        await screen.findByText("SERIE A");
+        await userEvent.click(screen.getByText("Asientos"));
+        await userEvent.click(await screen.findByText("Asiento de apertura de ejercicio 2026"));
+        await userEvent.click(screen.getByRole("button", { name: "Ir a ver asiento" }));
+        expect(await screen.findByText("destino /contabilidad/asiento?id=12&ejercicio_id=eq__2026"))
+            .toBeInTheDocument();
     });
 });
