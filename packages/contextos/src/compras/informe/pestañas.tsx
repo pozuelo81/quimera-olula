@@ -13,6 +13,8 @@ const opciones = (valores: string[]) => valores.map((valor) => ({ valor, descrip
 const ORDENES = opciones(["No ordenar", "Código", "Cod.Proveedor", "Proveedor", "Fecha", "Total"]);
 const SENTIDOS = opciones(["Ascendente", "Descendente"]);
 
+const TODOS_SI_NO = opciones(["Todos", "Sí", "No"]);
+
 const TIPOS_INFORME = opciones(["Moneda original", "Moneda original y euros", "Euros"]);
 
 const texto = (id: string, label: string): CampoInforme => ({ id, label, tipo: "texto" });
@@ -93,4 +95,17 @@ export const PEDIDOS: PestañaInforme = {
     modos: MODOS_PEDIDOS,
 };
 
-export const PESTAÑAS_COMPRAS: PestañaInforme[] = [PEDIDOS];
+export const ALBARANES: PestañaInforme = {
+    clave: "albaranes",
+    titulo: "Albaranes",
+    url: "/compras/informe/albaranes",
+    regla: "compras.albaran",
+    filas: [
+        ...filasComunes("albarán"),
+        [combo("pte_factura", "Pte. factura", TODOS_SI_NO)],
+        ...filasOrden("Albaranes"),
+    ],
+    inicial: { ...INICIAL_COMUN, pte_factura: "Todos" },
+};
+
+export const PESTAÑAS_COMPRAS: PestañaInforme[] = [PEDIDOS, ALBARANES];

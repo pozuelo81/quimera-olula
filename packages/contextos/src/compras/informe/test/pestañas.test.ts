@@ -1,6 +1,6 @@
 import { fichaAApi, fichaNueva } from "#/comun/informe_documentos/dominio.ts";
 import { describe, expect, test } from "vitest";
-import { PEDIDOS, PESTAÑAS_COMPRAS } from "../pestañas.tsx";
+import { ALBARANES, PEDIDOS, PESTAÑAS_COMPRAS } from "../pestañas.tsx";
 
 const ids = (filas: { id: string }[][]) => filas.flat().map((campo) => campo.id);
 
@@ -45,6 +45,11 @@ describe("pestañas de Compras > Informes", () => {
             "Calcular resumen",
             "Calcular resumen por líneas",
         ]);
+    });
+
+    test("albaranes: pendiente de facturar", () => {
+        expect(ids(ALBARANES.filas)).toContain("pte_factura");
+        expect(ALBARANES.modos).toBeUndefined();
     });
 
 
