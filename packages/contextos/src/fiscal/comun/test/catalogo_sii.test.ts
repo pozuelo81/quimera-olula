@@ -18,5 +18,6 @@ describe("Catálogos del SII", () => {
     });
     it("la opción muestra código y descripción y guarda el código", () => {
         expect(opcion({ id: "01", descripcion: "GENERAL" })).toEqual({ valor: "01", descripcion: "01 — GENERAL" });
+        expect(opcion(tipos[1]).descripcion).toBe("S1 - Sujeta No Exenta");
     });
 });

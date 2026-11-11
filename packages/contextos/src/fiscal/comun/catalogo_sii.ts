@@ -25,8 +25,10 @@ export const leer = (url: string): Promise<Elemento[]> => {
     return cache.get(url)!;
 };
 
+// En sii_tiposoperacion la descripción ya empieza por el código («S1 - Sujeta…»).
 export const opcion = ({ id, descripcion }: Elemento): OpcionSii => ({
-    valor: id, descripcion: descripcion ? `${id} — ${descripcion}` : id,
+    valor: id,
+    descripcion: !descripcion ? id : descripcion.startsWith(id) ? descripcion : `${id} — ${descripcion}`,
 });
 
 /** Filtra por código o descripción, sin distinguir mayúsculas ni tildes. */
