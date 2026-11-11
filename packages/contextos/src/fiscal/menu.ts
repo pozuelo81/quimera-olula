@@ -3,7 +3,7 @@
  * (en Eneboo, maestros del módulo principal de facturación).
  */
 export const menuFiscal = {
-    Fiscalidad: { icono: "menu_fiscalidad", area: "Comercial" },
+    Fiscalidad: { icono: "menu_fiscalidad", area: "Finanzas" },
     "Fiscalidad/Ejercicios fiscales": { url: "/fiscal/ejercicio", regla: "contabilidad.asiento" },
     "Fiscalidad/Series": { url: "/fiscal/serie", regla: "comun.serie" },
     "Fiscalidad/Impuestos": { url: "/fiscal/impuesto", regla: "comun.impuesto" },
