@@ -2,7 +2,8 @@ import { describe, expect, test, vi } from "vitest";
 
 vi.mock("#/contabilidad/asiento/dominio.ts", () => ({ ejercicioActual: () => "2026" }));
 
-const { cambiosImpuestoAApi, impuestoDesdeApi, nuevoImpuestoAApi } = await import("../dominio.ts");
+const { cambiosImpuestoAApi, impuestoDesdeApi, nuevoImpuestoAApi, SUBCUENTAS } = await import("../dominio.ts");
+const { SUBCUENTAS_COMPRAS, SUBCUENTAS_VENTAS } = await import("../subcuentas.ts");
 
 const api = {
     id: "GEN", descripcion: "I.V.A. General", iva: 21, recargo: 5.2, tipo_bienes: "Corrientes",
@@ -30,5 +31,17 @@ describe("impuestos (impuestos.mtd)", () => {
         expect(nuevoImpuestoAApi(nuevo)).toMatchObject({
             id: "RED", iva: 21, subcuentas: { rep: "4770000000" }, ejercicio_id: "2026",
         });
+    });
+
+    test("subcuenta vaciada (null en el formulario) se envía como quitada", () => {
+        const impuesto = impuestoDesdeApi(api);
+        expect(cambiosImpuestoAApi(impuesto, { ...impuesto, sc_rep: null as unknown as string }))
+            .toEqual({ subcuentas: { rep: "" }, ejercicio_id: "2026" });
+    });
+
+    test("las 19 subcuentas, repartidas entre compras y ventas sin repetir", () => {
+        expect(SUBCUENTAS_COMPRAS).toHaveLength(12);
+        expect(SUBCUENTAS_VENTAS).toHaveLength(7);
+        expect(new Set(SUBCUENTAS.map((s) => s.sufijo)).size).toBe(19);
     });
 });
