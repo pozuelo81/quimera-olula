@@ -16,6 +16,7 @@ import { getMaquina } from "#/contabilidad/ejercicio/detalle/maquina.ts";
 import { etiquetaEjercicio, puedeGenerarPgc } from "#/contabilidad/ejercicio/dominio.ts";
 import { GenerarPgcEjercicio } from "#/contabilidad/ejercicio/generar_pgc/GenerarPgcEjercicio.tsx";
 import { patchEjercicioActual } from "#/contabilidad/ejercicio/infraestructura.ts";
+import { SecuenciasContabilidad } from "../secuencias/SecuenciasContabilidad.tsx";
 import { SecuenciasSerie } from "../secuencias/SecuenciasSerie.tsx";
 import { SeriesEjercicio } from "../series/SeriesEjercicio.tsx";
 import { DatosEjercicio } from "./DatosEjercicio.tsx";
@@ -98,6 +99,9 @@ export const DetalleEjercicioFiscal = ({
                                     Secuencias por serie
                                 </QBoton>
                             )} />
+                    </Tab>,
+                    <Tab key="secuencias" label="Secuencias contabilidad">
+                        <SecuenciasContabilidad ejercicioId={ejercicio.id} />
                     </Tab>,
                 ]} />
                 <h3>Asientos</h3>

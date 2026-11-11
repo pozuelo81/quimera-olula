@@ -27,3 +27,12 @@ export interface CambiosSecuencia {
     valorout?: number | null;
     valorini?: number | null;
 }
+
+/** Fila de `co_secuencias` del ejercicio (pestaña «Secuencias contabilidad»). */
+export interface SecuenciaContabilidad extends Entidad {
+    id: string;
+    nombre: string;
+    descripcion: string;
+    valor: number | null;
+    valorout: number | null;
+}

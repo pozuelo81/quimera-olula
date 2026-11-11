@@ -1,6 +1,6 @@
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
 import ApiUrls from "#/contabilidad/comun/urls.ts";
-import { CambiosSecuencia, SecuenciaSerie } from "./diseño.ts";
+import { CambiosSecuencia, SecuenciaContabilidad, SecuenciaSerie } from "./diseño.ts";
 
 const urls = new ApiUrls();
 
@@ -39,4 +39,27 @@ export const patchSecuenciaSerie = async (
         cambios,
         "Error al guardar la secuencia",
     );
+};
+
+interface SecuenciaContabilidadApi {
+    id: number;
+    nombre: string;
+    descripcion: string | null;
+    valor: number | null;
+    valorout: number | null;
+}
+
+export const secuenciaContabilidadDesdeApi = (api: SecuenciaContabilidadApi): SecuenciaContabilidad => ({
+    id: String(api.id),
+    nombre: api.nombre,
+    descripcion: api.descripcion ?? "",
+    valor: api.valor,
+    valorout: api.valorout,
+});
+
+export const getSecuenciasContabilidad = async (ejercicioId: string): Promise<SecuenciaContabilidad[]> => {
+    const respuesta = await RestAPI.get<{ datos: SecuenciaContabilidadApi[] }>(
+        `${urls.EJERCICIO}/${encodeURIComponent(ejercicioId)}/secuencia`,
+    );
+    return respuesta.datos.map(secuenciaContabilidadDesdeApi);
 };
