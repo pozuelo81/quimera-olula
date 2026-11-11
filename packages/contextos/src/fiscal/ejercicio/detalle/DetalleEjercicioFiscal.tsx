@@ -111,7 +111,7 @@ export const DetalleEjercicioFiscal = ({
                 <CerrarEjercicio ejercicio={ejercicio} ejercicios={ejercicios} publicar={emitir} />
             )}
             {estado === "DESHACIENDO" && (
-                <DeshacerCierreEjercicio ejercicio={ejercicio} publicar={emitir} />
+                <DeshacerCierreEjercicio ejercicio={ejercicio} ejercicios={ejercicios} publicar={emitir} />
             )}
         </Detalle>
     );

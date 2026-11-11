@@ -3,14 +3,17 @@ import { EmitirEvento } from "@olula/lib/diseño.js";
 import { useForm } from "@olula/lib/useForm.js";
 import { useCallback } from "react";
 import { Ejercicio } from "../diseño.ts";
-import { etiquetaEjercicio } from "../dominio.ts";
+import { mensajeReabrir } from "../dominio.ts";
 import { patchDeshacerCierre } from "../infraestructura.ts";
 
+/** «Reabrir Ejercicio»: avisa de lo que se borra y pide confirmación. */
 export const DeshacerCierreEjercicio = ({
     ejercicio,
+    ejercicios,
     publicar,
 }: {
     ejercicio: Ejercicio;
+    ejercicios: Ejercicio[];
     publicar: EmitirEvento;
 }) => {
     const aceptar_ = useCallback(async () => {
@@ -21,10 +24,10 @@ export const DeshacerCierreEjercicio = ({
 
     return (
         <QModalConfirmacion
-            nombre="deshacerCierre"
+            nombre="reabrirEjercicio"
             abierto={true}
-            titulo="Deshacer el cierre"
-            mensaje={`Se borrarán los asientos de pérdidas y ganancias, de cierre y la apertura del ejercicio siguiente, y ${etiquetaEjercicio(ejercicio)} quedará abierto. ¿Continuar?`}
+            titulo="Reabrir Ejercicio"
+            mensaje={mensajeReabrir(ejercicio, ejercicios)}
             onCerrar={cancelar}
             onAceptar={aceptar}
         />

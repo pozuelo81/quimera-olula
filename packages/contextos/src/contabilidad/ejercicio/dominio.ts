@@ -145,6 +145,21 @@ export const validarOpcionesCierre = (ejercicio: Ejercicio, o: OpcionesCierre): 
     return true;
 };
 
+/** Aviso de «Reabrir Ejercicio» (co_masterasientosejer.qs::reabrirEjercicio):
+ * se borran la regularización y el cierre de este ejercicio y la apertura del
+ * siguiente, y el ejercicio queda abierto. */
+export const mensajeReabrir = (ejercicio: Ejercicio, ejercicios: Ejercicio[]): string => {
+    const siguiente = ejercicios
+        .filter((e) => e.fechaInicio.getTime() > ejercicio.fechaInicio.getTime())
+        .sort((a, b) => a.fechaInicio.getTime() - b.fechaInicio.getTime())[0];
+    const apertura = siguiente
+        ? `el asiento de apertura del ejercicio siguiente (${etiquetaEjercicio(siguiente)})`
+        : "el asiento de apertura del ejercicio siguiente, si lo hay";
+    return `Se van a borrar los asientos de pérdidas y ganancias y de cierre del ejercicio `
+        + `${etiquetaEjercicio(ejercicio)} y ${apertura}. El ejercicio ${ejercicio.id} `
+        + `quedará abierto. ¿Desea continuar?`;
+};
+
 export const esAvisoCuentasSinCodigoBalance = (error: unknown): boolean => {
     const e = error as { estado?: number; descripcion?: string } | null;
     return e?.estado === 409

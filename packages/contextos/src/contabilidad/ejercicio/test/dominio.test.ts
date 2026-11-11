@@ -3,6 +3,7 @@ import { Ejercicio } from "../diseño.ts";
 import {
     asientosDelEjercicio,
     ejerciciosApertura,
+    mensajeReabrir,
     ejercicioVacio,
     esAvisoCuentasSinCodigoBalance,
     nuevoEjercicioPropuesto,
@@ -121,6 +122,15 @@ describe("ejercicios: cierre", () => {
         expect(opcionesCierreAEnviar(regularizado, { ...opciones, abrir: false }).ejercicioDestinoId).toBe("");
         const api = opcionesCierreAApi(opcionesCierreAEnviar(regularizado, opciones));
         expect(api).toMatchObject({ fecha: "2026-12-31", cerrar: true, abrir: true, ejercicio_destino_id: "2027" });
+    });
+
+    test("«Reabrir Ejercicio» avisa de lo que se borra y de que queda abierto (A6)", () => {
+        const e26 = ejercicio("2026", 2026, { estado: "CERRADO" });
+        const texto = mensajeReabrir(e26, [ejercicio("2028", 2028), e26, ejercicio("2027", 2027)]);
+        expect(texto).toContain("pérdidas y ganancias y de cierre del ejercicio 2026 — EJERCICIO 2026");
+        expect(texto).toContain("asiento de apertura del ejercicio siguiente (2027 — EJERCICIO 2027)");
+        expect(texto).toContain("El ejercicio 2026 quedará abierto");
+        expect(mensajeReabrir(e26, [e26])).toContain("si lo hay");
     });
 
     test("reconoce el aviso de cuentas sin código de balance", () => {
