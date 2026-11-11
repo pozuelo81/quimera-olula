@@ -19,7 +19,9 @@ describe("menú «Tablas generales» (área Organización)", () => {
 
     test("sus pantallas cuelgan del grupo", () => {
         const pantallas = aplanarMenu(menu, todo).filter((p) => p.grupo === "Tablas generales");
-        expect(pantallas.map((p) => p.nombre)).toContain("Países");
+        expect(pantallas.map((p) => p.nombre)).toEqual([
+            "Países", "Provincias", "Zonas geográficas", "Divisas",
+        ]);
         for (const pantalla of pantallas) {
             expect(pantalla.url.startsWith("/comun/")).toBe(true);
         }
