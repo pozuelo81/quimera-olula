@@ -3,7 +3,7 @@ import { MetaFiltro } from "@olula/componentes/maestro/maestroFiltros/MaestroFil
 import { Entidad, Modelo } from "@olula/lib/diseño.ts";
 import { FormModelo, MetaModelo } from "@olula/lib/dominio.ts";
 import { ListaActivaEntidades } from "@olula/lib/ListaActivaEntidades.js";
-import { ComponentType } from "react";
+import { ComponentType, ReactNode } from "react";
 
 export type UiProps = FormModelo["uiProps"];
 
@@ -11,6 +11,8 @@ export type UiProps = FormModelo["uiProps"];
 export interface PropsCampos<T> {
     uiProps: UiProps;
     entidad?: T;
+    /** El campo Código, cuando el formulario lo coloca (`codigoEnCampos`). */
+    codigo?: ReactNode;
 }
 
 /**
@@ -34,7 +36,10 @@ export interface ConfigMaestroFiscal<T extends Entidad & Modelo, N extends Model
     /** Solo los campos cambiados, con los nombres de la API. */
     cambiosAApi: (previo: T, actual: T) => Record<string, unknown>;
     Campos: ComponentType<PropsCampos<T>>;
-    CamposNuevo?: ComponentType<{ uiProps: UiProps }>;
+    CamposNuevo?: ComponentType<{ uiProps: UiProps; codigo?: ReactNode }>;
+    /** El formulario pone el Código donde quiere (p. ej. en la fila de la
+     * descripción) en vez de en una fila propia al principio. */
+    codigoEnCampos?: boolean;
     /** Texto del aviso al borrar (p. ej. «no se puede borrar si está en uso»). */
     avisoBorrado?: string;
     /** Si el servidor responde 409 al guardar, pregunta esto y repite con

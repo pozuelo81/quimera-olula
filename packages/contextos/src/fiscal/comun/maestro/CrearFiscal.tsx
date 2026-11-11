@@ -30,14 +30,15 @@ export const CrearFiscal = <T extends Entidad & Modelo, N extends Modelo>({
     const [crear, cancelar] = useForm(crear_, cancelar_);
     const focus = useFocus();
     const Campos = config.CamposNuevo;
+    const codigo = <QInput label="Código" {...uiProps("id")} ref={focus} />;
 
     return (
         <QModal abierto={true} nombre={`crear_${config.nombre}`}
             titulo={`Nuevo: ${config.nombre}`} onCerrar={cancelar}>
             <div className="CrearFiscal">
                 <quimera-formulario>
-                    <QInput label="Código" {...uiProps("id")} ref={focus} />
-                    {Campos && <Campos uiProps={uiProps} />}
+                    {!config.codigoEnCampos && codigo}
+                    {Campos && <Campos uiProps={uiProps} codigo={config.codigoEnCampos ? codigo : undefined} />}
                 </quimera-formulario>
                 <div className="botones maestro-botones">
                     <QBoton onClick={crear} deshabilitado={!valido}>Crear</QBoton>

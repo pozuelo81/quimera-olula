@@ -28,11 +28,13 @@ const FormularioFiscal = <T extends Entidad & Modelo, N extends Modelo>({
 
     const { uiProps } = useModelo(config.metaEntidad, entidad, guardar);
     const Campos = config.Campos;
+    const codigo = <QInput label="Código" nombre="id" valor={entidad.id} soloLectura />;
 
     return (
         <quimera-formulario>
-            <QInput label="Código" nombre="id" valor={entidad.id} soloLectura />
-            <Campos uiProps={uiProps} entidad={entidad} />
+            {!config.codigoEnCampos && codigo}
+            <Campos uiProps={uiProps} entidad={entidad}
+                codigo={config.codigoEnCampos ? codigo : undefined} />
         </quimera-formulario>
     );
 };

@@ -93,5 +93,6 @@ export const configGrupoIvaNegocio: ConfigMaestroFiscal<GrupoIvaNegocioFiscal, N
     cambiosAApi: cambiosGrupoAApi,
     Campos: CamposGrupoIvaNegocio,
     CamposNuevo: CamposGrupoIvaNegocio,
+    codigoEnCampos: true,
     avisoBorrado: "No se puede borrar si lo usan clientes, proveedores, subcuentas o documentos.",
 };
