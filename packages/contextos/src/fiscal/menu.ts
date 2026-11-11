@@ -11,4 +11,8 @@ export const menuFiscal = {
         url: "/fiscal/grupo_iva_negocio",
         regla: "comun.grupo_iva_negocio",
     },
+    "Fiscalidad/Regímenes IVA Veri*Factu": {
+        url: "/fiscal/regimen_iva_verifactu",
+        regla: "comun.regimen_iva_verifactu",
+    },
 };
