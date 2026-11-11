@@ -1,6 +1,7 @@
-import { fichaAApi, fichaNueva } from "#/comun/informe_documentos/dominio.ts";
+import { fichaAApi, fichaNueva, metaFichaInforme } from "#/comun/informe_documentos/dominio.ts";
+import { FichaInforme } from "#/comun/informe_documentos/diseño.ts";
 import { describe, expect, test } from "vitest";
-import { ALBARANES, PEDIDOS, PESTAÑAS_COMPRAS } from "../pestañas.tsx";
+import { ALBARANES, FACTURAS, PEDIDOS, PESTAÑAS_COMPRAS } from "../pestañas.tsx";
 
 const ids = (filas: { id: string }[][]) => filas.flat().map((campo) => campo.id);
 
@@ -52,5 +53,23 @@ describe("pestañas de Compras > Informes", () => {
         expect(ALBARANES.modos).toBeUndefined();
     });
 
-
+    test("facturas: los criterios de i_facturasprov", () => {
+        expect(ids(FACTURAS.filas)).toEqual(
+            expect.arrayContaining([
+                "pte_pago",
+                "serie_id",
+                "regimen_iva",
+                "de_abono",
+                "filtrar_importes",
+                "importe_desde",
+                "importe_hasta",
+                "acumulado",
+                "orden_acumulado",
+                "limite_acumulado",
+            ])
+        );
+        const meta = metaFichaInforme<FichaInforme>(FACTURAS);
+        const ficha = { ...fichaNueva(FACTURAS), filtrar_importes: false, importe_desde: "10" };
+        expect(meta.onChange!(ficha, "filtrar_importes", true).importe_desde).toBe("");
+    });
 });

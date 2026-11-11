@@ -1,4 +1,4 @@
-import { CampoInforme, PestañaInforme } from "#/comun/informe_documentos/diseño.ts";
+import { CampoInforme, FichaInforme, PestañaInforme } from "#/comun/informe_documentos/diseño.ts";
 import { OPCIONES_INTERVALO } from "#/comun/informe_documentos/dominio.ts";
 import { ControlProveedor } from "./controles.tsx";
 
@@ -108,4 +108,51 @@ export const ALBARANES: PestañaInforme = {
     inicial: { ...INICIAL_COMUN, pte_factura: "Todos" },
 };
 
-export const PESTAÑAS_COMPRAS: PestañaInforme[] = [PEDIDOS, ALBARANES];
+const filtraImportes = (ficha: FichaInforme) => ficha.filtrar_importes === true;
+
+const esAcumulado = (ficha: FichaInforme) => ficha.acumulado === true;
+
+/** `habilitarPorFiltroImportes`: sin «Filtrar por importe» los importes se vacían. */
+const ajustarFacturas = (ficha: FichaInforme, campo: string): FichaInforme =>
+    campo === "filtrar_importes" && !ficha.filtrar_importes
+        ? { ...ficha, importe_desde: "", importe_hasta: "" }
+        : ficha;
+
+export const FACTURAS: PestañaInforme = {
+    clave: "facturas",
+    titulo: "Facturas",
+    url: "/compras/informe/facturas",
+    regla: "compras.factura",
+    filas: [
+        ...filasComunes("factura"),
+        [
+            combo("pte_pago", "Ptes. de pago", TODOS_SI_NO),
+            texto("serie_id", "Serie"),
+            combo("regimen_iva", "Régimen I.V.A.", opciones(["Todos", "General", "Importaciones", "UE", "Exento"])),
+        ],
+        [casilla("de_abono", "Sólo facturas de abono")],
+        [
+            casilla("filtrar_importes", "Filtrar por importe"),
+            { id: "importe_desde", label: "Desde importe", tipo: "decimal", activo: filtraImportes },
+            { id: "importe_hasta", label: "Hasta importe", tipo: "decimal", activo: filtraImportes },
+        ],
+        [
+            casilla("acumulado", "Acumulado"),
+            { ...combo("orden_acumulado", "Orden A.", opciones(["DESC", "ASC"])), activo: esAcumulado },
+            { id: "limite_acumulado", label: "Límite A.", tipo: "entero", activo: esAcumulado },
+        ],
+        ...filasOrden("Facturas"),
+    ],
+    inicial: {
+        ...INICIAL_COMUN,
+        pte_pago: "Todos",
+        regimen_iva: "Todos",
+        de_abono: false,
+        filtrar_importes: false,
+        acumulado: false,
+        orden_acumulado: "DESC",
+    },
+    ajustar: ajustarFacturas,
+};
+
+export const PESTAÑAS_COMPRAS: PestañaInforme[] = [PEDIDOS, ALBARANES, FACTURAS];
