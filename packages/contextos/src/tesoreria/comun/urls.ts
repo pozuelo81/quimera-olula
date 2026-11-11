@@ -12,6 +12,7 @@ class Tesoreria_Urls {
     readonly PRESTAMO_BANCARIO = `/tesoreria/prestamo_bancario`;
     readonly CONFIG = `/tesoreria/config`;
     readonly FORMA_PAGO = `/comun/forma_pago`;
+    readonly BANCO = `/comun/banco`;
 }
 
 export default Tesoreria_Urls;
