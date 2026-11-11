@@ -112,6 +112,19 @@ describe("AsientoDeDocumento — el asiento de una factura", () => {
         expect(document.querySelector(".PartidasAsientoLista")).not.toBeNull();
     });
 
+    test("en una factura la cabecera no lleva tipo de documento, documento ni concepto", async () => {
+        getAsiento.mockResolvedValue(asientoDeFactura());
+
+        render(<AsientoDeDocumento asientoId="128" sinDatosDocumento />);
+
+        expect(await screen.findByText("6000000")).toBeInTheDocument();
+        const campo = (nombre: string) => document.querySelector(`.CabeceraAsiento [nombre="${nombre}"]`);
+        expect(campo("numero")).not.toBeNull();
+        expect(campo("tipoDocumento")).toBeNull();
+        expect(campo("documento")).toBeNull();
+        expect(campo("concepto")).toBeNull();
+    });
+
     test("con título lo pinta con el número y la fecha del asiento", async () => {
         getAsiento.mockResolvedValue(asientoDeFactura());
 

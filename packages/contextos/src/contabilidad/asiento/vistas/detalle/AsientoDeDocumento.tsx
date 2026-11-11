@@ -16,12 +16,15 @@ interface AsientoDeDocumentoProps {
     asientoId: string | null;
     conCabecera?: boolean;
     titulo?: string;
+    /** Quita de la cabecera tipo de documento, documento y concepto (facturas). */
+    sinDatosDocumento?: boolean;
 }
 
 export const AsientoDeDocumento = ({
     asientoId,
     conCabecera = true,
     titulo,
+    sinDatosDocumento = false,
 }: AsientoDeDocumentoProps) => {
     const [asiento, setAsiento] = useState<Asiento | null>(null);
     const [cargando, setCargando] = useState(false);
@@ -57,7 +60,7 @@ export const AsientoDeDocumento = ({
                     {`${titulo} · Nº ${asiento.numero} · ${formatearFechaDate(asiento.fecha)}`}
                 </h3>
             )}
-            {conCabecera && <CabeceraAsiento asiento={asiento} />}
+            {conCabecera && <CabeceraAsiento asiento={asiento} sinDatosDocumento={sinDatosDocumento} />}
             <PartidasAsientoLista partidas={asiento.partidas} />
         </div>
     );

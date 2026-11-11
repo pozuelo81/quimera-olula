@@ -147,7 +147,7 @@ export const DetalleFactura = ({
                             <Tab
                                 key="tab-contabilidad"
                                 label="Contabilidad"
-                                children={<AsientoDeDocumento asientoId={factura.asientoId} />}
+                                children={<AsientoDeDocumento asientoId={factura.asientoId} sinDatosDocumento />}
                             />
                         ),
                     ]}

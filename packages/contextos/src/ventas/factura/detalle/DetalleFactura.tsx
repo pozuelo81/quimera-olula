@@ -160,7 +160,7 @@ export const DetalleFactura = ({
 
         {puede("contabilidad.asiento") && (
           <Tab label="Contabilidad">
-            <AsientoDeDocumento asientoId={ctx.factura.asiento_id ?? null} />
+            <AsientoDeDocumento asientoId={ctx.factura.asiento_id ?? null} sinDatosDocumento />
           </Tab>
         )}
       </Tabs>
