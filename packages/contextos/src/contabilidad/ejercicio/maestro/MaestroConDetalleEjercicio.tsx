@@ -11,9 +11,13 @@ import { Ejercicio } from "../diseño.ts";
 import { criteriaEjerciciosDefecto, metaTablaEjercicio } from "./diseño.ts";
 import { getMaquina } from "./maquina.ts";
 
-/** Ejercicios contables (Eneboo masterejercicios + co_cerrarejer). La misma
- * pantalla es Fiscalidad > Ejercicios fiscales (ejercicios.ui de facturación). */
-export const MaestroConDetalleEjercicio = ({ titulo = "Apertura y Cierre de Ejercicio" }: { titulo?: string } = {}) => {
+/** Listado de la tabla `ejercicios`. En Contabilidad > «Apertura y Cierre de
+ * Ejercicio» (co_cerrarejer) no se crean ni se borran ejercicios; en
+ * Fiscalidad > «Ejercicios fiscales» (ejercicios.ui) sí se crean (`conAlta`). */
+export const MaestroConDetalleEjercicio = ({
+    titulo = "Apertura y Cierre de Ejercicio",
+    conAlta = false,
+}: { titulo?: string; conAlta?: boolean } = {}) => {
 
     const criteriaInicial = useMemo(criteriaEjerciciosDefecto, []);
 
@@ -49,13 +53,13 @@ export const MaestroConDetalleEjercicio = ({ titulo = "Apertura y Cierre de Ejer
                             entidades={ejercicios.lista}
                             totalEntidades={ejercicios.total}
                             seleccionada={ejercicios.activo}
-                            renderAcciones={() => (
+                            renderAcciones={conAlta ? () => (
                                 <div className="maestro-botones">
                                     <QBoton onClick={() => emitir("crear_ejercicio_solicitado")}>
                                         Nuevo ejercicio
                                     </QBoton>
                                 </div>
-                            )}
+                            ) : undefined}
                             onSeleccion={(payload) => emitir("ejercicio_seleccionado", payload)}
                             onCriteriaChanged={(payload) => emitir("criteria_cambiado", payload)}
                             onSiguientePagina={(payload) => emitir("siguiente_pagina", payload)}
@@ -71,7 +75,7 @@ export const MaestroConDetalleEjercicio = ({ titulo = "Apertura y Cierre de Ejer
                 }
             />
 
-            {estado === "CREANDO" && (
+            {conAlta && estado === "CREANDO" && (
                 <CrearEjercicio publicar={emitir} ejercicios={ejercicios.lista} />
             )}
         </div>
