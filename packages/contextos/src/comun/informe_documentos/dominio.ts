@@ -3,6 +3,7 @@ import { Modelo } from "@olula/lib/diseño.ts";
 import {
     CampoInforme,
     FichaInforme,
+    ModoCalculo,
     ModoInforme,
     PestañaInforme,
     TipoColumnaResultado,
@@ -236,14 +237,27 @@ export const fechasIntervalo = (
     }
 };
 
+/** Intervalo -> sus fechas. El segundo es la fecha de entrada de los
+ * pedidos de proveedor (`codintervaloe`). */
+const INTERVALOS_FECHAS: Record<string, [string, string]> = {
+    intervalo: ["fecha_desde", "fecha_hasta"],
+    intervalo_entrada: ["fecha_entrada_desde", "fecha_entrada_hasta"],
+};
+
 /** `formUTIL.gestionIntervalo`: al elegir un intervalo se rellenan las fechas. */
 export const conIntervalo = (
     ficha: FichaInforme,
     campo: string,
     hoy: Date = new Date()
 ): FichaInforme => {
-    if (campo !== "intervalo") return ficha;
-    const fechas = fechasIntervalo(String(ficha.intervalo ?? ""), hoy);
+    const destino = INTERVALOS_FECHAS[campo];
+    if (!destino) return ficha;
+    const fechas = fechasIntervalo(String(ficha[campo] ?? ""), hoy);
     if (!fechas) return ficha;
-    return { ...ficha, fecha_desde: fechas[0], fecha_hasta: fechas[1] };
+    return { ...ficha, [destino[0]]: fechas[0], [destino[1]]: fechas[1] };
 };
+
+export const MODOS_POR_DEFECTO: ModoCalculo[] = [
+    { modo: "detalle", etiqueta: "Calcular detalle" },
+    { modo: "resumen", etiqueta: "Calcular resumen" },
+];

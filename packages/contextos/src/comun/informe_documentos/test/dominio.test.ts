@@ -8,6 +8,7 @@ import {
     fichaDesdeApi,
     fichaNueva,
     metaFichaInforme,
+    MODOS_POR_DEFECTO,
     nombreFicheroInforme,
     textoCelda,
 } from "../dominio.ts";
@@ -149,5 +150,19 @@ describe("resultado", () => {
         expect(nombreFicheroInforme(pestaña, { descripcion: "Ventas Año" }, "detalle")).toBe(
             "prueba-detalle-ventas-ano.pdf"
         );
+    });
+});
+
+describe("piezas de compras", () => {
+    test("el intervalo de entrada rellena las fechas de entrada", () => {
+        const ficha = { ...fichaNueva(pestaña), intervalo_entrada: "000001" };
+        expect(conIntervalo(ficha, "intervalo_entrada", new Date(2026, 1, 10))).toMatchObject({
+            fecha_entrada_desde: "2026-02-10",
+            fecha_entrada_hasta: "2026-02-10",
+        });
+    });
+
+    test("modos por defecto: detalle y resumen", () => {
+        expect(MODOS_POR_DEFECTO.map((m) => m.modo)).toEqual(["detalle", "resumen"]);
     });
 });
