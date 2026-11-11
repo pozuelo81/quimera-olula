@@ -13,7 +13,7 @@ import { getMaquina } from "./maquina.ts";
 
 /** Ejercicios contables (Eneboo masterejercicios + co_cerrarejer). La misma
  * pantalla es Fiscalidad > Ejercicios fiscales (ejercicios.ui de facturación). */
-export const MaestroConDetalleEjercicio = ({ titulo = "Ejercicios" }: { titulo?: string } = {}) => {
+export const MaestroConDetalleEjercicio = ({ titulo = "Apertura y Cierre de Ejercicio" }: { titulo?: string } = {}) => {
 
     const criteriaInicial = useMemo(criteriaEjerciciosDefecto, []);
 
