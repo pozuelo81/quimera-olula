@@ -123,6 +123,10 @@ describe("AsientoDeDocumento — el asiento de una factura", () => {
         expect(campo("tipoDocumento")).toBeNull();
         expect(campo("documento")).toBeNull();
         expect(campo("concepto")).toBeNull();
+        // Sin título «Partidas» y siempre en tabla, sin el cambio tabla/tarjetas.
+        expect(screen.queryByText("Partidas")).toBeNull();
+        expect(document.querySelector(".PartidasAsientoLista table")).not.toBeNull();
+        expect(screen.queryByText("Tarjetas")).toBeNull();
     });
 
     test("con título lo pinta con el número y la fecha del asiento", async () => {

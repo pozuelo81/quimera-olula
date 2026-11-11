@@ -29,13 +29,21 @@ const metaTablaPartida: MetaTabla<PartidaAsiento> = [
 // memoria: no hay consulta que lanzar al servidor.
 const criteriaPartidasDefecto: Criteria = { ...criteriaDefecto };
 
-export const PartidasAsientoLista = ({ partidas }: { partidas: PartidaAsiento[] }) => {
+/** `simple`: sin el título «Partidas» y siempre en tabla, sin el cambio
+ * tabla/tarjetas (pestaña Contabilidad de las facturas). */
+export const PartidasAsientoLista = ({
+    partidas,
+    simple = false,
+}: {
+    partidas: PartidaAsiento[];
+    simple?: boolean;
+}) => {
     const esMovil = useEsMovil();
     const descuadre = descuadrePartidas(partidas);
 
     return (
         <div className="PartidasAsientoLista">
-            <h3>Partidas</h3>
+            {!simple && <h3>Partidas</h3>}
             <ListadoSemiControlado
                 metaTabla={metaTablaPartida}
                 entidades={partidas}
@@ -43,7 +51,8 @@ export const PartidasAsientoLista = ({ partidas }: { partidas: PartidaAsiento[] 
                 seleccionada={null}
                 onSeleccion={() => {}}
                 criteriaInicial={criteriaPartidasDefecto}
-                modoInicial={esMovil ? "tarjetas" : "tabla"}
+                modoInicial={simple || !esMovil ? "tabla" : "tarjetas"}
+                modosDisponibles={simple ? ["tabla"] : undefined}
                 onCriteriaChanged={(_: Criteria) => null}
             />
             <div className="totales-asiento">

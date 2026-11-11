@@ -16,7 +16,9 @@ interface AsientoDeDocumentoProps {
     asientoId: string | null;
     conCabecera?: boolean;
     titulo?: string;
-    /** Quita de la cabecera tipo de documento, documento y concepto (facturas). */
+    /** Pestaña Contabilidad de una factura: quita de la cabecera tipo de
+     * documento, documento y concepto, y las partidas van sin título y siempre
+     * en tabla. */
     sinDatosDocumento?: boolean;
 }
 
@@ -61,7 +63,7 @@ export const AsientoDeDocumento = ({
                 </h3>
             )}
             {conCabecera && <CabeceraAsiento asiento={asiento} sinDatosDocumento={sinDatosDocumento} />}
-            <PartidasAsientoLista partidas={asiento.partidas} />
+            <PartidasAsientoLista partidas={asiento.partidas} simple={sinDatosDocumento} />
         </div>
     );
 };
