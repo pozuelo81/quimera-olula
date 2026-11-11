@@ -140,6 +140,7 @@ const iconos: Record<string, Icon> = {
   menu_rrhh: IconIdBadge2,
   menu_empresa: IconBuilding,
   menu_administracion: IconShieldCheck,
+  menu_tablas_generales: IconTable,
   menu_grupo: IconFolder,
   estrella_rellena: IconStarFilled,
   reloj: IconClock,

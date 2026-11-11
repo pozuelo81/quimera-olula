@@ -1,4 +1,9 @@
 export const menuComun = {
+    // Tablas generales de Eneboo (facturacion/principal). El menú solo tiene
+    // área > grupo > pantalla, así que «Tablas generales» es un grupo del área
+    // Organización y cada tabla una pantalla suya ("Tablas generales/Países").
+    // Sin pantallas visibles el grupo no se pinta.
+    "Tablas generales": { icono: "menu_tablas_generales", area: "Organización" },
     "Dashboards": { icono: "grafico_barras", url: "/comun/dashboard", area: "Sistema" },
     "Asistente IA": { icono: "asistente", area: "Sistema" },
     "Asistente IA/Chat": { url: "/comun/asistente" },
