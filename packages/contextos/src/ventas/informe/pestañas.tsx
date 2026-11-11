@@ -16,6 +16,13 @@ const TODOS_SI_NO = opciones(["Todos", "Sí", "No"]);
 
 const texto = (id: string, label: string): CampoInforme => ({ id, label, tipo: "texto" });
 
+const casilla = (id: string, label: string, activo?: CampoInforme["activo"]): CampoInforme => ({
+    id,
+    label,
+    tipo: "casilla",
+    activo,
+});
+
 const combo = (id: string, label: string, valores: CampoInforme["opciones"]): CampoInforme => ({
     id,
     label,
@@ -63,4 +70,22 @@ export const PRESUPUESTOS: PestañaInforme = {
     inicial: { ...INICIAL_COMUN, pte_aprobar: "Todos" },
 };
 
-export const PESTAÑAS_VENTAS: PestañaInforme[] = [PRESUPUESTOS];
+export const PEDIDOS: PestañaInforme = {
+    clave: "pedidos",
+    titulo: "Pedidos",
+    url: "/ventas/informe/pedidos",
+    regla: "ventas.pedido.leer",
+    filas: [
+        ...filasComunes("pedido"),
+        [
+            combo("servido", "Servido", opciones(["Todos", "Pendiente", "Sí", "No", "Parcial"])),
+            texto("serie_id", "Serie"),
+            texto("referencia", "Referencia"),
+        ],
+        [casilla("mostrar_lineas", "Mostrar líneas"), casilla("solo_pendientes", "Sólo pendientes")],
+        ...filasOrden("Pedidos"),
+    ],
+    inicial: { ...INICIAL_COMUN, servido: "Todos", mostrar_lineas: false, solo_pendientes: false },
+};
+
+export const PESTAÑAS_VENTAS: PestañaInforme[] = [PRESUPUESTOS, PEDIDOS];
