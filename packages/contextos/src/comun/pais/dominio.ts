@@ -32,7 +32,7 @@ const campos = {
     codigoIsoAlpha2: { requerido: false, maximo: 3 },
     codigoIsoAlpha3: { requerido: false, maximo: 3 },
     enUe: { tipo: "checkbox" as const },
-    zonaId: { requerido: false, maximo: 100 },
+    zonaId: { requerido: false, tipo: "selector" as const },
     zonaSepa: { tipo: "checkbox" as const },
     validarProvincias: { tipo: "checkbox" as const },
     exigirValidacion: { tipo: "checkbox" as const, validacion: validarExigir },

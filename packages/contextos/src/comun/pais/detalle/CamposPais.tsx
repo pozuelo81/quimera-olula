@@ -1,3 +1,4 @@
+import { ZonaGeograficaSelect } from "#/comun/zona_geografica/componentes/ZonaGeograficaSelect.tsx";
 import { QCheckbox } from "@olula/componentes/atomos/qcheckbox.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QTextArea } from "@olula/componentes/atomos/qtextarea.tsx";
@@ -12,7 +13,7 @@ export const CamposPais = ({ uiProps }: { uiProps: UiProps }) => (
         <QInput label="Código I.S.O." {...uiProps("codiso")} />
         <QInput label="Código I.S.O. Alpha 2" {...uiProps("codigoIsoAlpha2")} />
         <QInput label="Código I.S.O. Alpha 3" {...uiProps("codigoIsoAlpha3")} />
-        <QInput label="Zona geográfica" {...uiProps("zonaId")} />
+        <ZonaGeograficaSelect label="Zona geográfica" {...uiProps("zonaId")} />
         <QCheckbox label="Exigir validación de provincias" {...uiProps("validarProvincias")} />
         <QCheckbox label="Pertenece a zona SEPA" {...uiProps("zonaSepa")} />
         <QCheckbox label="Pertenece a U.E." {...uiProps("enUe")} />

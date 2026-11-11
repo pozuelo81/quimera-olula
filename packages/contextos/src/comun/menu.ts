@@ -6,6 +6,7 @@ export const menuComun = {
     "Tablas generales": { icono: "menu_tablas_generales", area: "Organización" },
     "Tablas generales/Países": { alias: ["país", "ISO", "U.E."], url: "/comun/pais", regla: "comun.pais" },
     "Tablas generales/Provincias": { alias: ["provincia"], url: "/comun/provincia", regla: "comun.provincia" },
+    "Tablas generales/Zonas geográficas": { alias: ["zona"], url: "/comun/zona_geografica", regla: "comun.zona_geografica" },
     "Dashboards": { icono: "grafico_barras", url: "/comun/dashboard", area: "Sistema" },
     "Asistente IA": { icono: "asistente", area: "Sistema" },
     "Asistente IA/Chat": { url: "/comun/asistente" },
