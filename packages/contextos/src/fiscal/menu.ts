@@ -5,4 +5,5 @@
 export const menuFiscal = {
     Fiscalidad: { icono: "menu_fiscalidad", area: "Comercial" },
     "Fiscalidad/Ejercicios fiscales": { url: "/fiscal/ejercicio", regla: "contabilidad.asiento" },
+    "Fiscalidad/Series": { url: "/fiscal/serie", regla: "comun.serie" },
 };
