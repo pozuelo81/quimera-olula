@@ -5,6 +5,10 @@ import { PaginaDashboards } from "./dashboard/vistas/PaginaDashboards.tsx";
 import { MaestroConDetalleCredencialExterna } from "./credencial_externa/maestro/MaestroConDetalleCredencialExterna.tsx";
 import { MaestroConDetalleIaFlujo } from "./ia_flujo/maestro/MaestroConDetalleIaFlujo.tsx";
 import { MaestroConDetalleIaMemoria } from "./ia_memoria/maestro/MaestroConDetalleIaMemoria.tsx";
+import { MaestroConDetallePais } from "./pais/maestro/MaestroConDetallePais.tsx";
+import { MaestroConDetalleProvincia } from "./provincia/maestro/MaestroConDetalleProvincia.tsx";
+import { MaestroConDetalleZonaGeografica } from "./zona_geografica/maestro/MaestroConDetalleZonaGeografica.tsx";
+import { MaestroConDetalleDivisa } from "./divisa/maestro/MaestroConDetalleDivisa.tsx";
 import { MaestroConDetalleIaTareaProgramada } from "./tarea_programada_ia/maestro/MaestroConDetalleIaTareaProgramada.tsx";
 
 export class RouterFactoryComunOlula {
@@ -20,6 +24,10 @@ export class RouterFactoryComunOlula {
         "comun/ia-tarea-programada/:id": MaestroConDetalleIaTareaProgramada,
         "comun/credencial-externa": MaestroConDetalleCredencialExterna,
         "comun/credencial-externa/:id": MaestroConDetalleCredencialExterna,
+        "comun/pais": MaestroConDetallePais,
+        "comun/provincia": MaestroConDetalleProvincia,
+        "comun/zona_geografica": MaestroConDetalleZonaGeografica,
+        "comun/divisa": MaestroConDetalleDivisa,
         "comun/dashboard": PaginaDashboards,
         "comun/dashboard/:id": PaginaDashboard,
         "dashboard/:clave": PaginaDashboardModulo,
