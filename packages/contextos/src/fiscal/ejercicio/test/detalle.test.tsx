@@ -48,4 +48,11 @@ describe("edición de ejercicio fiscal (B4a)", () => {
         expect(screen.getByRole("button", { name: "Quitar serie" })).toBeInTheDocument();
         expect(screen.getByRole("button", { name: "Copiar series" })).toBeInTheDocument();
     });
+
+    test("pestaña Series con «Secuencias por serie» (B4b)", async () => {
+        pintar();
+        await screen.findByText("SERIE A");
+        expect(screen.getAllByText("Series").length).toBeGreaterThan(0);
+        expect(screen.getByRole("button", { name: "Secuencias por serie" })).toBeInTheDocument();
+    });
 });

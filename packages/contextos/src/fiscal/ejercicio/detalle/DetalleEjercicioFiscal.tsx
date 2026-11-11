@@ -4,7 +4,9 @@ import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
 import { QuimeraAcciones } from "@olula/componentes/moleculas/qacciones.tsx";
 import { puede } from "@olula/lib/dominio.ts";
 import { preferencias } from "@olula/lib/preferencias.ts";
-import { useEffect } from "react";
+import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
+import { Tab, Tabs } from "@olula/componentes/detalle/tabs/Tabs.tsx";
+import { useEffect, useState } from "react";
 import { ejercicioActual, PREFERENCIA_EJERCICIO_ACTUAL } from "#/contabilidad/asiento/dominio.ts";
 import { FilaFormulario } from "#/contabilidad/comun/componentes/FilaFormulario.tsx";
 import { AsientosEjercicio } from "#/contabilidad/ejercicio/asientos/AsientosEjercicio.tsx";
@@ -14,6 +16,7 @@ import { getMaquina } from "#/contabilidad/ejercicio/detalle/maquina.ts";
 import { etiquetaEjercicio, puedeGenerarPgc } from "#/contabilidad/ejercicio/dominio.ts";
 import { GenerarPgcEjercicio } from "#/contabilidad/ejercicio/generar_pgc/GenerarPgcEjercicio.tsx";
 import { patchEjercicioActual } from "#/contabilidad/ejercicio/infraestructura.ts";
+import { SecuenciasSerie } from "../secuencias/SecuenciasSerie.tsx";
 import { SeriesEjercicio } from "../series/SeriesEjercicio.tsx";
 import { DatosEjercicio } from "./DatosEjercicio.tsx";
 
@@ -27,6 +30,7 @@ export const DetalleEjercicioFiscal = ({
 }: PropsDetalleEjercicio) => {
     const { ctx, emitir } = useMaquina(getMaquina, contextoDetalleEjercicioInicial, publicar);
     const { estado, ejercicio } = ctx;
+    const [serieSecuencias, setSerieSecuencias] = useState("");
 
     useEffect(() => {
         emitir("ejercicio_id_cambiada", id, true);
@@ -85,12 +89,25 @@ export const DetalleEjercicioFiscal = ({
                         {campo("Plan contable", "tienePgc", ejercicio.tienePgc ? `PGC ${ejercicio.planContable || "08"}` : "Sin plan contable")}
                     </FilaFormulario>
                 </quimera-formulario>
-                <h3>Series</h3>
-                <SeriesEjercicio ejercicio={ejercicio} ejercicios={ejercicios} editable={autorizado} />
+                <Tabs children={[
+                    <Tab key="series" label="Series">
+                        <SeriesEjercicio ejercicio={ejercicio} ejercicios={ejercicios} editable={autorizado}
+                            accionesSerie={(serie) => (
+                                <QBoton variante="borde" deshabilitado={!serie}
+                                    onClick={() => serie && setSerieSecuencias(serie.serieId)}>
+                                    Secuencias por serie
+                                </QBoton>
+                            )} />
+                    </Tab>,
+                ]} />
                 <h3>Asientos</h3>
                 <AsientosEjercicio ejercicio={ejercicio} />
             </div>
 
+            {serieSecuencias && (
+                <SecuenciasSerie ejercicioId={ejercicio.id} serieId={serieSecuencias}
+                    editable={autorizado} onCerrar={() => setSerieSecuencias("")} />
+            )}
             {estado === "GENERANDO_PGC" && (
                 <GenerarPgcEjercicio ejercicio={ejercicio} ejercicios={ejercicios} publicar={emitir} />
             )}
