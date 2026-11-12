@@ -29,8 +29,9 @@ const metaTablaPartida: MetaTabla<PartidaAsiento> = [
 // memoria: no hay consulta que lanzar al servidor.
 const criteriaPartidasDefecto: Criteria = { ...criteriaDefecto };
 
-/** `simple`: sin el título «Partidas» y siempre en tabla, sin el cambio
- * tabla/tarjetas (pestaña Contabilidad de las facturas). */
+/** `simple`: sin el título «Partidas», siempre en tabla (sin el cambio
+ * tabla/tarjetas) y sin el recuadro de totales Debe/Haber (pestaña
+ * Contabilidad de las facturas). */
 export const PartidasAsientoLista = ({
     partidas,
     simple = false,
@@ -55,22 +56,24 @@ export const PartidasAsientoLista = ({
                 modosDisponibles={simple ? ["tabla"] : undefined}
                 onCriteriaChanged={(_: Criteria) => null}
             />
-            <div className="totales-asiento">
-                <div className="totales-asiento-item">
-                    <label>Debe:</label>
-                    <span>{formatearMoneda(totalDebe(partidas), "EUR")}</span>
-                </div>
-                <div className="totales-asiento-item">
-                    <label>Haber:</label>
-                    <span>{formatearMoneda(totalHaber(partidas), "EUR")}</span>
-                </div>
-                {Math.abs(descuadre) >= 0.005 && (
-                    <div className="totales-asiento-item totales-asiento-item--descuadre">
-                        <label>Descuadre:</label>
-                        <span>{formatearMoneda(descuadre, "EUR")}</span>
+            {!simple && (
+                <div className="totales-asiento">
+                    <div className="totales-asiento-item">
+                        <label>Debe:</label>
+                        <span>{formatearMoneda(totalDebe(partidas), "EUR")}</span>
                     </div>
-                )}
-            </div>
+                    <div className="totales-asiento-item">
+                        <label>Haber:</label>
+                        <span>{formatearMoneda(totalHaber(partidas), "EUR")}</span>
+                    </div>
+                    {Math.abs(descuadre) >= 0.005 && (
+                        <div className="totales-asiento-item totales-asiento-item--descuadre">
+                            <label>Descuadre:</label>
+                            <span>{formatearMoneda(descuadre, "EUR")}</span>
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 };

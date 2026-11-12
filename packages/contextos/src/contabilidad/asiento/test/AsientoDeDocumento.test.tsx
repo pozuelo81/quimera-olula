@@ -127,6 +127,8 @@ describe("AsientoDeDocumento — el asiento de una factura", () => {
         expect(screen.queryByText("Partidas")).toBeNull();
         expect(document.querySelector(".PartidasAsientoLista table")).not.toBeNull();
         expect(screen.queryByText("Tarjetas")).toBeNull();
+        // Ni el recuadro de totales Debe/Haber.
+        expect(document.querySelector(".totales-asiento")).toBeNull();
     });
 
     test("con título lo pinta con el número y la fecha del asiento", async () => {
