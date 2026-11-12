@@ -3,7 +3,7 @@ import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
 import { MetaTabla } from "@olula/componentes/index.js";
 import { Listado } from "@olula/componentes/maestro/Listado.js";
 import { MaestroDetalle } from "@olula/componentes/maestro/MaestroDetalle.tsx";
-import { MetaFiltro } from "@olula/componentes/maestro/maestroFiltros/MaestroFiltrosActivoControlado.js";
+import { filtroFechas, MetaFiltro } from "@olula/componentes/maestro/maestroFiltros/MaestroFiltrosActivoControlado.js";
 import { criteriaDefecto } from "@olula/lib/dominio.js";
 import { listaActivaEntidadesInicial } from "@olula/lib/ListaActivaEntidades.js";
 import { getUrlParams, useUrlParams } from "@olula/lib/url-params.js";
@@ -11,7 +11,6 @@ import { useEffect } from "react";
 import { DetalleEventoCola } from "../detalle/DetalleEventoCola.tsx";
 import { EventoCola } from "../diseño.ts";
 import { ESTADOS_EVENTO_COLA, formatearMarcaTiempo, varianteEstadoEvento } from "../dominio.ts";
-import "./MaestroConDetalleEventoCola.css";
 import { getMaquina } from "./maquina.ts";
 
 // Columnas del escritorio (flmastercolas.qs, ordenarColumnas).
@@ -42,16 +41,16 @@ const metaFiltro: MetaFiltro = {
     },
     tipo: { id: "tipo", label: "Tipo de evento", tipo: "texto", filtro: (v) => (v ? ["tipo", "~", v as string] : null) },
     cola_id: { id: "cola_id", label: "Cola", tipo: "texto", filtro: (v) => (v ? ["cola_id", "~", v as string] : null) },
+    // Por día (el servidor compara la parte de fecha de cada marca de tiempo).
+    ...Object.fromEntries(([
+        ["fecha_creacion", "Fecha creación"],
+        ["fecha_programada", "Fecha programada"],
+        ["fecha_inicio", "Fecha inicio"],
+        ["fecha_fin", "Fecha fin"],
+    ] as const).map(([id, label]) => [id, {
+        id, label, tipo: "intervalo_fechas" as const, filtro: (v: unknown) => filtroFechas(id, v),
+    }])),
 };
-
-const TarjetaEventoCola = (evento: EventoCola) => (
-    <div className="tarjeta-evento-cola">
-        <div className="tarjeta-evento-cola-tipo">{evento.tipo}</div>
-        <QEtiqueta variante={varianteEstadoEvento(evento.estado)}>{evento.estado}</QEtiqueta>
-        <div className="tarjeta-evento-cola-fecha">{formatearMarcaTiempo(evento.creacion)}</div>
-        <div className="tarjeta-evento-cola-cola">{evento.colaId}</div>
-    </div>
-);
 
 /** Administración > Cola de eventos (flmastercolas.ui / flcolas.ui). */
 export const MaestroConDetalleEventoCola = () => {
@@ -82,7 +81,7 @@ export const MaestroConDetalleEventoCola = () => {
                             metaFiltro={metaFiltro}
                             criteria={eventos.criteria}
                             modoInicial="tabla"
-                            tarjeta={TarjetaEventoCola}
+                            modosDisponibles={["tabla"]}
                             entidades={eventos.lista}
                             totalEntidades={eventos.total}
                             seleccionada={eventos.activo}
