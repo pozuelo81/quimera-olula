@@ -25,15 +25,12 @@ import { DetallePresupuesto } from "#/ventas/presupuesto/detalle/DetallePresupue
 import { getPresupuestos } from "#/ventas/presupuesto/infraestructura.ts";
 import { metaTablaPresupuesto, Presupuesto } from "#/ventas/presupuesto/maestro/diseño.ts";
 import { TarjetaMaestroPresupuesto } from "#/ventas/presupuesto/maestro/TarjetaMaestroPresupuesto.tsx";
-import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QCheckbox } from "@olula/componentes/atomos/qcheckbox.tsx";
 import { Tab, Tabs } from "@olula/componentes/detalle/tabs/Tabs.tsx";
 import { MetaTabla } from "@olula/componentes/index.js";
 import { ClausulaFiltro, Criteria, Entidad } from "@olula/lib/diseño.ts";
 import { puede } from "@olula/lib/dominio.ts";
 import { useState } from "react";
-import { useNavigate } from "react-router";
-import { documentos } from "./documentos.ts";
 
 
 /** El cliente ya es el de la ficha: sus columnas sobran. */
@@ -156,7 +153,6 @@ const RecibosCliente = ({ clienteId }: { clienteId: string }) => {
  * pulsarla; el orden es fecha y código descendentes.
  */
 export const TabDocumentos = ({ clienteId }: { clienteId: string }) => {
-  const navigate = useNavigate();
   const orden = ordenDocumentos();
 
   const pestañas = [
@@ -195,23 +191,6 @@ export const TabDocumentos = ({ clienteId }: { clienteId: string }) => {
 
   return (
     <div className="detalle-cliente-tab-contenido">
-      <div className="botones">
-        {documentos
-          .filter((documento) => puede(documento.regla))
-          .map((documento) => (
-            <QBoton
-              key={documento.url}
-              variante="borde"
-              onClick={() =>
-                navigate(
-                  `${documento.url}?cliente_id==__${encodeURIComponent(clienteId)}`
-                )
-              }
-            >
-              {documento.texto}
-            </QBoton>
-          ))}
-      </div>
       <Tabs children={pestañas} />
     </div>
   );

@@ -1,4 +1,4 @@
-/** Documentos del cliente: botones a sus pantallas y reglas para ver la pestaña. */
+/** Documentos del cliente: la pestaña se ve si hay permiso para alguno. */
 export const documentos = [
     {
         texto: "Presupuestos",
