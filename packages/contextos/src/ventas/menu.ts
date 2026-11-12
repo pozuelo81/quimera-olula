@@ -21,6 +21,8 @@ export const menuVentas = {
     "Ventas/Informes": {
         alias: ["resumen de presupuestos", "resumen de pedidos", "resumen de albaranes", "resumen de facturas", "acumulado de ventas"],
         url: "/ventas/informe",
+        // Las reglas de los documentos de cada pestaña (REGLAS_INFORMES_VENTAS).
+        regla: ["ventas.presupuesto", "ventas.pedido", "ventas.albaran", "ventas.factura"],
     },
     "Ventas/Configuración": { alias: ["borrador", "copia de correos", "observaciones del cliente"], url: "/ventas/config", regla: "ventas.config" },
 };

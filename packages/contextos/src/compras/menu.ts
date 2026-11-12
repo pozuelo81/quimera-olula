@@ -9,6 +9,8 @@ export const menuCompras = {
     "Compras/Informes": {
         alias: ["resumen de pedidos de proveedor", "resumen de albaranes de proveedor", "resumen de facturas de proveedor", "acumulado de compras"],
         url: "/compras/informe",
+        // Las reglas de los documentos de cada pestaña (REGLAS_INFORMES_COMPRAS).
+        regla: ["compras.pedido", "compras.albaran", "compras.factura"],
     },
     "Compras/Configuración": { alias: ["artículos de proveedor"], url: "/compras/config", regla: "compras.config" },
 };
