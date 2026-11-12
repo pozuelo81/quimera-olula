@@ -38,7 +38,7 @@ export const MaestroConDetalleCliente = () => {
               metaTabla={metaTablaCliente}
               metaFiltro={metaFiltroCliente}
               tarjeta={TarjetaCliente}
-              modoInicial="tarjetas"
+              modoInicial="tabla"
               criteria={ctx.clientes.criteria}
               entidades={ctx.clientes.lista}
               totalEntidades={ctx.clientes.total}
