@@ -3,12 +3,14 @@ import { Login } from './login/vistas/Login.tsx';
 import { ResetPassword } from './login/vistas/ResetPassword.tsx';
 import { VerificarEnlaceMagicoPasskey } from './passkey/vistas/VerificarEnlaceMagicoPasskey.tsx';
 import { Logout } from './usuario/logout/Logout.tsx';
+import { MaestroConDetalleEventoCola } from "./evento_cola/maestro/MaestroConDetalleEventoCola.tsx";
 import { MaestroConDetalleUsuario } from "./usuario/maestro/MaestroConDetalleUsuario.tsx";
 import Perfil from './usuario/perfil/Perfil.tsx';
 
 export const routerAuth = {
     "auth/usuario": MaestroConDetalleUsuario,
     "auth/grupo": MaestroConDetalleGruposReglas,
+    "auth/evento_cola": MaestroConDetalleEventoCola,
     "login": Login,
     "logout": Logout,
     "usuario/perfil": Perfil,
