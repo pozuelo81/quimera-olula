@@ -157,6 +157,16 @@
         }
     }
 
+    /* Importes (CampoImporte, campo de texto para admitir coma decimal):
+       alineados a la derecha como los numéricos. */
+    :is(quimera-input[nombre^="debe-"], quimera-input[nombre^="haber-"],
+        quimera-input[nombre^="debeme-"], quimera-input[nombre^="haberme-"],
+        quimera-input[nombre^="tasa-"], quimera-input[nombre^="base-"],
+        quimera-input[nombre^="ivapct-"]) input {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+    }
+
     /* ── Pie: añadir partida y totales ────────────────────────────────────── */
 
     .EditorPartidasManual-pie {

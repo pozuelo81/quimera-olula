@@ -6,6 +6,7 @@ import {
     cambiarTasa,
     divisaParaNuevaPartida,
     esDivisaExtranjera,
+    textoAImporte,
 } from "../divisa_partida.ts";
 import { partidaManualVacia } from "../dominio.ts";
 
@@ -45,5 +46,15 @@ describe("Partidas en divisa (co_partidas.qs)", () => {
         // Aunque la última partida no se haya tocado: manda la última en que se eligió.
         expect(divisaParaNuevaPartida([usd, partidaManualVacia()])).toEqual({ divisaId: "USD", tasaConversion: 0.92 });
         expect(divisaParaNuevaPartida([partidaManualVacia()])).toEqual({});
+    });
+
+    it("los importes admiten coma o punto decimal", () => {
+        expect(textoAImporte("12,75")).toBe(12.75);
+        expect(textoAImporte("100.25")).toBe(100.25);
+        expect(textoAImporte("1.234,5")).toBe(1234.5);
+        expect(textoAImporte("84,")).toBe(84);
+        expect(textoAImporte("")).toBe(0);
+        expect(textoAImporte("-")).toBeNull();
+        expect(textoAImporte("abc")).toBeNull();
     });
 });

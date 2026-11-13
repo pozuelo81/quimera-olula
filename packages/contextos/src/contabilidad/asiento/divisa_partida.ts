@@ -64,3 +64,14 @@ export const divisaParaNuevaPartida = (
         ? { divisaId: ultima.divisaId, tasaConversion: ultima.tasaConversion ?? 1 }
         : {};
 };
+
+/** Texto de un importe a número: admite coma o punto decimal; vacío es 0 y lo
+ * que aún no es un número completo («-», «,») da null. */
+export const textoAImporte = (texto: string): number | null => {
+    const limpio = texto.trim().replace(/\s/g, "");
+    if (limpio === "") return 0;
+    const normalizado = limpio.includes(",") ? limpio.replace(/\./g, "").replace(",", ".") : limpio;
+    if (!/^-?\d*\.?\d*$/.test(normalizado) || normalizado === "-" || normalizado === ".") return null;
+    const n = Number(normalizado);
+    return Number.isFinite(n) ? n : null;
+};

@@ -22,6 +22,7 @@ import {
     divisaParaNuevaPartida,
     esDivisaExtranjera,
 } from "../../divisa_partida.ts";
+import { CampoImporte } from "./CampoImporte.tsx";
 import "./EditorPartidasManual.css";
 import { useDivisasPartidas } from "./useDivisasPartidas.ts";
 
@@ -133,28 +134,10 @@ export const EditorPartidasManual = ({
                                 />
                             </td>
                             <td>
-                                <QInput
-                                    label=""
-                                    nombre={`debe-${i}`}
-                                    tipo="decimal"
-                                    valor={String(p.debe)}
-                                    deshabilitado={extranjera}
-                                    onChange={(v) =>
-                                        actualizar(i, "debe", Number(v) || 0)
-                                    }
-                                />
+                                <CampoImporte nombre={`debe-${i}`} valor={p.debe} deshabilitado={extranjera} onChange={(v) => actualizar(i, "debe", v)} />
                             </td>
                             <td>
-                                <QInput
-                                    label=""
-                                    nombre={`haber-${i}`}
-                                    tipo="decimal"
-                                    valor={String(p.haber)}
-                                    deshabilitado={extranjera}
-                                    onChange={(v) =>
-                                        actualizar(i, "haber", Number(v) || 0)
-                                    }
-                                />
+                                <CampoImporte nombre={`haber-${i}`} valor={p.haber} deshabilitado={extranjera} onChange={(v) => actualizar(i, "haber", v)} />
                             </td>
                             <td>
                                 <QSelect
@@ -171,16 +154,7 @@ export const EditorPartidasManual = ({
                                 />
                             </td>
                             <td>
-                                <QInput
-                                    label=""
-                                    nombre={`tasa-${i}`}
-                                    tipo="decimal"
-                                    valor={String(p.tasaConversion ?? 1)}
-                                    deshabilitado={!extranjera}
-                                    onChange={(v) =>
-                                        transformar(i, (q) => cambiarTasa(q, Number(v) || 0))
-                                    }
-                                />
+                                <CampoImporte nombre={`tasa-${i}`} valor={p.tasaConversion ?? 1} deshabilitado={!extranjera} onChange={(v) => transformar(i, (q) => cambiarTasa(q, v))} />
                             </td>
                             <td>
                                 <QInput
@@ -214,32 +188,16 @@ export const EditorPartidasManual = ({
                             <tr className="EditorPartidasManual-filaIva">
                                 <td colSpan={8}>
                                     <div className="EditorPartidasManual-ivaCampos">
-                                        <QInput
-                                            label="Base imponible"
-                                            nombre={`base-${i}`}
-                                            tipo="decimal"
-                                            valor={String(p.baseImponible ?? 0)}
-                                            onChange={(v) =>
-                                                actualizar(
+                                        <CampoImporte label="Base imponible" nombre={`base-${i}`} valor={p.baseImponible ?? 0} onChange={(v) => actualizar(
                                                     i,
                                                     "baseImponible",
-                                                    Number(v) || 0
-                                                )
-                                            }
-                                        />
-                                        <QInput
-                                            label="% IVA"
-                                            nombre={`ivapct-${i}`}
-                                            tipo="decimal"
-                                            valor={String(p.ivaPct ?? 21)}
-                                            onChange={(v) =>
-                                                actualizar(
+                                                    v
+                                                )} />
+                                        <CampoImporte label="% IVA" nombre={`ivapct-${i}`} valor={p.ivaPct ?? 21} onChange={(v) => actualizar(
                                                     i,
                                                     "ivaPct",
-                                                    Number(v) || 0
-                                                )
-                                            }
-                                        />
+                                                    v
+                                                )} />
                                         <QInput
                                             label="Casilla 303"
                                             nombre={`casilla-${i}`}
@@ -306,24 +264,8 @@ export const EditorPartidasManual = ({
                             <tr className="EditorPartidasManual-filaDivisa">
                                 <td colSpan={8}>
                                     <div className="EditorPartidasManual-ivaCampos">
-                                        <QInput
-                                            label="Debe Moneda Extranjera"
-                                            nombre={`debeme-${i}`}
-                                            tipo="decimal"
-                                            valor={String(p.debeMe ?? 0)}
-                                            onChange={(v) =>
-                                                transformar(i, (q) => cambiarDebeMe(q, Number(v) || 0))
-                                            }
-                                        />
-                                        <QInput
-                                            label="Haber Moneda Extranjera"
-                                            nombre={`haberme-${i}`}
-                                            tipo="decimal"
-                                            valor={String(p.haberMe ?? 0)}
-                                            onChange={(v) =>
-                                                transformar(i, (q) => cambiarHaberMe(q, Number(v) || 0))
-                                            }
-                                        />
+                                        <CampoImporte label="Debe Moneda Extranjera" nombre={`debeme-${i}`} valor={p.debeMe ?? 0} onChange={(v) => transformar(i, (q) => cambiarDebeMe(q, v))} />
+                                        <CampoImporte label="Haber Moneda Extranjera" nombre={`haberme-${i}`} valor={p.haberMe ?? 0} onChange={(v) => transformar(i, (q) => cambiarHaberMe(q, v))} />
                                     </div>
                                 </td>
                             </tr>
