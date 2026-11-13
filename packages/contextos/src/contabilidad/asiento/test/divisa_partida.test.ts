@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
     cambiarDebeMe,
     cambiarDivisa,
+    cambiarDivisaEnPartidas,
     cambiarHaberMe,
     cambiarTasa,
     divisaParaNuevaPartida,
@@ -56,5 +57,17 @@ describe("Partidas en divisa (co_partidas.qs)", () => {
         expect(textoAImporte("")).toBe(0);
         expect(textoAImporte("-")).toBeNull();
         expect(textoAImporte("abc")).toBeNull();
+    });
+
+    it("al cambiar la divisa, las partidas siguientes vacías toman la misma", () => {
+        const conDatos = { ...partidaManualVacia(), subcuentaId: 7, haber: 10 };
+        const r = cambiarDivisaEnPartidas(
+            [partidaManualVacia(), partidaManualVacia(), conDatos, partidaManualVacia()], 0, "USD", "EUR", divisas);
+        expect(r.map((p) => p.divisaId)).toEqual(["USD", "USD", undefined, "USD"]);
+        expect(r[1].tasaConversion).toBe(0.92);
+        expect(r[2]).toBe(conDatos);
+        // Las anteriores no se tocan.
+        const desdeLaSegunda = cambiarDivisaEnPartidas([partidaManualVacia(), partidaManualVacia()], 1, "USD", "EUR", divisas);
+        expect(desdeLaSegunda.map((p) => p.divisaId)).toEqual([undefined, "USD"]);
     });
 });

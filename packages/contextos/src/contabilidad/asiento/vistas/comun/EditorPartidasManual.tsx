@@ -15,7 +15,7 @@ import {
 } from "../../dominio.ts";
 import {
     cambiarDebeMe,
-    cambiarDivisa,
+    cambiarDivisaEnPartidas,
     cambiarHaberMe,
     cambiarTasa,
     divisaDePartida,
@@ -147,8 +147,8 @@ export const EditorPartidasManual = ({
                                     opciones={opcionesDivisa}
                                     onChange={(opcion) =>
                                         opcion &&
-                                        transformar(i, (q) =>
-                                            cambiarDivisa(q, opcion.valor, divisaEmpresa, divisas)
+                                        onChange(
+                                            cambiarDivisaEnPartidas(partidas, i, opcion.valor, divisaEmpresa, divisas)
                                         )
                                     }
                                 />

@@ -42,6 +42,25 @@ export const cambiarDivisa = (
     };
 };
 
+/** Partida sin nada informado: ni subcuenta, ni importes, ni concepto. */
+export const partidaVacia = (p: PartidaManualInput): boolean =>
+    !p.subcuentaId && !p.debe && !p.haber && !p.debeMe && !p.haberMe && !p.concepto?.trim();
+
+/** Cambia la divisa de la partida `indice` y, con ella, la de las partidas
+ * siguientes que sigan vacías (p. ej. la segunda de las dos que trae el alta). */
+export const cambiarDivisaEnPartidas = (
+    partidas: PartidaManualInput[],
+    indice: number,
+    divisa: string,
+    divisaEmpresa: string,
+    divisas: DivisaConTasa[],
+): PartidaManualInput[] =>
+    partidas.map((p, i) =>
+        i === indice || (i > indice && partidaVacia(p))
+            ? cambiarDivisa(p, divisa, divisaEmpresa, divisas)
+            : p
+    );
+
 /** Debe en moneda extranjera: con importe, el haber se pone a cero. */
 export const cambiarDebeMe = (p: PartidaManualInput, valor: number): PartidaManualInput =>
     recalcular({ ...p, debeMe: valor, ...(valor !== 0 ? { haberMe: 0 } : {}) });
