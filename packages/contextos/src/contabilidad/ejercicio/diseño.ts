@@ -7,6 +7,8 @@ export interface Ejercicio extends Entidad {
     id: string;
     nombre: string;
     empresaId: number | null;
+    /** Divisa de la empresa del ejercicio: la de las partidas por defecto. */
+    divisaId?: string;
     fechaInicio: Date;
     fechaFin: Date;
     estado: EstadoEjercicio;

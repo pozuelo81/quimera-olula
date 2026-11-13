@@ -22,6 +22,7 @@ export interface EjercicioApi {
     id: string;
     nombre: string;
     empresa_id: number | null;
+    divisa_id?: string | null;
     fecha_inicio: string;
     fecha_fin: string;
     estado: string;
@@ -43,6 +44,7 @@ export const ejercicioDesdeApi = (api: EjercicioApi): Ejercicio => ({
     id: api.id,
     nombre: api.nombre ?? "",
     empresaId: api.empresa_id,
+    divisaId: api.divisa_id ?? undefined,
     fechaInicio: fechaDesdeApi(api.fecha_inicio),
     fechaFin: fechaDesdeApi(api.fecha_fin),
     estado: (api.estado === "CERRADO" ? "CERRADO" : "ABIERTO") as EstadoEjercicio,

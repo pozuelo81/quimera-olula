@@ -1,5 +1,6 @@
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
+import { QSelect } from "@olula/componentes/atomos/qselect.tsx";
 import {
     OpcionSubcuenta,
     SubcuentaSelector,
@@ -12,7 +13,17 @@ import {
     totalDebe,
     totalHaber,
 } from "../../dominio.ts";
+import {
+    cambiarDebeMe,
+    cambiarDivisa,
+    cambiarHaberMe,
+    cambiarTasa,
+    divisaDePartida,
+    divisaParaNuevaPartida,
+    esDivisaExtranjera,
+} from "../../divisa_partida.ts";
 import "./EditorPartidasManual.css";
+import { useDivisasPartidas } from "./useDivisasPartidas.ts";
 
 export const EditorPartidasManual = ({
     partidas,
@@ -23,6 +34,12 @@ export const EditorPartidasManual = ({
     ejercicioId: string;
     onChange: (partidas: PartidaManualInput[]) => void;
 }) => {
+    const { divisaEmpresa, divisas } = useDivisasPartidas(ejercicioId);
+    const opcionesDivisa = divisas.map((d) => ({ valor: d.id, descripcion: d.id }));
+
+    const transformar = (index: number, fn: (p: PartidaManualInput) => PartidaManualInput) =>
+        onChange(partidas.map((p, i) => (i === index ? fn(p) : p)));
+
     const actualizar = (
         index: number,
         campo: keyof PartidaManualInput,
@@ -53,7 +70,10 @@ export const EditorPartidasManual = ({
         onChange(copia);
     };
 
-    const anadir = () => onChange([...partidas, partidaManualVacia()]);
+    // La partida nueva sigue en la divisa de la anterior (co_partidas: la
+    // divisa elegida se mantiene en las partidas que se añaden después).
+    const anadir = () =>
+        onChange([...partidas, { ...partidaManualVacia(), ...divisaParaNuevaPartida(partidas) }]);
     const quitar = (index: number) => {
         if (partidas.length <= 2) return;
         onChange(partidas.filter((_, i) => i !== index));
@@ -71,6 +91,8 @@ export const EditorPartidasManual = ({
                     <col className="col-subcuenta" />
                     <col className="col-importe" />
                     <col className="col-importe" />
+                    <col className="col-divisa" />
+                    <col className="col-tasa" />
                     <col className="col-concepto" />
                     <col className="col-iva" />
                     <col className="col-acciones" />
@@ -80,12 +102,16 @@ export const EditorPartidasManual = ({
                         <th>Subcuenta</th>
                         <th>Debe</th>
                         <th>Haber</th>
+                        <th>Divisa</th>
+                        <th>Tasa conv.</th>
                         <th>Concepto</th>
                         <th>IVA</th>
                         <th />
                     </tr>
                 </thead>
-                {partidas.map((p, i) => (
+                {partidas.map((p, i) => {
+                    const extranjera = esDivisaExtranjera(p, divisaEmpresa);
+                    return (
                     // Una tbody por partida: agrupa su fila con la de IVA y deja
                     // poner la línea separadora entre partidas, no dentro de una.
                     <tbody key={i}>
@@ -112,6 +138,7 @@ export const EditorPartidasManual = ({
                                     nombre={`debe-${i}`}
                                     tipo="decimal"
                                     valor={String(p.debe)}
+                                    deshabilitado={extranjera}
                                     onChange={(v) =>
                                         actualizar(i, "debe", Number(v) || 0)
                                     }
@@ -123,8 +150,35 @@ export const EditorPartidasManual = ({
                                     nombre={`haber-${i}`}
                                     tipo="decimal"
                                     valor={String(p.haber)}
+                                    deshabilitado={extranjera}
                                     onChange={(v) =>
                                         actualizar(i, "haber", Number(v) || 0)
+                                    }
+                                />
+                            </td>
+                            <td>
+                                <QSelect
+                                    label=""
+                                    nombre={`divisa-${i}`}
+                                    valor={divisaDePartida(p, divisaEmpresa)}
+                                    opciones={opcionesDivisa}
+                                    onChange={(opcion) =>
+                                        opcion &&
+                                        transformar(i, (q) =>
+                                            cambiarDivisa(q, opcion.valor, divisaEmpresa, divisas)
+                                        )
+                                    }
+                                />
+                            </td>
+                            <td>
+                                <QInput
+                                    label=""
+                                    nombre={`tasa-${i}`}
+                                    tipo="decimal"
+                                    valor={String(p.tasaConversion ?? 1)}
+                                    deshabilitado={!extranjera}
+                                    onChange={(v) =>
+                                        transformar(i, (q) => cambiarTasa(q, Number(v) || 0))
                                     }
                                 />
                             </td>
@@ -158,7 +212,7 @@ export const EditorPartidasManual = ({
                         </tr>
                         {p.esIva && (
                             <tr className="EditorPartidasManual-filaIva">
-                                <td colSpan={6}>
+                                <td colSpan={8}>
                                     <div className="EditorPartidasManual-ivaCampos">
                                         <QInput
                                             label="Base imponible"
@@ -248,8 +302,35 @@ export const EditorPartidasManual = ({
                                 </td>
                             </tr>
                         )}
+                        {extranjera && (
+                            <tr className="EditorPartidasManual-filaDivisa">
+                                <td colSpan={8}>
+                                    <div className="EditorPartidasManual-ivaCampos">
+                                        <QInput
+                                            label="Debe Moneda Extranjera"
+                                            nombre={`debeme-${i}`}
+                                            tipo="decimal"
+                                            valor={String(p.debeMe ?? 0)}
+                                            onChange={(v) =>
+                                                transformar(i, (q) => cambiarDebeMe(q, Number(v) || 0))
+                                            }
+                                        />
+                                        <QInput
+                                            label="Haber Moneda Extranjera"
+                                            nombre={`haberme-${i}`}
+                                            tipo="decimal"
+                                            valor={String(p.haberMe ?? 0)}
+                                            onChange={(v) =>
+                                                transformar(i, (q) => cambiarHaberMe(q, Number(v) || 0))
+                                            }
+                                        />
+                                    </div>
+                                </td>
+                            </tr>
+                        )}
                     </tbody>
-                ))}
+                    );
+                })}
             </table>
             <div className="EditorPartidasManual-pie">
                 <QBoton onClick={anadir}>Añadir partida</QBoton>
